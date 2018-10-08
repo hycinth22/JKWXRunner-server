@@ -1,3 +1,6 @@
 [submodule "sunshinemotion"]
 	path = sunshinemotion
 	url = https://github.com/inkedawn/go-sunshinemotion
+[submodule "html"]
+	path = html
+	url = https://github.com/inkedawn/JKWXFuckerWebFront.git
