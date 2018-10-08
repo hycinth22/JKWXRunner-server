@@ -6,10 +6,10 @@ import (
 )
 
 type AccountLog struct {
-	AccountID uint `gorm:"INDEX:account_id"`
-	Time      time.Time
-	Type      LogType
-	Content   string
+	AccountID uint      `gorm:"INDEX:account_id" json:"accountID"`
+	Time      time.Time `json:"time"`
+	Type      LogType   `json:"type"`
+	Content   string    `json:"content"`
 }
 
 type LogType uint

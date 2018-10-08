@@ -25,6 +25,7 @@ func RunForAccount(account *model.Account) RunResult {
 				lastDistance: 0.0,
 			}
 		}
+		account.AddLog(time.Now(), model.LogTypeInfo, "登录成功: "+err.Error())
 		model.SaveSession(account.ID, s)
 	}
 	failCnt := 0

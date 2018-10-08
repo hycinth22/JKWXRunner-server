@@ -16,7 +16,7 @@ func registerTicketRoute(router gin.IRouter) {
 	router.PUT("/ticket", updateTicket)
 	router.DELETE("/ticket/:id", deleteTicket)
 
-	router.GET("/ticket/log/:id", getTicketLog)
+	router.GET("/ticket/:id/log", getTicketLog)
 }
 
 func getAllTickets(context *gin.Context) {
@@ -52,7 +52,7 @@ func newTicket(context *gin.Context) {
 	}
 	model.SaveSession(ticket.Account.ID, session)
 
-	context.JSON(http.StatusAccepted, struct{ ID uint }{ID: id})
+	context.JSON(http.StatusCreated, struct{ ID uint }{ID: id})
 }
 
 func updateTicket(context *gin.Context) {
@@ -66,7 +66,7 @@ func updateTicket(context *gin.Context) {
 		context.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	context.Status(http.StatusAccepted)
+	context.JSON(http.StatusOK, ticket)
 }
 
 func deleteTicket(context *gin.Context) {
@@ -83,7 +83,7 @@ func deleteTicket(context *gin.Context) {
 		context.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
-	context.Status(http.StatusAccepted)
+	context.Status(http.StatusOK)
 }
 
 func getTicketLog(context *gin.Context) {
