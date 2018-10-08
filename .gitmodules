@@ -1,0 +1,3 @@
+[submodule "sunshinemotion"]
+	path = sunshinemotion
+	url = https://github.com/inkedawn/go-sunshinemotion
