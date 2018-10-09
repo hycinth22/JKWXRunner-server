@@ -23,9 +23,7 @@ func main() {
 func runStaticFileServer() {
 	// static files
 	engine := gin.Default()
-	engine.Use(gin.BasicAuth(gin.Accounts{
-		"admin": "123456",
-	}))
+	engine.Use(authMiddleWare)
 	engine.Static("/", `./html`)
 	engine.Run(":80")
 }
