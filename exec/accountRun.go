@@ -27,7 +27,7 @@ func RunForAccount(account *model.Account) RunResult {
 		}
 		account.AddLog(time.Now(), model.LogTypeInfo, "登录成功: "+err.Error())
 		model.SaveSession(account.ID, s)
-		randSleep(15 * time.Second, 30 * time.Second)
+		randSleep(15*time.Second, 30*time.Second)
 	}
 	failCnt := 0
 	lastDistance := 0.0
