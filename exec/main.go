@@ -30,6 +30,7 @@ func RunOnce() {
 		result := RunForAccount(account)
 		account.LastTime, account.LastStatus, account.LastDistance = result.lastTime, result.status, result.lastDistance
 		model.UpdateAccount(account)
+		randSleep(15 * time.Second, 360 * time.Second)
 	}
 }
 
