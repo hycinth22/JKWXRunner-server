@@ -34,17 +34,19 @@ func RunForAccount(account *model.Account) model.RunResult {
 	lastDistance := 0.0
 	lastTime := time.Now()
 	records := sunshinemotion.SmartCreateRecords(account.RemoteUserID, s.LimitParams, account.Distance, time.Now())
+
+	result, err := s.GetSportResult()
+	if err == nil {
+		account.AddLog(time.Now(), model.LogTypeInfo, "上传前已跑距离"+view.DistanceFormat(result.Distance))
+		saveCachedUserInfo(account, model.CachedUserInfo{
+			TotalDistance:     result.Distance,
+			QualifiedDistance: result.Qualified,
+		})
+	} else {
+		account.AddLog(time.Now(), model.LogTypeError, "上传前获取已跑信息失败")
+	}
+
 	for i, record := range records {
-		result, err := s.GetSportResult()
-		if err == nil {
-			account.AddLog(time.Now(), model.LogTypeInfo, "第"+strconv.Itoa(i+1)+"条记录上传前已跑距离"+view.DistanceFormat(result.Distance))
-			saveCachedUserInfo(account, model.CachedUserInfo{
-				TotalDistance:     result.Distance,
-				QualifiedDistance: result.Qualified,
-			})
-		} else {
-			account.AddLog(time.Now(), model.LogTypeError, "第"+strconv.Itoa(i+1)+"条记录上传前获取已跑信息失败")
-		}
 		if !Debug {
 			err = s.UploadRecord(record)
 		} else {
@@ -56,19 +58,25 @@ func RunForAccount(account *model.Account) model.RunResult {
 		} else {
 			lastDistance += record.Distance
 			lastTime = record.EndTime
-			account.AddLog(time.Now(), model.LogTypeSuccess, "第"+strconv.Itoa(i+1)+"条记录上传成功")
+			account.AddLog(time.Now(), model.LogTypeSuccess, "第"+strconv.Itoa(i+1)+"条记录上传成功。 "+
+				"距离"+view.DistanceFormat(record.Distance)+"公里。\n"+
+				"起始时间"+view.TimeFormat(record.BeginTime)+" "+
+				"结束时间"+view.TimeFormat(record.EndTime))
 		}
-		result, err = s.GetSportResult()
-		if err == nil {
-			account.AddLog(time.Now(), model.LogTypeInfo, "第"+strconv.Itoa(i+1)+"条记录上传后已跑距离"+view.DistanceFormat(result.Distance))
-			saveCachedUserInfo(account, model.CachedUserInfo{
-				TotalDistance:     result.Distance,
-				QualifiedDistance: result.Qualified,
-			})
-		} else {
-			account.AddLog(time.Now(), model.LogTypeError, "第"+strconv.Itoa(i+1)+"条记录上传后获取已跑信息失败")
-		}
+
 	}
+
+	result, err = s.GetSportResult()
+	if err == nil {
+		account.AddLog(time.Now(), model.LogTypeInfo, "上传后已跑距离"+view.DistanceFormat(result.Distance))
+		saveCachedUserInfo(account, model.CachedUserInfo{
+			TotalDistance:     result.Distance,
+			QualifiedDistance: result.Qualified,
+		})
+	} else {
+		account.AddLog(time.Now(), model.LogTypeError, "上传后获取已跑信息失败")
+	}
+
 	var status model.Status
 	if failCnt == 0 {
 		status = model.StatusOK
