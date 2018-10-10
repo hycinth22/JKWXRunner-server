@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 	"os"
 )
 
@@ -9,8 +10,14 @@ func init() {
 	_, err := os.Stat("debug")
 	if os.IsNotExist(err) {
 		gin.SetMode(gin.ReleaseMode)
-	}else{
+	} else {
 		gin.SetMode(gin.DebugMode)
+	}
+	workDir, err := os.Getwd()
+	if err == nil {
+		log.Println("Working Directory: ", workDir)
+	} else {
+		log.Println("Get Working Directory Fail.")
 	}
 }
 

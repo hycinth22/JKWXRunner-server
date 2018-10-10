@@ -10,7 +10,6 @@ type TicketWithSingleAccount struct {
 	Account
 }
 
-
 func GetAllTickets() (tickets []*TicketWithSingleAccount, err error) {
 	simpleTickets := make([]Ticket, 0)
 	accounts := make([]Account, 0)
@@ -46,7 +45,7 @@ func GetTicketByID(ticketID uint) (ticket *TicketWithSingleAccount, err error) {
 }
 
 // add to database
-func AddTicket(ticket *TicketWithSingleAccount) (ticketID uint, err error) {
+func AddTicket(ticket *TicketWithSingleAccount, info CachedUserInfo) (ticketID uint, err error) {
 	if !db.NewRecord(&ticket.Ticket) {
 		return 0, errors.New("parameter ticket.Ticket is not a new record")
 	}
@@ -61,6 +60,7 @@ func AddTicket(ticket *TicketWithSingleAccount) (ticketID uint, err error) {
 	}
 	// create account
 	ticket.Account.TicketID = ticket.Ticket.ID
+	ticket.Account.CachedUserInfo = info
 	if err := tx.Create(&ticket.Account).Error; err != nil {
 		tx.Rollback()
 		return 0, errors.New("Add ticket.Account Fail:" + err.Error())
@@ -77,8 +77,8 @@ func DelTicketByID(ticketID uint) (err error) {
 }
 
 // del from database
-func (ticket *TicketWithSingleAccount) Del() (err error){
-	if ticket.Ticket.ID == 0{
+func (ticket *TicketWithSingleAccount) Del() (err error) {
+	if ticket.Ticket.ID == 0 {
 		return
 	}
 	tx := db.Begin()
@@ -100,7 +100,7 @@ func (ticket *TicketWithSingleAccount) Del() (err error){
 }
 
 // write to database
-func (ticket *TicketWithSingleAccount) Update()  (err error) {
+func (ticket *TicketWithSingleAccount) Update() (err error) {
 	tx := db.Begin()
 	if err := tx.Save(&ticket).Error; err != nil {
 		tx.Rollback()

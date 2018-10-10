@@ -52,4 +52,5 @@ func init() {
 	if err := db.DB().Ping(); err != nil {
 		panic(errors.New("Ping Failed. " + err.Error()))
 	}
+	db.AutoMigrate(&Account{})
 }

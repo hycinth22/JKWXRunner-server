@@ -43,7 +43,16 @@ func newTicket(context *gin.Context) {
 	}
 	ticket.Account.RemoteUserID = session.UserID
 
-	id, err := model.AddTicket(&ticket)
+	result, err := session.GetSportResult()
+	if err != nil {
+		context.Error(err)
+		context.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+	id, err := model.AddTicket(&ticket, model.CachedUserInfo{
+		TotalDistance:     result.Distance,
+		QualifiedDistance: result.Qualified,
+	})
 	if err != nil {
 		context.Error(err)
 		context.AbortWithStatus(http.StatusInternalServerError)

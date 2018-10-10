@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func RunForAccount(account *model.Account) RunResult {
+func RunForAccount(account *model.Account) model.RunResult {
 	// (status model.Status, lastTime time.Time, lastDistance float64)
 	s, err := model.GetSession(account.ID)
 	if err != nil || s.UserExpirationTime.Before(time.Now()) {
@@ -20,10 +20,10 @@ func RunForAccount(account *model.Account) RunResult {
 		err := s.Login(account.Username, "123", sunshinemotion.PasswordHash(account.Password))
 		if err != nil {
 			account.AddLog(time.Now(), model.LogTypeError, "登录失败: "+err.Error())
-			return RunResult{
-				status:       model.StatusFail,
-				lastTime:     time.Now(),
-				lastDistance: 0.0,
+			return model.RunResult{
+				LastStatus:   model.StatusFail,
+				LastTime:     time.Now(),
+				LastDistance: 0.0,
 			}
 		}
 		account.AddLog(time.Now(), model.LogTypeInfo, "登录成功: "+err.Error())
@@ -38,6 +38,10 @@ func RunForAccount(account *model.Account) RunResult {
 		result, err := s.GetSportResult()
 		if err == nil {
 			account.AddLog(time.Now(), model.LogTypeInfo, "第"+strconv.Itoa(i+1)+"条记录上传前已跑距离"+view.DistanceFormat(result.Distance))
+			saveCachedUserInfo(account, model.CachedUserInfo{
+				TotalDistance:     result.Distance,
+				QualifiedDistance: result.Qualified,
+			})
 		} else {
 			account.AddLog(time.Now(), model.LogTypeError, "第"+strconv.Itoa(i+1)+"条记录上传前获取已跑信息失败")
 		}
@@ -57,6 +61,10 @@ func RunForAccount(account *model.Account) RunResult {
 		result, err = s.GetSportResult()
 		if err == nil {
 			account.AddLog(time.Now(), model.LogTypeInfo, "第"+strconv.Itoa(i+1)+"条记录上传后已跑距离"+view.DistanceFormat(result.Distance))
+			saveCachedUserInfo(account, model.CachedUserInfo{
+				TotalDistance:     result.Distance,
+				QualifiedDistance: result.Qualified,
+			})
 		} else {
 			account.AddLog(time.Now(), model.LogTypeError, "第"+strconv.Itoa(i+1)+"条记录上传后获取已跑信息失败")
 		}
@@ -69,15 +77,19 @@ func RunForAccount(account *model.Account) RunResult {
 	} else {
 		status = model.StatusFail
 	}
-	return RunResult{
-		status:       status,
-		lastTime:     lastTime,
-		lastDistance: lastDistance,
+	return model.RunResult{
+		LastStatus:   status,
+		LastTime:     lastTime,
+		LastDistance: lastDistance,
 	}
 }
 
-type RunResult struct {
-	status       model.Status
-	lastTime     time.Time
-	lastDistance float64
+func saveRunResult(account *model.Account, result model.RunResult) error {
+	account.RunResult = result
+	return model.UpdateAccount(account)
+}
+
+func saveCachedUserInfo(account *model.Account, info model.CachedUserInfo) error {
+	account.CachedUserInfo = info
+	return model.UpdateAccount(account)
 }

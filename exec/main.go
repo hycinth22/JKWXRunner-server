@@ -2,7 +2,7 @@ package main
 
 import (
 	"../model"
-        "flag"
+	"flag"
 	"log"
 	"os"
 	"time"
@@ -13,7 +13,7 @@ var Debug bool
 func init() {
 	_, err := os.Stat("debug")
 	Debug = !os.IsNotExist(err)
-	if Debug{
+	if Debug {
 		log.Println("DEBUG MODE")
 	}
 }
@@ -29,9 +29,8 @@ func RunOnce() {
 	}
 	for _, account := range accounts {
 		result := RunForAccount(account)
-		account.LastTime, account.LastStatus, account.LastDistance = result.lastTime, result.status, result.lastDistance
-		model.UpdateAccount(account)
-		randSleep(15 * time.Second, 360 * time.Second)
+		saveRunResult(account, result)
+		randSleep(15*time.Second, 360*time.Second)
 	}
 }
 
@@ -47,17 +46,16 @@ func RunAsDaemon() {
 }
 
 func main() {
-        username := flag.String("username", "", "username for running")
-        flag.Parse()
-        if *username != "" {
-                account, err := model.GetAccountByUsername(*username)
-                if err != nil {
-                       log.Println(err.Error())
-                       return
-               }
-               result := RunForAccount(account)
-account.LastTime, account.LastStatus, account.LastDistance = result.lastTime, result.status, result.lastDistance
-              model.UpdateAccount(account)
-        }
+	username := flag.String("username", "", "username for running")
+	flag.Parse()
+	if *username != "" {
+		account, err := model.GetAccountByUsername(*username)
+		if err != nil {
+			log.Println(err.Error())
+			return
+		}
+		result := RunForAccount(account)
+		saveRunResult(account, result)
+	}
 	RunOnce()
 }

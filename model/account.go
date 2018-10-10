@@ -16,11 +16,22 @@ type Account struct {
 	Password     string  `json:"password"`
 	Distance     float64 `json:"distance"`
 
+	RunResult
+	CachedUserInfo
+}
+
+type Status uint
+
+type RunResult struct {
 	LastStatus   Status    `json:"lastStatus"`
 	LastDistance float64   `json:"lastDistance"`
 	LastTime     time.Time `json:"lastTime"`
 }
-type Status uint
+
+type CachedUserInfo struct {
+	TotalDistance     float64 `json:"totalDistance"`
+	QualifiedDistance float64 `json:"qualifiedDistance"`
+}
 
 const (
 	StatusOK Status = iota
