@@ -37,12 +37,14 @@ const (
 	StatusOK Status = iota
 	StatusPartialFail
 	StatusFail
+	StatusCompleted
 )
 
 func GetAllAccountsTodayNotRun() (accounts []*Account, err error) {
 	accounts = make([]*Account, 0)
 	now := time.Now()
-	err = db.Where("last_time < ?", time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)).Find(&accounts).Error
+	todayZero := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	err = db.Where("last_time < ? AND last_status != ?", todayZero, StatusCompleted).Find(&accounts).Error
 	return
 }
 

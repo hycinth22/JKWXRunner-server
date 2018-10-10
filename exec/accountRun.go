@@ -30,11 +30,6 @@ func RunForAccount(account *model.Account) model.RunResult {
 		model.SaveSession(account.ID, s)
 		randSleep(15*time.Second, 30*time.Second)
 	}
-	failCnt := 0
-	lastDistance := 0.0
-	lastTime := time.Now()
-	records := sunshinemotion.SmartCreateRecords(account.RemoteUserID, s.LimitParams, account.Distance, time.Now())
-
 	result, err := s.GetSportResult()
 	if err == nil {
 		account.AddLog(time.Now(), model.LogTypeInfo, "上传前已跑距离"+view.DistanceFormat(result.Distance))
@@ -45,6 +40,18 @@ func RunForAccount(account *model.Account) model.RunResult {
 	} else {
 		account.AddLog(time.Now(), model.LogTypeError, "上传前获取已跑信息失败")
 	}
+	if result.Distance > result.Qualified {
+		return model.RunResult{
+			LastStatus:   model.StatusCompleted,
+			LastTime:     time.Now(),
+			LastDistance: 0.0,
+		}
+	}
+
+	failCnt := 0
+	lastDistance := 0.0
+	lastTime := time.Now()
+	records := sunshinemotion.SmartCreateRecords(account.RemoteUserID, s.LimitParams, account.Distance, time.Now())
 
 	for i, record := range records {
 		if !Debug {
