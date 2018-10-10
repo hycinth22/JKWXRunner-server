@@ -42,7 +42,6 @@ func newTicket(context *gin.Context) {
 		return
 	}
 	ticket.Account.RemoteUserID = session.UserID
-	ticket.Account.Profile = session.UserInfo
 
 	id, err := model.AddTicket(&ticket)
 	if err != nil {

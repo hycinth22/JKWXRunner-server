@@ -1,7 +1,6 @@
 package model
 
 import (
-	sunshinemotion "../sunshinemotion"
 	"time"
 )
 
@@ -17,10 +16,9 @@ type Account struct {
 	Password     string  `json:"password"`
 	Distance     float64 `json:"distance"`
 
-	LastStatus   Status                  `json:"lastStatus"`
-	LastDistance float64                 `json:"lastDistance"`
-	LastTime     time.Time               `json:"lastTime"`
-	Profile      sunshinemotion.UserInfo `json:"profile"`
+	LastStatus   Status    `json:"lastStatus"`
+	LastDistance float64   `json:"lastDistance"`
+	LastTime     time.Time `json:"lastTime"`
 }
 type Status uint
 
