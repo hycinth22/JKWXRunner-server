@@ -43,6 +43,12 @@ func GetAllAccounts() (accounts []*Account, err error) {
 	return
 }
 
+func GetAccountByUsername(username string) (account *Account, err error) {
+	account = new(Account)
+	err = db.Where("username = ?", username).First(account).Error
+	return
+}
+
 func UpdateAccount(account *Account) (err error) {
 	db.Save(account)
 	return db.Error

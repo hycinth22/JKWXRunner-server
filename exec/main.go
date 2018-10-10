@@ -2,6 +2,7 @@ package main
 
 import (
 	"../model"
+        "flag"
 	"log"
 	"os"
 	"time"
@@ -46,5 +47,17 @@ func RunAsDaemon() {
 }
 
 func main() {
+        username := flag.String("username", "", "username for running")
+        flag.Parse()
+        if *username != "" {
+                account, err := model.GetAccountByUsername(*username)
+                if err != nil {
+                       log.Println(err.Error())
+                       return
+               }
+               result := RunForAccount(account)
+account.LastTime, account.LastStatus, account.LastDistance = result.lastTime, result.status, result.lastDistance
+              model.UpdateAccount(account)
+        }
 	RunOnce()
 }
