@@ -15,8 +15,10 @@ func TestAddTicket(t *testing.T) {
 				Username:     identity,
 				Password:     "testPassword_for_" + identity,
 				Distance:     0.111 + float64(i),
-				LastTime:     time.Now(),
-				LastStatus:   StatusOK,
+				RunResult: RunResult{
+					LastTime:   time.Now(),
+					LastStatus: StatusOK,
+				},
 			},
 			Ticket: Ticket{
 				OwnerID: 0,
@@ -24,7 +26,7 @@ func TestAddTicket(t *testing.T) {
 				Memo:    "testMemo_for_" + identity,
 			},
 		}
-		id, err := AddTicket(ticket)
+		id, err := AddTicket(ticket, CachedUserInfo{})
 		if err != nil {
 			t.Error(err)
 			t.Fail()
@@ -52,15 +54,16 @@ func TestGetTicketByID(t *testing.T) {
 			Username:     "ttttttttttttttttttttttttt" + identity,
 			Password:     "testPassword_for_" + identity,
 			Distance:     0.111,
-			LastTime:     time.Now(),
-			LastStatus:   StatusOK,
+			RunResult: RunResult{
+				LastTime:   time.Now(),
+				LastStatus: StatusOK,
+			},
 		},
 		Ticket: Ticket{
 			OwnerID: 0,
 			Contact: "testContact_for_" + identity,
 			Memo:    "testMemo_for_" + identity,
-		}},
-	)
+		}}, CachedUserInfo{})
 	if err != nil {
 		t.Error(err)
 		t.Fail()
@@ -72,7 +75,7 @@ func TestGetTicketByID(t *testing.T) {
 		t.Fail()
 		return
 	}
-	if ticket.Password !=  "testPassword_for_" + identity{
+	if ticket.Password != "testPassword_for_"+identity {
 		t.Fail()
 		return
 	}
