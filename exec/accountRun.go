@@ -36,7 +36,7 @@ func RunForAccount(account *model.Account) RunResult {
 	records := sunshinemotion.SmartCreateRecords(account.RemoteUserID, s.LimitParams, account.Distance, time.Now())
 	for i, record := range records {
 		result, err := s.GetSportResult()
-		if err != nil {
+		if err == nil {
 			account.AddLog(time.Now(), model.LogTypeInfo, "第"+strconv.Itoa(i+1)+"条记录上传前已跑距离"+view.DistanceFormat(result.Distance))
 		} else {
 			account.AddLog(time.Now(), model.LogTypeError, "第"+strconv.Itoa(i+1)+"条记录上传前获取已跑信息失败")
@@ -55,7 +55,7 @@ func RunForAccount(account *model.Account) RunResult {
 			account.AddLog(time.Now(), model.LogTypeSuccess, "第"+strconv.Itoa(i+1)+"条记录上传成功")
 		}
 		result, err = s.GetSportResult()
-		if err != nil {
+		if err == nil {
 			account.AddLog(time.Now(), model.LogTypeInfo, "第"+strconv.Itoa(i+1)+"条记录上传后已跑距离"+view.DistanceFormat(result.Distance))
 		} else {
 			account.AddLog(time.Now(), model.LogTypeError, "第"+strconv.Itoa(i+1)+"条记录上传后获取已跑信息失败")
