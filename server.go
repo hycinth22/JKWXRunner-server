@@ -39,5 +39,6 @@ func runAPIServer() {
 	engine := gin.Default()
 	registerCORSRoute(engine)
 	registerTicketRoute(engine)
+	registerRemoteProfileRoute(engine)
 	engine.Run(":8080")
 }
