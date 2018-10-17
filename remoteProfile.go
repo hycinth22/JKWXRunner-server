@@ -44,6 +44,7 @@ func getRemoteProfile(context *gin.Context) {
 	r, err := s.GetSportResult()
 	if err != nil {
 		context.Error(err)
+	} else {
 		profile.SportResult = SportResult{
 			CompletedDistance: r.Distance,
 			QualifiedDistance: r.Qualified,
