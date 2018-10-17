@@ -10,10 +10,16 @@ type RemoteProfile struct {
 	StudentName   string `json:"studentName"`
 	StudentNumber string `json:"studentNumber"`
 	Sex           string `json:"sex"`
+	SportResult
+}
+
+type SportResult struct {
+	CompletedDistance float64 `json:"completedDistance"`
+	QualifiedDistance float64 `json:"qualifiedDistance"`
 }
 
 func registerRemoteProfileRoute(router gin.IRouter) {
-	router.GET("/remoteProfile/username/:username", getRemoteProfile)
+	router.GET("/remoteProfile/:username", getRemoteProfile)
 }
 
 func getRemoteProfile(context *gin.Context) {
@@ -34,6 +40,14 @@ func getRemoteProfile(context *gin.Context) {
 		StudentName:   s.UserInfo.StudentName,
 		StudentNumber: s.UserInfo.StudentNumber,
 		Sex:           s.UserInfo.Sex,
+	}
+	r, err := s.GetSportResult()
+	if err != nil {
+		context.Error(err)
+		profile.SportResult = SportResult{
+			CompletedDistance: r.Distance,
+			QualifiedDistance: r.Qualified,
+		}
 	}
 	context.JSON(http.StatusOK, profile)
 }
