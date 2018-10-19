@@ -84,8 +84,11 @@ func RunForAccount(account *model.Account) model.RunResult {
 		account.AddLog(time.Now(), model.LogTypeError, "上传后获取已跑信息失败")
 	}
 
+	result, err = s.GetSportResult()
 	var status model.Status
-	if failCnt == 0 {
+	if err == nil && result.Distance > result.Qualified {
+		status = model.StatusCompleted
+	} else if failCnt == 0 {
 		status = model.StatusOK
 	} else if failCnt < len(records) {
 		status = model.StatusPartialFail
