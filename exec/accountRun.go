@@ -26,7 +26,7 @@ func RunForAccount(account *model.Account) model.RunResult {
 				LastDistance: 0.0,
 			}
 		}
-		account.AddLog(time.Now(), model.LogTypeInfo, "登录成功: "+err.Error())
+		account.AddLog(time.Now(), model.LogTypeInfo, "登录成功")
 		model.SaveSession(account.ID, s)
 		randSleep(15*time.Second, 30*time.Second)
 	}
@@ -61,13 +61,13 @@ func RunForAccount(account *model.Account) model.RunResult {
 		}
 		if err != nil {
 			failCnt++
-			account.AddLog(time.Now(), model.LogTypeError, "第"+strconv.Itoa(i+1)+"条记录上传失败，原因是："+err.Error())
+			account.AddLog(time.Now(), model.LogTypeError, "第"+strconv.Itoa(i+1)+"条记录上传失败，原因是：\n"+err.Error())
 		} else {
 			lastDistance += record.Distance
 			lastTime = record.EndTime
-			account.AddLog(time.Now(), model.LogTypeSuccess, "第"+strconv.Itoa(i+1)+"条记录上传成功。 "+
+			account.AddLog(time.Now(), model.LogTypeSuccess, "第"+strconv.Itoa(i+1)+"条记录上传成功，"+
 				"距离"+view.DistanceFormat(record.Distance)+"公里。\n"+
-				"起始时间"+view.TimeFormat(record.BeginTime)+" "+
+				"起始时间"+view.TimeFormat(record.BeginTime)+"\n"+
 				"结束时间"+view.TimeFormat(record.EndTime))
 		}
 
