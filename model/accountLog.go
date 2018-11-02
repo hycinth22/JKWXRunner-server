@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"log"
 	"time"
 )
 
@@ -27,14 +28,22 @@ func addLog(log *AccountLog) (err error) {
 	return nil
 }
 
-// the latest record of the previous n
-func GetLogs(AccountID uint, n int) (logs []AccountLog) {
+// the latest record of the previous n at offset n
+func GetLogs(AccountID uint, offset, n int) (logs []AccountLog) {
 	// log.Println("lookup log where id", AccountID)
-	if err := db.Model(&Account{
-		ID: AccountID,
-	}).Where("account_id = ?", AccountID).Order("Time DESC").Limit(n).Find(&logs).Error; err != nil {
-		// log.Println(err.Error())
+	if err := db.Model(&AccountLog{}).Where("account_id = ?", AccountID).Order("Time DESC").Offset(offset).Limit(n).Find(&logs).Error; err != nil && !db.RecordNotFound() {
+		log.Println("GetLogs", err.Error())
 		return nil
 	}
-	return
+	return logs
+}
+
+// the latest record of the previous n
+func GetLogsTotalNum(AccountID uint) uint {
+	var count uint
+	if err := db.Model(&AccountLog{}).Where("account_id = ?", AccountID).Count(&count).Error; err != nil && !db.RecordNotFound() {
+		log.Println("GetLogsTotalNum Error", err.Error())
+		return 0
+	}
+	return count
 }

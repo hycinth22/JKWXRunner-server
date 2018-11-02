@@ -96,6 +96,34 @@ func deleteTicket(context *gin.Context) {
 
 func getTicketLog(context *gin.Context) {
 	id, err := strconv.ParseUint(context.Param("id"), 10, 64)
+	offsetParam := context.Query("offset")
+	numParam := context.Query("num")
+	var (
+		offset int
+		num    int
+	)
+	if offsetParam != "" {
+		offset, err = strconv.Atoi(offsetParam)
+		if err != nil || offset < 0 {
+			context.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+	} else {
+		offset = 0
+	}
+	if numParam != "" {
+		num, err = strconv.Atoi(numParam)
+		if err != nil || num < 0 {
+			context.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+		if num > 100 {
+			num = 100
+		}
+	} else {
+		num = 10
+	}
+
 	if err != nil {
 		context.AbortWithStatus(http.StatusBadRequest)
 		return
@@ -108,6 +136,10 @@ func getTicketLog(context *gin.Context) {
 		return
 	}
 	// log.Println("ticket.Account.ID" , ticket.Account.ID, ticket.Account)
-	list := model.GetLogs(ticket.Account.ID, 30)
-	context.JSON(http.StatusOK, list)
+	list := model.GetLogs(ticket.Account.ID, offset, num)
+	total := model.GetLogsTotalNum(ticket.Account.ID)
+	context.JSON(http.StatusOK, struct {
+		Total uint               `json:"total"`
+		Logs  []model.AccountLog `json:"logs"`
+	}{total, list})
 }

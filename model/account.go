@@ -65,8 +65,8 @@ func UpdateAccount(account *Account) (err error) {
 	return db.Error
 }
 
-func (acc *Account) GetLogs(n int) (logs []AccountLog) {
-	return GetLogs(acc.ID, n)
+func (acc *Account) GetLogs(offset, n int) (logs []AccountLog) {
+	return GetLogs(acc.ID, offset, n)
 }
 
 func (acc *Account) AddLog(time time.Time, logType LogType, content string) (err error) {
