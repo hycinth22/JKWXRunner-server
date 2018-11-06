@@ -69,7 +69,7 @@ func updateTicket(context *gin.Context) {
 		log.Println(context.ClientIP(), err.Error())
 		return
 	}
-	if err := ticket.Update(); err != nil {
+	if err := ticket.Save(); err != nil {
 		context.Error(err)
 		context.AbortWithStatus(http.StatusInternalServerError)
 		return

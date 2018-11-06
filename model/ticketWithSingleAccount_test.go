@@ -81,3 +81,37 @@ func TestGetTicketByID(t *testing.T) {
 	}
 	t.Logf("GetTicket: %v", ticket)
 }
+
+func TestTicketWithSingleAccount_Update(t *testing.T) {
+	oldTicket, err := GetTicketByID(4)
+	if err != nil {
+		t.Fail()
+		return
+	}
+	t.Log("old ", oldTicket.LastStatus)
+
+	err = oldTicket.Save()
+
+	newTicket := oldTicket
+	newTicket.LastStatus = StatusCompleted
+	t.Log("modify to ", oldTicket.LastStatus)
+	newTicket.Save()
+
+	resultTicket, err := GetTicketByID(4)
+	if err != nil {
+		t.Fail()
+		return
+	}
+	t.Log("result", resultTicket.LastStatus)
+	err = oldTicket.Save()
+	if err != nil {
+		t.Fatal("recover updated ticket failed", err)
+		return
+	}
+
+	if newTicket.LastStatus != resultTicket.LastStatus {
+		t.Fail()
+		t.Log(newTicket)
+		t.Log(resultTicket)
+	}
+}

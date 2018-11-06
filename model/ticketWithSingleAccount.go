@@ -100,12 +100,34 @@ func (ticket *TicketWithSingleAccount) Del() (err error) {
 }
 
 // write to database
-func (ticket *TicketWithSingleAccount) Update() (err error) {
+func (ticket *TicketWithSingleAccount) Save() (err error) {
 	tx := db.Begin()
-	if err := tx.Save(&ticket).Error; err != nil {
+
+	accountID, err := ticket.Ticket.GetRelatedAccountID()
+	if err != nil {
+		tx.Rollback()
+		return errors.New("update ticket fail:" + err.Error())
+	}
+	account := ticket.Account
+	account.ID = accountID
+	account.TicketID = ticket.Ticket.ID
+
+	if err := tx.Save(&account).Error; err != nil {
+		tx.Rollback()
+		return errors.New("update ticket fail:" + err.Error())
+	}
+	if err := tx.Save(&ticket.Ticket).Error; err != nil {
 		tx.Rollback()
 		return errors.New("update ticket fail:" + err.Error())
 	}
 	tx.Commit()
 	return nil
+}
+
+func (ticket *Ticket) GetRelatedAccountID() (id uint, err error) {
+	var account Account
+	if err := db.Model(ticket).Related(&account).Error; err != nil {
+		return 0, errors.New("get Deleted ticket's account fail:" + err.Error())
+	}
+	return account.ID, nil
 }
