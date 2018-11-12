@@ -44,7 +44,7 @@ const (
 	StatusCompleted = ExecStatusEndDelim + iota
 )
 
-func GetAllAccountsTodayNotRun() (accounts []*Account, err error) {
+func ListAccountsTodayNotRun() (accounts []*Account, err error) {
 	accounts = make([]*Account, 0)
 	now := time.Now()
 	todayZero := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
@@ -52,7 +52,7 @@ func GetAllAccountsTodayNotRun() (accounts []*Account, err error) {
 	return
 }
 
-func GetAllAccounts() (accounts []*Account, err error) {
+func ListAccounts() (accounts []*Account, err error) {
 	accounts = make([]*Account, 0)
 	err = db.Find(&accounts).Error
 	return
@@ -70,7 +70,7 @@ func UpdateAccount(account *Account) (err error) {
 }
 
 func (acc *Account) GetLogs(offset, n int) (logs []AccountLog) {
-	return GetLogs(acc.ID, offset, n)
+	return ListLogsForAccount(acc.ID, offset, n)
 }
 
 func (acc *Account) AddLog(time time.Time, logType LogType, content string) (err error) {

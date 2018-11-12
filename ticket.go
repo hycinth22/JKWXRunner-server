@@ -11,16 +11,16 @@ import (
 )
 
 func registerTicketRoute(router gin.IRouter) {
-	router.GET("/allTicket", getAllTickets)
+	router.GET("/allTicket", listTickets)
 	router.POST("/ticket", newTicket)
 	router.PUT("/ticket", updateTicket)
 	router.DELETE("/ticket/:id", deleteTicket)
 
-	router.GET("/ticket/:id/log", getTicketLog)
+	router.GET("/ticket/:id/log", listTicketLogs)
 }
 
-func getAllTickets(context *gin.Context) {
-	list, err := model.GetAllTickets()
+func listTickets(context *gin.Context) {
+	list, err := model.ListTickets()
 	if err != nil {
 		context.Error(err)
 		context.AbortWithStatus(http.StatusInternalServerError)
@@ -94,7 +94,7 @@ func deleteTicket(context *gin.Context) {
 	context.Status(http.StatusOK)
 }
 
-func getTicketLog(context *gin.Context) {
+func listTicketLogs(context *gin.Context) {
 	id, err := strconv.ParseUint(context.Param("id"), 10, 64)
 	offsetParam := context.Query("offset")
 	numParam := context.Query("num")
@@ -136,8 +136,8 @@ func getTicketLog(context *gin.Context) {
 		return
 	}
 	// log.Println("ticket.Account.ID" , ticket.Account.ID, ticket.Account)
-	list := model.GetLogs(ticket.Account.ID, offset, num)
-	total := model.GetLogsTotalNum(ticket.Account.ID)
+	list := model.ListLogsForAccount(ticket.Account.ID, offset, num)
+	total := model.CountLogsForAccount(ticket.Account.ID)
 	context.JSON(http.StatusOK, struct {
 		Total uint               `json:"total"`
 		Logs  []model.AccountLog `json:"logs"`

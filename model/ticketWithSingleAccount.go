@@ -10,17 +10,17 @@ type TicketWithSingleAccount struct {
 	Account
 }
 
-func GetAllTickets() (tickets []*TicketWithSingleAccount, err error) {
+func ListTickets() (tickets []*TicketWithSingleAccount, err error) {
 	simpleTickets := make([]Ticket, 0)
 	accounts := make([]Account, 0)
 	if err := db.Find(&simpleTickets).Related(&accounts, "TicketID").Error; err != nil {
-		return nil, errors.New("GetAllTickets Failed:" + err.Error())
+		return nil, errors.New("ListTickets Failed:" + err.Error())
 	}
 	for _, ticket := range simpleTickets {
 		// TODO: 优化
 		var account Account
 		if err := db.Model(&ticket).Related(&account, "TicketID").Error; err != nil {
-			return nil, errors.New("GetAllTickets Failed:" + err.Error())
+			return nil, errors.New("ListTickets Failed:" + err.Error())
 		}
 		var one TicketWithSingleAccount
 		one.Ticket = ticket

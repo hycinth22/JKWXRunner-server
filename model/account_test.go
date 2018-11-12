@@ -2,8 +2,8 @@ package model
 
 import "testing"
 
-func TestGetAllTodayNotRun(t *testing.T) {
-	a, err := GetAllAccountsTodayNotRun()
+func TestListAccountsTodayNotRun(t *testing.T) {
+	a, err := ListAccountsTodayNotRun()
 	if err != nil {
 		t.Error(err)
 		t.Fail()

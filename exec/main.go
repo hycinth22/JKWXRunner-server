@@ -19,9 +19,9 @@ func init() {
 }
 
 func RunOnce() {
-	accounts, err := model.GetAllAccountsTodayNotRun()
+	accounts, err := model.ListAccountsTodayNotRun()
 	if len(accounts) == 0 && Debug {
-		accounts, err = model.GetAllAccounts()
+		accounts, err = model.ListAccounts()
 	}
 	if err != nil {
 		log.Println(err.Error())

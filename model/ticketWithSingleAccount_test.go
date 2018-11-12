@@ -35,8 +35,8 @@ func TestAddTicket(t *testing.T) {
 	}
 }
 
-func TestGetAll(t *testing.T) {
-	list, err := GetAllTickets()
+func TestListTickets(t *testing.T) {
+	list, err := ListTickets()
 	if err != nil {
 		t.Error(err)
 		t.Fail()
