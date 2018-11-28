@@ -1,10 +1,10 @@
 package main
 
 import (
-	"./model"
-	sunshinemotion "./sunshinemotion"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/inkedawn/JKWXFucker-server/model"
+	sunshinemotion "github.com/inkedawn/go-sunshinemotion"
 	"log"
 	"net/http"
 	"strconv"

@@ -1,7 +1,7 @@
 package model
 
 import (
-	sunshinemotion "../sunshinemotion"
+	sunshinemotion "github.com/inkedawn/go-sunshinemotion"
 	"log"
 	"testing"
 )

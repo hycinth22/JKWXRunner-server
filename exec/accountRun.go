@@ -1,10 +1,10 @@
 package main
 
 import (
-	"../model"
-	sunshinemotion "../sunshinemotion"
-	"../view"
 	"errors"
+	"github.com/inkedawn/JKWXFucker-server/model"
+	"github.com/inkedawn/JKWXFucker-server/view"
+	sunshinemotion "github.com/inkedawn/go-sunshinemotion"
 	"strconv"
 	"time"
 )

@@ -1,8 +1,8 @@
 package main
 
 import (
-	sunshinemotion "./sunshinemotion"
 	"github.com/gin-gonic/gin"
+	sunshinemotion "github.com/inkedawn/go-sunshinemotion"
 	"net/http"
 )
 

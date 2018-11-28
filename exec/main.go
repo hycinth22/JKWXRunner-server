@@ -1,8 +1,8 @@
 package main
 
 import (
-	"../model"
 	"flag"
+	"github.com/inkedawn/JKWXFucker-server/model"
 	"log"
 	"os"
 	"time"

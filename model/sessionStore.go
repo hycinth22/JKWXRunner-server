@@ -1,14 +1,14 @@
 package model
 
 import (
-	sunshinemotion "../sunshinemotion"
 	"bytes"
 	"encoding/gob"
 	"errors"
+	sunshinemotion "github.com/inkedawn/go-sunshinemotion"
 )
 
 type SessionStore struct {
-	AccountID  uint       `gorm:"primary_key"`
+	AccountID  uint `gorm:"primary_key"`
 	SessionObj []byte
 }
 
