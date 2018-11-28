@@ -28,8 +28,14 @@ func RunOnce() {
 		return
 	}
 	for _, account := range accounts {
+		log.Println("Run Task For Account ", account.Username)
 		result := RunForAccount(account)
-		saveRunResult(account, result)
+		err := saveRunResult(account, result)
+		if err == nil {
+			log.Println("Account ", account.Username, " task run Successfully.")
+		} else {
+			log.Println("Account ", account.Username, " task occur an Error: ", err.Error())
+		}
 		randSleep(15*time.Second, 360*time.Second)
 	}
 }
