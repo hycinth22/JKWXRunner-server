@@ -3,3 +3,4 @@
 *.dsn
 debug
 go.sum
+html/

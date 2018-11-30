@@ -17,7 +17,7 @@ func RunForAccount(account *model.Account) model.RunResult {
 			s = sunshinemotion.CreateSession()
 			account.AddLog(time.Now(), model.LogTypeError, "获取session失败"+err.Error())
 		}
-		err := s.Login(account.Username, "123", sunshinemotion.PasswordHash(account.Password))
+		err := s.LoginEx(account.Username, "123", sunshinemotion.PasswordHash(account.Password), account.RemoteSchoolID)
 		if err != nil {
 			account.AddLog(time.Now(), model.LogTypeError, "登录失败: "+err.Error())
 			return model.RunResult{

@@ -11,10 +11,11 @@ type Account struct {
 	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
 	TicketID  uint       `gorm:"UNIQUE;NOT NULL" json:"-"`
 
-	RemoteUserID int64   `gorm:"UNIQUE;NOT NULL" json:"userID"`
-	Username     string  `gorm:"UNIQUE;NOT NULL;UNIQUE_INDEX:username" json:"username"`
-	Password     string  `json:"password"`
-	Distance     float64 `json:"distance"`
+	RemoteSchoolID int64   `gorm:"NOT NULL" json:"schoolID"`
+	RemoteUserID   int64   `gorm:"UNIQUE;NOT NULL" json:"userID"`
+	Username       string  `gorm:"UNIQUE;NOT NULL;UNIQUE_INDEX:username" json:"username"`
+	Password       string  `json:"password"`
+	Distance       float64 `json:"distance"`
 
 	RunResult
 	CachedUserInfo

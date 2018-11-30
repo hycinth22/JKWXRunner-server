@@ -37,7 +37,7 @@ func newTicket(context *gin.Context) {
 	}
 
 	session := sunshinemotion.CreateSession()
-	if err := session.Login(ticket.Account.Username, "123", sunshinemotion.PasswordHash(ticket.Password)); err != nil {
+	if err := session.LoginEx(ticket.Account.Username, "123", sunshinemotion.PasswordHash(ticket.Password), ticket.Account.RemoteSchoolID); err != nil {
 		log.Println(context.ClientIP(), err.Error())
 		return
 	}

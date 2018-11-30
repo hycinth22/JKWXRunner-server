@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	sunshinemotion "github.com/inkedawn/go-sunshinemotion"
 	"net/http"
+	"strconv"
 )
 
 type RemoteProfile struct {
@@ -19,10 +20,16 @@ type SportResult struct {
 }
 
 func registerRemoteProfileRoute(router gin.IRouter) {
-	router.GET("/remoteProfile/:username", getRemoteProfile)
+	router.GET("/remoteProfile/:schoolID/:username", getRemoteProfile)
 }
 
 func getRemoteProfile(context *gin.Context) {
+	schoolID, err := strconv.ParseInt(context.Param("schoolID"), 10, 64)
+	if err != nil {
+		context.Error(err)
+		context.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
 	username := context.Param("username")
 	password := context.Query("password")
 	if password == "" {
@@ -30,7 +37,7 @@ func getRemoteProfile(context *gin.Context) {
 		return
 	}
 	s := sunshinemotion.CreateSession()
-	err := s.Login(username, "123", sunshinemotion.PasswordHash(password))
+	err = s.LoginEx(username, "123", sunshinemotion.PasswordHash(password), schoolID)
 	if err != nil {
 		context.Error(err)
 		context.AbortWithStatus(http.StatusUnauthorized)
