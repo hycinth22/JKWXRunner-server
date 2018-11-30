@@ -28,7 +28,6 @@ func RunForAccount(account *model.Account) model.RunResult {
 		}
 		account.AddLog(time.Now(), model.LogTypeInfo, "登录成功")
 		model.SaveSession(account.ID, s)
-		randSleep(15*time.Second, 30*time.Second)
 	}
 	result, err := s.GetSportResult()
 	if err == nil {

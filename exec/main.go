@@ -18,6 +18,22 @@ func init() {
 	}
 }
 
+// can't guarantee must be not timeout
+func SleepALitte(totalAccountCount int64, totalExecTime time.Duration) {
+	totalExecTime = time.Duration(0.8 * float64(totalExecTime)) // 20% for delay & other
+	single := totalExecTime.Nanoseconds() / totalAccountCount
+
+	var d time.Duration
+	if time.Duration(single) > 5*time.Minute {
+		d = randSleepDuration(15*time.Second, 5*time.Minute)
+	} else {
+		d = randSleepDuration(time.Duration(0.8*float64(single)), time.Duration(1.2*float64(single)))
+	}
+
+	log.Println("Sleep ", d.String())
+	time.Sleep(d)
+}
+
 func RunOnce() {
 	accounts, err := model.ListAccountsTodayNotRun()
 	if len(accounts) == 0 && Debug {
@@ -36,7 +52,7 @@ func RunOnce() {
 		} else {
 			log.Println("Account ", account.Username, " task occur an Error: ", err.Error())
 		}
-		randSleep(15*time.Second, 360*time.Second)
+		SleepALitte(int64(len(accounts)), 6*time.Hour)
 	}
 }
 
