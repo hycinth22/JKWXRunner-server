@@ -49,3 +49,16 @@ func GetSession(accountID uint) (session *sunshinemotion.Session, err error) {
 	}
 	return session, nil
 }
+
+func ListStoredSessionAccounts() (allAccountID []uint) {
+	var list []struct {
+		AccountID uint
+	}
+	if err := db.Raw("SELECT DISTINCT account_id FROM session_store").Scan(&list).Error; err != nil {
+		return nil
+	}
+	for _, a := range list {
+		allAccountID = append(allAccountID, a.AccountID)
+	}
+	return allAccountID
+}
