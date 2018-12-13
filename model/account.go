@@ -43,6 +43,7 @@ const (
 
 const (
 	StatusCompleted = ExecStatusEndDelim + iota
+	StatusSuspend
 )
 
 func ListAccountsTodayNotRun() (accounts []*Account, err error) {

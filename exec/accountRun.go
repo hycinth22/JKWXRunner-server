@@ -9,25 +9,40 @@ import (
 	"time"
 )
 
+
+func LoginForAccount(account *model.Account) (*sunshinemotion.Session, error) {
+	// first, fetch session from store 
+	s, err := model.GetSession(account.ID)
+	if err == nil && s.UserExpirationTime.After(time.Now()) {
+		return s, nil
+	}else if (err != nil) {
+		s = sunshinemotion.CreateSession()
+		account.AddLog(time.Now(), model.LogTypeError, "获取session失败"+err.Error())
+	}
+
+	// not store or expired, to call login
+	err = s.LoginEx(account.Username, "123", sunshinemotion.PasswordHash(account.Password), account.RemoteSchoolID)
+	if err != nil {
+		account.AddLog(time.Now(), model.LogTypeError, "登录失败: "+err.Error())
+		return s, errors.New("登录失败")
+	} else {
+		account.AddLog(time.Now(), model.LogTypeInfo, "登录成功")
+	}
+
+	// save it to store
+	model.SaveSession(account.ID, s)
+	return s, nil
+}
+
 func RunForAccount(account *model.Account) model.RunResult {
 	// (status model.Status, lastTime time.Time, lastDistance float64)
-	s, err := model.GetSession(account.ID)
-	if err != nil || s.UserExpirationTime.Before(time.Now()) {
-		if err != nil {
-			s = sunshinemotion.CreateSession()
-			account.AddLog(time.Now(), model.LogTypeError, "获取session失败"+err.Error())
+	s, err := LoginForAccount(account);
+	if err != nil {
+		return model.RunResult{
+			LastStatus:   model.StatusFail,
+			LastTime:     time.Now(),
+			LastDistance: 0.0,
 		}
-		err := s.LoginEx(account.Username, "123", sunshinemotion.PasswordHash(account.Password), account.RemoteSchoolID)
-		if err != nil {
-			account.AddLog(time.Now(), model.LogTypeError, "登录失败: "+err.Error())
-			return model.RunResult{
-				LastStatus:   model.StatusFail,
-				LastTime:     time.Now(),
-				LastDistance: 0.0,
-			}
-		}
-		account.AddLog(time.Now(), model.LogTypeInfo, "登录成功")
-		model.SaveSession(account.ID, s)
 	}
 	result, err := s.GetSportResult()
 	if err == nil {
