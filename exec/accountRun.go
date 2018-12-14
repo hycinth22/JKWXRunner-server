@@ -5,17 +5,17 @@ import (
 	"github.com/inkedawn/JKWXFucker-server/model"
 	"github.com/inkedawn/JKWXFucker-server/view"
 	sunshinemotion "github.com/inkedawn/go-sunshinemotion"
+	"log"
 	"strconv"
 	"time"
 )
 
-
 func LoginForAccount(account *model.Account) (*sunshinemotion.Session, error) {
-	// first, fetch session from store 
+	// first, fetch session from store
 	s, err := model.GetSession(account.ID)
 	if err == nil && s.UserExpirationTime.After(time.Now()) {
 		return s, nil
-	}else if (err != nil) {
+	} else if err != nil {
 		s = sunshinemotion.CreateSession()
 		account.AddLog(time.Now(), model.LogTypeError, "获取session失败"+err.Error())
 	}
@@ -27,6 +27,7 @@ func LoginForAccount(account *model.Account) (*sunshinemotion.Session, error) {
 		return s, errors.New("登录失败")
 	} else {
 		account.AddLog(time.Now(), model.LogTypeInfo, "登录成功")
+		log.Println("LoginForAccount, user", s.UserInfo.StudentNumber, s)
 	}
 
 	// save it to store
@@ -36,7 +37,7 @@ func LoginForAccount(account *model.Account) (*sunshinemotion.Session, error) {
 
 func RunForAccount(account *model.Account) model.RunResult {
 	// (status model.Status, lastTime time.Time, lastDistance float64)
-	s, err := LoginForAccount(account);
+	s, err := LoginForAccount(account)
 	if err != nil {
 		return model.RunResult{
 			LastStatus:   model.StatusFail,
@@ -44,6 +45,7 @@ func RunForAccount(account *model.Account) model.RunResult {
 			LastDistance: 0.0,
 		}
 	}
+
 	result, err := s.GetSportResult()
 	if err == nil {
 		account.AddLog(time.Now(), model.LogTypeInfo, "上传前已跑距离"+view.DistanceFormat(result.Distance))
@@ -116,7 +118,6 @@ func RunForAccount(account *model.Account) model.RunResult {
 		LastDistance: lastDistance,
 	}
 }
-
 
 func getLimitParamsForSmartCreateRecords(s *sunshinemotion.Session, hasDistance float64, qualifiedDistance float64) *sunshinemotion.LimitParams {
 	limit := s.LimitParams

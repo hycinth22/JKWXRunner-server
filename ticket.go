@@ -41,6 +41,7 @@ func newTicket(context *gin.Context) {
 		log.Println(context.ClientIP(), err.Error())
 		return
 	}
+	log.Println("newTicket, user", session.UserInfo.StudentNumber, session)
 	ticket.Account.RemoteUserID = session.UserID
 
 	result, err := session.GetSportResult()

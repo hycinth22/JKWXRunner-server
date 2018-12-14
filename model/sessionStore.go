@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"errors"
 	sunshinemotion "github.com/inkedawn/go-sunshinemotion"
+	"log"
 )
 
 type SessionStore struct {
@@ -15,6 +16,8 @@ type SessionStore struct {
 var ErrSessionNotFound = errors.New("sessionStore not found")
 
 func SaveSession(accountID uint, session *sunshinemotion.Session) (err error) {
+	log.Println("SaveSession, user", session.UserInfo.StudentNumber, session)
+
 	buffer := bytes.NewBuffer([]byte{})
 	enc := gob.NewEncoder(buffer)
 	if err := enc.Encode(session); err != nil {
@@ -47,6 +50,7 @@ func GetSession(accountID uint) (session *sunshinemotion.Session, err error) {
 	if err := dec.Decode(&session); err != nil {
 		return nil, errors.New("getSession decode Fail" + err.Error())
 	}
+	log.Println("GetSession, user", session.UserInfo.StudentNumber, session)
 	return session, nil
 }
 

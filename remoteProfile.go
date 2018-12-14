@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	sunshinemotion "github.com/inkedawn/go-sunshinemotion"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -43,6 +44,7 @@ func getRemoteProfile(context *gin.Context) {
 		context.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
+	log.Println("Get RemoteProfile, user", username, s)
 	profile := RemoteProfile{
 		StudentName:   s.UserInfo.StudentName,
 		StudentNumber: s.UserInfo.StudentNumber,
