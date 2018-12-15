@@ -24,8 +24,7 @@ func init() {
 }
 
 func main() {
-	engine := gin.Default()
-	go apiServer.Run(engine)
-	go staticFileServer.Run(gin.Default())
+	go apiServer.Run(gin.New())
+	go staticFileServer.Run(gin.New())
 	select {}
 }
