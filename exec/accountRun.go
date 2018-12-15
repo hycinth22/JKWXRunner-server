@@ -104,6 +104,7 @@ func RunForAccount(account *model.Account) model.RunResult {
 	result, err = s.GetSportResult()
 	var status model.Status
 	if err == nil && result.Distance > result.Qualified {
+		account.AddLog(time.Now(), model.LogTypeInfo, "已达标")
 		status = model.StatusCompleted
 	} else if failCnt == 0 {
 		status = model.StatusOK
