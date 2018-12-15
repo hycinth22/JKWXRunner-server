@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/inkedawn/JKWXFucker-server/apiServer"
+	"github.com/inkedawn/JKWXFucker-server/staticFileServer"
 	"log"
 	"os"
 )
@@ -22,23 +24,8 @@ func init() {
 }
 
 func main() {
-	go runAPIServer()
-	go runStaticFileServer()
+	engine := gin.Default()
+	go apiServer.Run(engine)
+	go staticFileServer.Run(gin.Default())
 	select {}
-}
-
-func runStaticFileServer() {
-	// static files
-	engine := gin.Default()
-	engine.Use(authMiddleWare)
-	engine.Static("/", `./html`)
-	engine.Run(":80")
-}
-
-func runAPIServer() {
-	engine := gin.Default()
-	registerCORSRoute(engine)
-	registerTicketRoute(engine)
-	registerRemoteProfileRoute(engine)
-	engine.Run(":8080")
 }

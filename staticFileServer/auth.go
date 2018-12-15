@@ -1,4 +1,4 @@
-package main
+package staticFileServer
 
 import (
 	"encoding/base64"
@@ -28,4 +28,5 @@ func authMiddleWare(c *gin.Context) {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
+	c.Next()
 }
