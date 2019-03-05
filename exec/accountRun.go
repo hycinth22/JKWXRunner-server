@@ -47,15 +47,19 @@ func RunForAccount(account *model.Account) model.RunResult {
 	}
 
 	result, err := s.GetSportResult()
-	if err == nil {
-		account.AddLog(time.Now(), model.LogTypeInfo, "上传前已跑距离"+view.DistanceFormat(result.Distance))
-		saveCachedUserInfo(account, model.CachedUserInfo{
-			TotalDistance:     result.Distance,
-			QualifiedDistance: result.Qualified,
-		})
-	} else {
-		account.AddLog(time.Now(), model.LogTypeError, "上传前获取已跑信息失败")
+	if err != nil {
+		account.AddLog(time.Now(), model.LogTypeError, "上传前获取已跑信息失败" + err.Error())
+		return model.RunResult{
+			LastStatus:   model.StatusFail,
+			LastTime:     time.Now(),
+			LastDistance: 0.0,
+		}
 	}
+	account.AddLog(time.Now(), model.LogTypeInfo, "上传前已跑距离"+view.DistanceFormat(result.Distance))
+	saveCachedUserInfo(account, model.CachedUserInfo{
+		TotalDistance:     result.Distance,
+		QualifiedDistance: result.Qualified,
+	})
 	if result.Distance > result.Qualified {
 		return model.RunResult{
 			LastStatus:   model.StatusCompleted,
@@ -63,7 +67,6 @@ func RunForAccount(account *model.Account) model.RunResult {
 			LastDistance: 0.0,
 		}
 	}
-
 	failCnt := 0
 	lastDistance := 0.0
 	lastTime := time.Now()
