@@ -68,7 +68,7 @@ func RunForAccount(account *model.Account) model.RunResult {
 	lastDistance := 0.0
 	lastTime := time.Now()
 	limit := getLimitParamsForSmartCreateRecords(s, result.Distance, result.Qualified)
-	records := sunshinemotion.SmartCreateRecords(account.RemoteUserID, limit, account.Distance, time.Now())
+	records := sunshinemotion.SmartCreateRecords(account.RemoteUserID, account.RemoteSchoolID, limit, account.Distance, time.Now())
 
 	for i, record := range records {
 		if !Debug {
