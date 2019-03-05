@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/inkedawn/JKWXFucker-server/apiServer"
-	"github.com/inkedawn/JKWXFucker-server/staticFileServer"
 	"log"
 	"os"
 )
@@ -24,7 +23,5 @@ func init() {
 }
 
 func main() {
-	go apiServer.Run(gin.New())
-	go staticFileServer.Run(gin.New())
-	select {}
+	apiServer.Run(gin.New())
 }
