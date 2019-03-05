@@ -41,7 +41,7 @@ func getRemoteProfile(context *gin.Context) {
 	err = s.LoginEx(username, "123", sunshinemotion.PasswordHash(password), schoolID)
 	if err != nil {
 		context.Error(err)
-		context.AbortWithStatus(http.StatusUnauthorized)
+		context.String(403, "%s", err)
 		return
 	}
 	log.Println("Get RemoteProfile, user", username, s)
