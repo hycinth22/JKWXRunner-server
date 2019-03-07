@@ -8,13 +8,21 @@ import (
 	"log"
 	"strconv"
 	"time"
+	"fmt"
 )
 
 func LoginForAccount(account *model.Account) (*sunshinemotion.Session, error) {
 	// first, fetch session from store
 	s, err := model.GetSession(account.ID)
 	if err == nil && s.UserExpirationTime.After(time.Now()) {
-		return s, nil
+		account.AddLog(time.Now(), model.LogTypeInfo, "Session" + fmt.Sprintf("%v", s))
+		_, err := s.GetSportResult()
+		if err == sunshinemotion.ErrTokenExpired {
+			account.AddLog(time.Now(), model.LogTypeInfo, "Token过期，尝试重新登录")
+		}
+		if err == nil {
+			return s, nil
+		}
 	} else if err != nil {
 		s = sunshinemotion.CreateSession()
 		account.AddLog(time.Now(), model.LogTypeError, "获取session失败"+err.Error())
@@ -26,7 +34,7 @@ func LoginForAccount(account *model.Account) (*sunshinemotion.Session, error) {
 		account.AddLog(time.Now(), model.LogTypeError, "登录失败: "+err.Error())
 		return s, errors.New("登录失败")
 	} else {
-		account.AddLog(time.Now(), model.LogTypeInfo, "登录成功")
+		account.AddLog(time.Now(), model.LogTypeInfo, "登录成功。" + "Session Dump：" + fmt.Sprintf("%v", s))
 		log.Println("LoginForAccount, user", s.UserInfo.StudentNumber, s)
 	}
 
