@@ -37,6 +37,7 @@ func SleepALitte(totalAccountCount int64, totalExecTime time.Duration) {
 func RunOnce() {
 	accounts, err := model.ListAccountsTodayNotRun()
 	if len(accounts) == 0 && Debug {
+		log.Println("Debug list all")
 		accounts, err = model.ListAccounts()
 	}
 	if err != nil {

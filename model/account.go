@@ -43,14 +43,32 @@ const (
 
 const (
 	StatusCompleted = ExecStatusEndDelim + iota
+	StatusBalance
 	StatusSuspend
+	StatusReadyRun
 )
 
+// All Accounts in list will be set to StatusReadyRun status, and cannot fetch again util status changed.
 func ListAccountsTodayNotRun() (accounts []*Account, err error) {
 	accounts = make([]*Account, 0)
 	now := time.Now()
 	todayZero := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
-	err = db.Where("last_time < ? AND last_status < ?", todayZero, ExecStatusEndDelim).Find(&accounts).Error
+	tx := db.Begin()
+	err = tx.Where("last_time < ? AND last_status < ?", todayZero, ExecStatusEndDelim).Find(&accounts).Error
+	if err != nil {
+		return nil, err
+	}
+	for _, ac := range accounts {
+		err = tx.Model(ac).Update("last_status", StatusReadyRun).Error
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
+	}
+	err = tx.Commit().Error
+	if err != nil {
+		return nil, err
+	}
 	return
 }
 
