@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 selfdir=$(dirname $0)
 
