@@ -25,6 +25,9 @@ github.com/inkedawn/go-sunshinemotion v1.4.1 h1:ks9LOuVJ+PRFGKgGSCIOM3ecQgy1OZbN
 github.com/inkedawn/go-sunshinemotion v1.4.1/go.mod h1:ME1W06eG2qkpsYrEvNPZRZyFpUW9RwipWau9UnbkL+A=
 github.com/inkedawn/go-sunshinemotion v1.5.0 h1:vMbPnOWBNKs282eyeClzGaTcd72Wr79PFhqI95jNgEM=
 github.com/inkedawn/go-sunshinemotion v1.5.0/go.mod h1:GptxzCzNeC0+7WBjxTzRE8QBgHx0z8b2MYo2Mnx0ASY=
+github.com/inkedawn/go-sunshinemotion v1.6.1/go.mod h1:GptxzCzNeC0+7WBjxTzRE8QBgHx0z8b2MYo2Mnx0ASY=
+github.com/inkedawn/go-sunshinemotion v1.6.2 h1:flzwYWMM0IqYTy7Urz8nLF0BSBaFD9g0zFNP7VWtuRw=
+github.com/inkedawn/go-sunshinemotion v1.6.2/go.mod h1:GptxzCzNeC0+7WBjxTzRE8QBgHx0z8b2MYo2Mnx0ASY=
 github.com/jackc/fake v0.0.0-20150926172116-812a484cc733/go.mod h1:WrMFNQdiFJ80sQsxDoMokWK1W5TQtxBFNpzWTD84ibQ=
 github.com/jackc/pgx v3.2.0+incompatible/go.mod h1:0ZGrqGqkRlliWnWB4zKnWtjbSWbGkVEFm4TeybAXq+I=
 github.com/jinzhu/gorm v1.9.1/go.mod h1:Vla75njaFJ8clLU1W44h34PjIkijhjHIYnZxMqCdxqo=
