@@ -78,6 +78,7 @@ func main() {
 		}
 		result := RunForAccount(account)
 		saveRunResult(account, result)
+		return
 	}
 	RunOnce()
 }
