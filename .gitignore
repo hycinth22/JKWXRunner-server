@@ -2,5 +2,4 @@
 *.db
 *.dsn
 debug
-html/
 log/
