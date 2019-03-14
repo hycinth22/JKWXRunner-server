@@ -3,6 +3,7 @@ package model
 
 import (
 	"errors"
+	"time"
 )
 
 type TicketWithSingleAccount struct {
@@ -62,6 +63,10 @@ func AddTicket(ticket *TicketWithSingleAccount, info CachedUserInfo) (ticketID u
 	ticket.Account.TicketID = ticket.Ticket.ID
 	ticket.Account.CachedUserInfo = info
 	if err := tx.Create(&ticket.Account).Error; err != nil {
+		tx.Rollback()
+		return 0, errors.New("Add ticket.Account Fail:" + err.Error())
+	}
+	if err := ticket.Account.AddLog(time.Now(), LogTypeInfo, "Created"); err != nil {
 		tx.Rollback()
 		return 0, errors.New("Add ticket.Account Fail:" + err.Error())
 	}
