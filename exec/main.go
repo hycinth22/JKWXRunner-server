@@ -2,12 +2,14 @@ package main
 
 import (
 	"flag"
-	"github.com/inkedawn/JKWXFucker-server/model"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/inkedawn/JKWXFucker-server/model"
+	sunshinemotion "github.com/inkedawn/go-sunshinemotion"
 )
 
 var Debug bool
@@ -123,18 +125,35 @@ func RunAsDaemon() {
 	}
 }
 
+func runForUsername(username string) {
+	account, err := model.GetAccountByUsername(username)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+	result := RunForAccount(account)
+	saveRunResult(account, result)
+}
+
 func main() {
 	username := flag.String("username", "", "username for running")
 	flag.Parse()
 	if *username != "" {
-		account, err := model.GetAccountByUsername(*username)
-		if err != nil {
-			log.Println(err.Error())
-			return
-		}
-		result := RunForAccount(account)
-		saveRunResult(account, result)
+		runForUsername(*username)
 		return
+	}
+	// check version
+	s := sunshinemotion.CreateSession()
+	info, err := s.GetAppInfo()
+	if err != nil {
+		log.Println("Can't get latest app info. ", err)
+		os.Exit(1)
+	}
+	log.Println("Target App version: ", sunshinemotion.AppVersionID)
+	log.Println("Latest App version: ", info.VerNumber)
+	if info.VerNumber > sunshinemotion.AppVersionID {
+		log.Println("need to upgrade")
+		os.Exit(1)
 	}
 	RunOnce()
 }
