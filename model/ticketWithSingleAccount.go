@@ -66,11 +66,8 @@ func AddTicket(ticket *TicketWithSingleAccount, info CachedUserInfo) (ticketID u
 		tx.Rollback()
 		return 0, errors.New("Add ticket.Account Fail:" + err.Error())
 	}
-	if err := ticket.Account.AddLog(time.Now(), LogTypeInfo, "Created"); err != nil {
-		tx.Rollback()
-		return 0, errors.New("Add ticket.Account Fail:" + err.Error())
-	}
 	tx.Commit()
+	ticket.Account.AddLog(time.Now(), LogTypeInfo, "Created") // 目前不能放在上面的事务中。由于该函数不会使用该事务而另外独立插入数据，而sqlite采用库锁，会导致死锁
 	return ticket.Ticket.ID, nil
 }
 
