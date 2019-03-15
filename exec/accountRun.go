@@ -82,11 +82,14 @@ func RunForAccount(account *model.Account) model.RunResult {
 	records := sunshinemotion.SmartCreateRecords(account.RemoteUserID, account.RemoteSchoolID, limit, account.Distance, time.Now())
 
 	for i, record := range records {
-		if !Debug {
-			err = s.UploadRecord(record)
-		} else {
-			err = errors.New("test Error")
+		if Debug {
+			account.AddLog(time.Now(), model.LogTypeSuccess, "测试生成记录：第"+strconv.Itoa(i+1)+"条记录，"+
+			"距离"+view.DistanceFormat(record.Distance)+"公里。\n"+
+			"起始时间"+view.TimeFormat(record.BeginTime)+"\n"+
+			"结束时间"+view.TimeFormat(record.EndTime))
+			continue
 		}
+		err = s.UploadRecord(record)
 		if err != nil {
 			failCnt++
 			account.AddLog(time.Now(), model.LogTypeError, "第"+strconv.Itoa(i+1)+"条记录上传失败，原因是：\n"+err.Error())
