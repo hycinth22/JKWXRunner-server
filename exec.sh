@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+params=$*
 selfdir=$(dirname $0)
 srcdir=$selfdir
 pidfile=$selfdir/jkwxfucker_exec.pid
@@ -8,4 +9,4 @@ logfile=$logdir/exec_`date +%Y%m%d_%s_%N`.log
 
 
 cd $selfdir
-nohup ./dayexec > $logfile & echo $! > $pidfile
+nohup ./dayexec $params > $logfile & echo $! > $pidfile
