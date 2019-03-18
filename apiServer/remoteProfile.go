@@ -33,14 +33,15 @@ func getRemoteProfile(context *gin.Context) {
 		return
 	}
 	username := context.Param("username")
+	password := context.Query("password")
 	s, err := model.GetSessionByUsername(username)
 	if err != nil {
 		if err == model.ErrSessionNotFound {
-			password := context.Query("password")
 			if password == "" {
 				context.String(200, "需要登录信息。")
 				return
 			}
+			s = sunshinemotion.CreateSession()
 			err = s.LoginEx(username, "123", sunshinemotion.PasswordHash(password), schoolID)
 			if err != nil {
 				context.Error(err)
@@ -60,6 +61,18 @@ func getRemoteProfile(context *gin.Context) {
 		Sex:           s.UserInfo.Sex,
 	}
 	r, err := s.GetSportResult()
+	if err == sunshinemotion.ErrTokenExpired {
+		err = s.LoginEx(username, "123", sunshinemotion.PasswordHash(password), schoolID)
+		if err != nil {
+			context.Error(err)
+			context.String(200, "登录错误：%s", err)
+			return
+		}
+		// retry
+		getRemoteProfile(context)
+		return
+		
+	}
 	if err != nil {
 		context.Error(err)
 	} else {
