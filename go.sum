@@ -19,6 +19,8 @@ github.com/inkedawn/go-sunshinemotion v1.8.0/go.mod h1:GptxzCzNeC0+7WBjxTzRE8QBg
 github.com/inkedawn/go-sunshinemotion v1.9.0/go.mod h1:GptxzCzNeC0+7WBjxTzRE8QBgHx0z8b2MYo2Mnx0ASY=
 github.com/inkedawn/go-sunshinemotion v1.10.0 h1:GCwOeKnSJ97CW93ZFIeYDdi5o7sTgpgJPMqWmXi6DTY=
 github.com/inkedawn/go-sunshinemotion v1.10.0/go.mod h1:GptxzCzNeC0+7WBjxTzRE8QBgHx0z8b2MYo2Mnx0ASY=
+github.com/inkedawn/go-sunshinemotion v1.11.0 h1:KD48gKWbmGNm5SkxNyIxZp6JKsCk1g+CtjK/iezqGiE=
+github.com/inkedawn/go-sunshinemotion v1.11.0/go.mod h1:GptxzCzNeC0+7WBjxTzRE8QBgHx0z8b2MYo2Mnx0ASY=
 github.com/jinzhu/gorm v1.9.2 h1:lCvgEaqe/HVE+tjAR2mt4HbbHAZsQOv3XAZiEZV37iw=
 github.com/jinzhu/gorm v1.9.2/go.mod h1:Vla75njaFJ8clLU1W44h34PjIkijhjHIYnZxMqCdxqo=
 github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a h1:eeaG9XMUvRBYXJi4pg1ZKM7nxc5AfXfojeLLW7O5J3k=
