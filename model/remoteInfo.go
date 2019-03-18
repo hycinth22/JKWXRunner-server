@@ -1,6 +1,6 @@
 package model
 
 type remoteInfo struct {
-	UserID uint
+	UserID  uint
 	TokenID string
 }

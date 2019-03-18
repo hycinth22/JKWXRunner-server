@@ -5,15 +5,28 @@ import (
 	"encoding/gob"
 	"errors"
 	sunshinemotion "github.com/inkedawn/go-sunshinemotion"
+	"github.com/jinzhu/gorm"
 	"log"
 )
 
 type SessionStore struct {
-	AccountID  uint `gorm:"primary_key"`
+	AccountID  uint   `gorm:"primary_key"`
+	Username   string `gorm:"index"`
 	SessionObj []byte
 }
 
 var ErrSessionNotFound = errors.New("sessionStore not found")
+
+func buildSessionObj(bin []byte) (*sunshinemotion.Session, error) {
+	buffer := bytes.NewBuffer([]byte{})
+	buffer.Write(bin)
+	dec := gob.NewDecoder(buffer)
+	session := new(sunshinemotion.Session)
+	if err := dec.Decode(&session); err != nil {
+		return nil, errors.New("buildSessionObj decode Fail" + err.Error())
+	}
+	return session, nil
+}
 
 func SaveSession(accountID uint, session *sunshinemotion.Session) (err error) {
 	log.Println("SaveSession, user", session.UserInfo.StudentNumber, session)
@@ -26,6 +39,7 @@ func SaveSession(accountID uint, session *sunshinemotion.Session) (err error) {
 
 	if err := db.Save(&SessionStore{
 		AccountID:  accountID,
+		Username:   session.UserInfo.StudentNumber,
 		SessionObj: buffer.Bytes(),
 	}).Error; err != nil {
 		return errors.New("saveSession Fail" + err.Error())
@@ -38,18 +52,25 @@ func GetSession(accountID uint) (session *sunshinemotion.Session, err error) {
 		AccountID: accountID,
 	}
 	if err := db.First(&store).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, ErrSessionNotFound
+		}
 		return nil, errors.New("getSession query sesion Fail" + err.Error())
 	}
-	if db.RecordNotFound() {
-		return nil, ErrSessionNotFound
+	session, err = buildSessionObj(store.SessionObj)
+	log.Println("GetSession, user", session.UserInfo.StudentNumber, session)
+	return session, nil
+}
+
+func GetSessionByUsername(username string) (session *sunshinemotion.Session, err error) {
+	store := &SessionStore{}
+	if err := db.Where("username = ?", username).First(&store).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, ErrSessionNotFound
+		}
+		return nil, errors.New("getSession query sesion Fail" + err.Error())
 	}
-	buffer := bytes.NewBuffer([]byte{})
-	buffer.Write(store.SessionObj)
-	dec := gob.NewDecoder(buffer)
-	session = new(sunshinemotion.Session)
-	if err := dec.Decode(&session); err != nil {
-		return nil, errors.New("getSession decode Fail" + err.Error())
-	}
+	session, err = buildSessionObj(store.SessionObj)
 	log.Println("GetSession, user", session.UserInfo.StudentNumber, session)
 	return session, nil
 }

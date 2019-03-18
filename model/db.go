@@ -54,3 +54,7 @@ func init() {
 	}
 	db.AutoMigrate(&Account{})
 }
+
+func GetDB() *gorm.DB {
+	return db
+}

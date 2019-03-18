@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"github.com/inkedawn/JKWXFucker-server/model"
 )
 
 type RemoteProfile struct {
@@ -32,17 +33,25 @@ func getRemoteProfile(context *gin.Context) {
 		return
 	}
 	username := context.Param("username")
-	password := context.Query("password")
-	if password == "" {
-		context.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-	s := sunshinemotion.CreateSession()
-	err = s.LoginEx(username, "123", sunshinemotion.PasswordHash(password), schoolID)
+	s, err := model.GetSessionByUsername(username)
 	if err != nil {
-		context.Error(err)
-		context.String(403, "%s", err)
-		return
+		if err == model.ErrSessionNotFound {
+			password := context.Query("password")
+			if password == "" {
+				context.String(200, "需要登录信息。")
+				return
+			}
+			err = s.LoginEx(username, "123", sunshinemotion.PasswordHash(password), schoolID)
+			if err != nil {
+				context.Error(err)
+				context.String(200, "登录错误：%s", err)
+				return
+			}
+		}else {
+			context.Error(err)
+			context.String(503, "获取SessionStore错误：%s", err)
+			return
+		}
 	}
 	log.Println("Get RemoteProfile, user", username, s)
 	profile := RemoteProfile{
