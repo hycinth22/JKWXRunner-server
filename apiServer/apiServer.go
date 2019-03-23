@@ -6,9 +6,19 @@ import (
 )
 
 func Run(engine *gin.Engine) error {
-	registerCORSRoute(engine)
-	registerTicketRoute(engine)
-	registerRemoteProfileRoute(engine)
-	engine.Use(cacheMiddleWare)
+	registerRoute(engine, RouteRegisterFunctions...)
+	engine.Use(cacheControlMiddleWare)
 	return engine.Run(config.ListenAddr)
+}
+
+type RouteRegisterFunc func(router gin.IRouter)
+
+func registerRoute(engine *gin.Engine, allF ...RouteRegisterFunc) {
+	for _, f := range allF {
+		f(engine)
+	}
+}
+
+func cacheControlMiddleWare(c *gin.Context) {
+	c.Header("Cache-Control", "no-store, max-age=0")
 }

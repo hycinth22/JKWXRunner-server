@@ -21,9 +21,6 @@ type SportResult struct {
 	QualifiedDistance float64 `json:"qualifiedDistance"`
 }
 
-func registerRemoteProfileRoute(router gin.IRouter) {
-	router.GET("/remoteProfile/:schoolID/:username", getRemoteProfile)
-}
 
 func getRemoteProfile(context *gin.Context) {
 	schoolID, err := strconv.ParseInt(context.Param("schoolID"), 10, 64)

@@ -23,5 +23,8 @@ func init() {
 }
 
 func main() {
-	apiServer.Run(gin.New())
+	err := apiServer.Run(gin.New())
+	if err != nil {
+		log.Fatal(err)
+	}
 }

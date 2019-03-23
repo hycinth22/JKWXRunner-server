@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 
-selfdir=$(dirname $0)
-srcdir=$selfdir
-pidfile=$selfdir/jkwxfucker.pid
-logdir=$selfdir/log
-logfile=$logdir/api_`date +%Y%m%d_%s_%N`.log
+selfDir=$(dirname $0)
+srcDir=${selfDir}
+pidFile=${selfDir}/jkwxfucker.pid
+logDir=${selfDir}/log
+logfile=${logDir}/api_`date +%Y%m%d_%s_%N`.log
 tmp_exec=$(mktemp)
 
-if [ ! -d $logdir ]; then
-	mkdir -m 655 $logdir
+if [[ ! -d ${logDir} ]]; then
+	mkdir -m 655 ${logDir}
 fi
 
 echo "building."
-go build -o $tmp_exec $srcdir
-if [ $? -ne 0 ]; then
+go build -o ${tmp_exec} ${srcDir}
+if [[ $? -ne 0 ]]; then
 	echo "build failed."
 	exit $?
 fi
-echo "build ok. "$tmp_exec
+echo "build ok. "${tmp_exec}
 
-nohup $tmp_exec > $logfile & echo $! > $pidfile
+nohup ${tmp_exec} > ${logfile} & echo $! > ${pidFile}

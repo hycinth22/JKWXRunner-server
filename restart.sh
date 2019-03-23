@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-selfdir=$(dirname $0)
+selfDir=$(dirname $0)
 
-$selfdir/stop.sh && $selfdir/start.sh
+${selfDir}/stop.sh && ${selfDir}/start.sh

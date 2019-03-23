@@ -1,7 +1,9 @@
+// DEPRECATED
 package staticFileServer
 
 import "github.com/gin-gonic/gin"
 
+// DEPRECATED
 func Run(engine *gin.Engine) error {
 	// static files
 	engine.Use(authMiddleWare)

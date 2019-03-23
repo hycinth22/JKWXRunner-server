@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-selfdir=$(dirname $0)
-pidfile=$selfdir/jkwxfucker.pid
+selfDir=$(dirname $0)
+pidFile=${selfDir}/jkwxfucker.pid
 
-if [ -f $pidfile ]; then
-	kill -9 `cat $pidfile`
+if [[ -f ${pidFile} ]]; then
+	kill -9 `cat ${pidFile}`
 fi
