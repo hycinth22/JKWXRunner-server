@@ -15,9 +15,11 @@ func main() {
 	}
 	for i := range accounts {
 		println(i)
-		err := sessionSrv.UpdateSession(db, accounts[i])
-		if err != nil {
-			println(err.Error())
+		if accounts[i].Status == accountSrv.StatusNormal {
+			err := sessionSrv.UpdateSession(db, accounts[i])
+			if err != nil {
+				println(err.Error())
+			}
 		}
 	}
 }
