@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/inkedawn/JKWXFucker-server/config"
 	"github.com/jinzhu/gorm"
+	"io"
 	"log"
 	"os"
 
@@ -20,8 +21,9 @@ var (
 
 func init() {
 	var err error
+	var logOutput io.Writer = os.Stdout
 	// initialize logger
-	logger = log.New(os.Stdout, "[Database]", log.LstdFlags)
+	logger = log.New(logOutput, "[Database]", log.LstdFlags)
 	// read database source config
 	logger.Println("dsn: ", config.DSN)
 	//  connect database

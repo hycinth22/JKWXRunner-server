@@ -1,12 +1,14 @@
 // 提供对Session的智能管理，屏蔽底层细节，比直接操作token更为便捷。
 //
-// 实际并不存在Session表，通过对下层token、device等数个表的组合访问虚拟而来。
+// 实际并不存在Session表，通过对下层token、device等数个表和服务的组合访问虚拟而来。
 package sessionSrv
 
 import (
+	"fmt"
 	"github.com/inkedawn/JKWXFucker-server/database"
-	"github.com/inkedawn/JKWXFucker-server/database/model"
 	"github.com/inkedawn/JKWXFucker-server/service"
+	"github.com/inkedawn/JKWXFucker-server/service/accountSrv"
+	"github.com/inkedawn/JKWXFucker-server/service/accountSrv/accLogSrv"
 	"github.com/inkedawn/JKWXFucker-server/service/userIDRelationSrv"
 	"time"
 
@@ -23,7 +25,7 @@ const PhoneNum = "123"
 //
 // 注意，该函数只检查Token的过期时间，并不会实际发送请求来验证Token有效性。
 // 如果返回的Session包含失效Token，需要手动调用NewSession来完成更新。
-func SmartGetSession(db *database.DB, acc model.Account) (s *ssmt.Session, err error) {
+func SmartGetSession(db *database.DB, acc accountSrv.Account) (s *ssmt.Session, err error) {
 	tx := db.Begin()
 	defer func() {
 		if err == nil {
@@ -59,7 +61,7 @@ func SmartGetSession(db *database.DB, acc model.Account) (s *ssmt.Session, err e
 	s.User = &ssmt.UserIdentify{
 		UserID:   userToken.RemoteUserID,
 		SchoolID: acc.SchoolID,
-		Username: acc.StuNum,
+		StuNum:   acc.StuNum,
 	}
 	return s, nil
 }
@@ -68,7 +70,7 @@ func SmartGetSession(db *database.DB, acc model.Account) (s *ssmt.Session, err e
 // 自动从service/device获取该Account的Device
 //
 // 返回的error可以直接与SSMT提供error比较
-func NewSession(db *database.DB, acc model.Account) (s *ssmt.Session, err error) {
+func NewSession(db *database.DB, acc accountSrv.Account) (s *ssmt.Session, err error) {
 	tx := db.Begin()
 	defer func() {
 		if err == nil {
@@ -89,14 +91,23 @@ func NewSession(db *database.DB, acc model.Account) (s *ssmt.Session, err error)
 	return s, err
 }
 
-func newSession(db *database.DB, acc model.Account, SSMTDevice ssmt.Device) (*ssmt.Session, error) {
+// 创建一个Session并保存到Session库。不管是否已有该账号的Session
+// 自动从service/device获取该Account的Device
+//
+// 返回的error可以直接与SSMT提供error比较
+func UpdateSession(db *database.DB, acc accountSrv.Account) (err error) {
+	_, err = NewSession(db, acc)
+	return
+}
+
+func newSession(db *database.DB, acc accountSrv.Account, SSMTDevice ssmt.Device) (*ssmt.Session, error) {
 	s := ssmt.CreateSession()
 	s.Device = &SSMTDevice
 	info, err := s.Login(acc.SchoolID, acc.StuNum, PhoneNum, ssmt.PasswordHash(acc.Password))
 	if err != nil {
 		return nil, err
 	}
-
+	accLogSrv.AddLogSuccess(db, acc.ID, fmt.Sprintf("登录成功。Device Dump：%v；Token Dump：%v", *s.Device, *s.Token))
 	// save into session storage
 	err = saveToken(db, fromSSMTToken(s.User.UserID, *s.Token))
 	if err != nil {

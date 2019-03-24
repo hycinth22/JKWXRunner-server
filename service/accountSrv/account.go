@@ -6,6 +6,7 @@ import (
 	"github.com/inkedawn/JKWXFucker-server/database"
 	"github.com/inkedawn/JKWXFucker-server/database/model"
 	"github.com/inkedawn/JKWXFucker-server/service"
+	"github.com/inkedawn/JKWXFucker-server/service/accountSrv/accLogSrv"
 
 	"time"
 )
@@ -16,21 +17,22 @@ var (
 	ErrNoAccount = errors.New("没有找到帐号")
 )
 
-type Status = uint
+type Status = string
 
 const (
-	StatusNormal Status = iota
-	StatusRunning
-	StatusFinished
-	StatusSuspend
-	StatusTerminated
+	StatusNormal     Status = "normal"
+	StatusPause      Status = "pause"
+	StatusRunning    Status = "running"
+	StatusFinished   Status = "finished"
+	StatusSuspend    Status = "suspend"
+	StatusTerminated Status = "terminated"
 )
 
-type RunResult = uint
+type RunResult = string
 
 const (
-	RunSuccess RunResult = iota
-	RunErrorOccurred
+	RunSuccess       RunResult = "success"
+	RunErrorOccurred RunResult = "error "
 )
 
 func ListAccounts(db *database.DB, offset, num uint) ([]Account, error) {
@@ -46,9 +48,13 @@ func ListAccounts(db *database.DB, offset, num uint) ([]Account, error) {
 }
 
 func SaveAccount(db *database.DB, acc *Account) error {
+	newAcc := db.NewRecord(acc)
 	err := db.Save(&acc).Error
 	if err != nil {
 		return service.WrapAsInternalError(err)
+	}
+	if newAcc {
+		accLogSrv.AddLogSuccess(db, acc.ID, "创建成功")
 	}
 	return nil
 }
@@ -89,10 +95,33 @@ func ListAndSetRunStatusForAllAccountsWaitRun(db *database.DB) (accounts []Accou
 	return accounts, nil
 }
 
-func SetStatusNormal(db *database.DB, acc *Account) error {
-	err := db.Model(acc).Update("status", StatusNormal).Error
+func SetStatus(db *database.DB, acc *Account, status Status) error {
+	err := db.Model(acc).Update("status", status).Error
 	if err != nil {
 		return service.WrapAsInternalError(err)
 	}
+	acc.Status = status
+	return nil
+}
+
+func SetStatusNormal(db *database.DB, acc *Account) error {
+	return SetStatus(db, acc, StatusNormal)
+}
+
+func SetLastTime(db *database.DB, acc *Account, lastTime time.Time) error {
+	err := db.Model(acc).Update("last_time", lastTime).Error
+	if err != nil {
+		return service.WrapAsInternalError(err)
+	}
+	acc.LastTime = lastTime
+	return nil
+}
+
+func SetLastResult(db *database.DB, acc *Account, r RunResult) error {
+	err := db.Model(acc).Update("last_result", r).Error
+	if err != nil {
+		return service.WrapAsInternalError(err)
+	}
+	acc.LastResult = r
 	return nil
 }
