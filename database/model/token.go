@@ -5,7 +5,6 @@ import (
 )
 
 type Token struct {
-	CreatedAt time.Time
 	UpdatedAt time.Time
 
 	RemoteUserID   int64     `gorm:"primary_key;NOT NULL"`
