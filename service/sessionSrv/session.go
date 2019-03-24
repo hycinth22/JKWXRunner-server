@@ -105,6 +105,7 @@ func newSession(db *database.DB, acc accountSrv.Account, SSMTDevice ssmt.Device)
 	s.Device = &SSMTDevice
 	info, err := s.Login(acc.SchoolID, acc.StuNum, PhoneNum, ssmt.PasswordHash(acc.Password))
 	if err != nil {
+		accLogSrv.AddLogFail(db, acc.ID, fmt.Sprintf("登录失败。Error: %v ;Device Dump：%v；;Token Dump：%v", err, *s.Device, *s.Token))
 		return nil, err
 	}
 	accLogSrv.AddLogSuccess(db, acc.ID, fmt.Sprintf("登录成功。Device Dump：%v；Token Dump：%v", *s.Device, *s.Token))
