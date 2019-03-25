@@ -36,6 +36,5 @@ func sleepPartOfTotalTime(totalCount int64, totalTime time.Duration) {
 }
 
 func sleepUtil(t time.Time) {
-	return
 	time.Sleep(time.Until(t))
 }
