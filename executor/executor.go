@@ -31,7 +31,7 @@ func main() {
 	if len(accounts) >= 2 {
 		for i := range accounts[1:] {
 			sleepPartOfTotalTime(int64(len(accounts)), 6*time.Hour)
-			startupTaskWorker(db, &accounts[i], &wg)
+			startupTaskWorker(db, &accounts[1+i], &wg)
 		}
 	}
 	wg.Wait()
