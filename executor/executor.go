@@ -23,6 +23,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	log.Println("Run List:")
+	for _, acc := range accounts {
+		log.Println(acc)
+	}
+	
 	var wg sync.WaitGroup
 	wg.Add(len(accounts))
 	if len(accounts) >= 1 {
