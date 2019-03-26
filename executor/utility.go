@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -37,4 +38,14 @@ func sleepPartOfTotalTime(totalCount int64, totalTime time.Duration) {
 
 func sleepUtil(t time.Time) {
 	time.Sleep(time.Until(t))
+}
+
+// %v the value in a default format, adds field names
+func dumpStructValue(data interface{}) string {
+	return fmt.Sprintf("%+v", data)
+}
+
+// %#v	a Go-syntax representation of the value
+func dumpStruct(data interface{}) string {
+	return fmt.Sprintf("%#v", data)
 }

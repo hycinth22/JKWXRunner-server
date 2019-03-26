@@ -30,23 +30,23 @@ execute:
 		uid := acc.ID
 		s, err := sessionSrv.SmartGetSession(db, *acc)
 		if err != nil {
-			accLogSrv.AddLogFail(db, uid, "创建Session失败："+err.Error())
+			accLogSrv.AddLogFail(db, uid, "创建Session失败："+dumpStruct(err))
 			return err
 		}
 
 		userInfo, err := userCacheSrv.GetCacheUserInfo(db, s.User.UserID)
 		if err != nil {
-			accLogSrv.AddLogFail(db, uid, "获取UserInfo失败："+err.Error())
+			accLogSrv.AddLogFail(db, uid, "获取UserInfo失败："+dumpStruct(err))
 			return err
 		}
 		limit := ssmt.GetDefaultLimitParams(userInfo.Sex)
 
 		r, err := recordResultBeforeRun(db, acc.ID, s)
 		if err == ssmt.ErrTokenExpired {
-			accLogSrv.AddLogInfo(db, uid, fmt.Sprintf("Session失效，尝试更新Session。Old Session Dump: %v", *s))
+			accLogSrv.AddLogInfo(db, uid, "Session失效，尝试更新Session。Old Session Dump: %s" + dumpStruct(*s))
 			err = sessionSrv.UpdateSession(db, *acc)
 			if err != nil {
-				accLogSrv.AddLogFail(db, uid, "更新Session失败："+err.Error())
+				accLogSrv.AddLogFail(db, uid, "更新Session失败："+dumpStruct(err))
 				return err
 			}
 			// Retry
@@ -86,20 +86,21 @@ execute:
 func uploadRecords(db *database.DB, acc *accountSrv.Account, s *ssmt.Session, records []ssmt.Record) error {
 	uid := acc.ID
 	for i, r := range records {
+		n := i + 1
 		_, err := s.GetRandRoute()
 		if err != nil {
-			accLogSrv.AddLogFail(db, uid, fmt.Sprintf("第%d条记录GetRandRoute失败：%v。", i, err))
+			accLogSrv.AddLogFail(db, uid, fmt.Sprintf("第%d条记录GetRandRoute失败：%#v。", n, err))
 			return errors.New("GetRandRoute" + err.Error())
 		}
-		log.Println(i, r)
+		log.Println(n, r)
 		log.Println("Sleep Util", r.EndTime)
 		sleepUtil(r.EndTime)
 		err = s.UploadRecord(r)
 		if err != nil {
-			accLogSrv.AddLogFail(db, uid, fmt.Sprintf("上传第%d条记录失败：%v。 RecordDump: %v", i, err, r))
+			accLogSrv.AddLogFail(db, uid, fmt.Sprintf("上传第%d条记录失败：%#v。 RecordDump: %s", n, err, dumpStructValue(r)))
 			return err
 		}
-		accLogSrv.AddLogSuccess(db, uid, fmt.Sprintf("上传第%d条记录成功。 RecordDump: %v", i, r))
+		accLogSrv.AddLogSuccess(db, uid, fmt.Sprintf("上传第%d条记录成功。 RecordDump: %s", n, dumpStructValue(r)))
 	}
 	return nil
 }
@@ -111,7 +112,7 @@ func recordResultBeforeRun(db *database.DB, uid uint, s *ssmt.Session) (result *
 		return nil, err
 	}
 	_ = userCacheSrv.SaveCacheSportResult(db, userCacheSrv.FromSSMTSportResult(*result, s.User.UserID, time.Now()))
-	accLogSrv.AddLogInfo(db, uid, fmt.Sprintf("上传前运动结果： %v", *result))
+	accLogSrv.AddLogInfo(db, uid, "上传前运动结果： "+dumpStructValue(*result))
 	return
 }
 
@@ -122,6 +123,6 @@ func recordResultAfterRun(db *database.DB, uid uint, s *ssmt.Session) (result *s
 		return nil, err
 	}
 	_ = userCacheSrv.SaveCacheSportResult(db, userCacheSrv.FromSSMTSportResult(*result, s.User.UserID, time.Now()))
-	accLogSrv.AddLogInfo(db, uid, fmt.Sprintf("上传后运动结果： %v", *result))
+	accLogSrv.AddLogInfo(db, uid, "上传后运动结果： "+dumpStructValue(*result))
 	return
 }

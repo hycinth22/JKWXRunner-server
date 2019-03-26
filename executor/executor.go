@@ -25,9 +25,9 @@ func main() {
 	}
 	log.Println("Run List:")
 	for _, acc := range accounts {
-		log.Println(acc)
+		log.Println(dumpStructValue(acc))
 	}
-	
+
 	var wg sync.WaitGroup
 	wg.Add(len(accounts))
 	if len(accounts) >= 1 {
@@ -48,7 +48,7 @@ func VersionCheck() bool {
 	s := ssmt.CreateSession()
 	info, err := s.GetAppInfo()
 	if err != nil {
-		log.Println("Can't get latest app info. ", err)
+		log.Println("Can't get latest app info.", err)
 		return false
 	}
 	if info.VerNumber != lib_version {
