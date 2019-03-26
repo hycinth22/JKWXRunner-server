@@ -2,5 +2,5 @@
 *.db
 *.dsn
 *.pid
-debug
 log/
+*.exe
