@@ -59,6 +59,38 @@ func SaveAccount(db *database.DB, acc *Account) error {
 	return nil
 }
 
+func ListAllAccountsWaitRun(db *database.DB) (accounts []Account, err error) {
+	now := time.Now()
+	todayZero := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
+	tx := db.Begin()
+	defer func() {
+		if err == nil {
+			tx.Commit()
+		} else {
+			tx.Rollback()
+		}
+	}()
+	var idGroup []uint
+	if err := tx.Model(&Account{}).Where("status = ? AND last_time < ?", StatusNormal, todayZero).Pluck("id", &idGroup).Error; err != nil {
+		if database.IsRecordNotFoundError(err) {
+			// 返回空集
+			return []Account{}, nil
+		}
+		return accounts, service.WrapAsInternalError(err)
+	}
+	if len(idGroup) == 0 {
+		// 返回空集
+		return []Account{}, nil
+	}
+	if err := tx.Where("id in (?)", idGroup).Find(&accounts).Error; err != nil {
+		if database.IsRecordNotFoundError(err) {
+			// 返回空集
+			return []Account{}, nil
+		}
+		return accounts, service.WrapAsInternalError(err)
+	}
+	return accounts, nil
+}
 func ListAndSetRunStatusForAllAccountsWaitRun(db *database.DB) (accounts []Account, err error) {
 	now := time.Now()
 	todayZero := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
