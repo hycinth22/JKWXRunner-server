@@ -17,6 +17,9 @@ var (
 func getToken(db *database.DB, remoteUserID int64) (token, error) {
 	var userToken token
 	err := db.First(&userToken, &token{RemoteUserID: remoteUserID}).Error
+	if err != nil && database.IsRecordNotFoundError(err) {
+		return userToken, ErrNoToken
+	}
 	return userToken, err
 }
 func getTokenByUID(db *database.DB, uid uint) (t token, err error) {
