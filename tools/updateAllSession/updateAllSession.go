@@ -4,6 +4,8 @@ import (
 	"github.com/inkedawn/JKWXFucker-server/database"
 	"github.com/inkedawn/JKWXFucker-server/service/accountSrv"
 	"github.com/inkedawn/JKWXFucker-server/service/sessionSrv"
+	"github.com/inkedawn/JKWXFucker-server/utils"
+	"time"
 )
 
 func main() {
@@ -13,13 +15,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	for i := range accounts {
+	n := len(accounts)
+	for i := range accounts[1:] {
 		println(i)
 		if accounts[i].Status == accountSrv.StatusNormal {
 			err := sessionSrv.UpdateSession(db, accounts[i])
 			if err != nil {
 				println(err.Error())
 			}
+			utils.SleepPartOfTotalTime(n, time.Duration(n) * 5 * time.Second)
 		}
 	}
 }
