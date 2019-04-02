@@ -4,9 +4,10 @@ import (
 	"errors"
 	"github.com/inkedawn/JKWXFucker-server/config"
 	"github.com/jinzhu/gorm"
-	"io"
 	"log"
 	"os"
+	"path/filepath"
+	"time"
 
 	// _ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
@@ -21,9 +22,28 @@ var (
 
 func init() {
 	var err error
-	var logOutput io.Writer = os.Stdout
+	var sqlLogger *log.Logger
 	// initialize logger
-	logger = log.New(logOutput, "[Database]", log.LstdFlags)
+	logger = log.New(os.Stdout, "[Database]", log.LstdFlags)
+	// open log file && initialize sql logger
+	{
+		sqlLogDir, err := filepath.Abs(config.DBLogDir)
+		if err != nil {
+			logger.Println(sqlLogDir, err)
+		}
+		sqlLogFileName := filepath.Join(sqlLogDir, time.Now().Format(config.DBLogFileName))
+		// ensure directory existed
+		if err := os.MkdirAll(sqlLogDir, 0644); err != nil {
+			logger.Println(sqlLogDir, err)
+		}
+		if sqlLogFile, err := os.Create(sqlLogFileName); err != nil {
+			logger.Println(err)
+			logger.Println("Warning: Failed to open log file. Database log will be shown only in database module log (usually StdOut)")
+			sqlLogger = logger
+		} else {
+			sqlLogger = log.New(sqlLogFile, "", log.LstdFlags)
+		}
+	}
 	// read database source config
 	logger.Println("dsn: ", config.DSN)
 	//  connect database
@@ -32,6 +52,7 @@ func init() {
 		panic(err)
 	}
 	// configure database connection
+	db.SetLogger(sqlLogger)
 	db.LogMode(config.DBLogMode)
 	db.DB().SetMaxIdleConns(config.DBMaxIdleConn)
 	db.DB().SetMaxOpenConns(config.DBMaxOpenConn)

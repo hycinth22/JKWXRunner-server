@@ -7,7 +7,10 @@ const (
 	ListenAddr = "localhost:8066"
 
 	DBLogMode     = true
-	DSN           = `.\app_new3.db?mode=rw`
+	DBLogDir	  = `.\data\logs\`
+	DBLogFileName = `20060102_150405.000000000.log` // Time Package Format Layout
+
+	DSN           = `.\data\v3_2018-2019-2_s.db?mode=rw`
 	DBMaxIdleConn = 1
 	DBMaxOpenConn = 10
 )
