@@ -61,11 +61,14 @@ func startupTaskWorker(db *database.DB, acc *accountSrv.Account, wg *sync.WaitGr
 	log.Println("runAccountTask", acc.SchoolID, acc.StuNum)
 	go func() {
 		defer wg.Done()
-		executeTask(db, acc)
+		executeTask(db, acc, 3)
 	}()
 }
 
-func executeTask(db *database.DB, acc *accountSrv.Account) {
+func executeTask(db *database.DB, acc *accountSrv.Account, retryTimes uint) {
+	if retryTimes < 0 {
+		return
+	}
 	err := runAccountTask(db, acc)
 	setAccountLastTime(db, acc, time.Now())
 	switch err {
@@ -76,6 +79,8 @@ func executeTask(db *database.DB, acc *accountSrv.Account) {
 	case ErrFinished:
 		setAccountLastResult(db, acc, accountSrv.RunSuccess)
 		setAccountStatus(db, acc, accountSrv.StatusFinished)
+	case ssmt.ErrTokenExpired:
+		executeTask(db, acc, retryTimes-1)
 	default:
 		fmt.Println(acc.SchoolID, acc.StuNum, ": ", err.Error())
 		setAccountLastResult(db, acc, accountSrv.RunErrorOccurred)
