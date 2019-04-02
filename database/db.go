@@ -33,7 +33,7 @@ func init() {
 		}
 		sqlLogFileName := filepath.Join(sqlLogDir, time.Now().Format(config.DBLogFileName))
 		// ensure directory existed
-		if err := os.MkdirAll(sqlLogDir, 0644); err != nil {
+		if err := os.MkdirAll(sqlLogDir, 0777); err != nil {
 			logger.Println(sqlLogDir, err)
 		}
 		if sqlLogFile, err := os.Create(sqlLogFileName); err != nil {
