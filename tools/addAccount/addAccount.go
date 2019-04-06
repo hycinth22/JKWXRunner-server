@@ -80,4 +80,13 @@ func main() {
 	}
 	fmt.Printf("Account %d: %+v", acc.ID, acc)
 	fmt.Println()
+
+	session := new(ssmt.Session)
+	session.Device = ssmtDevice
+	info, err := session.Login(Arg_SchoolID, Arg_StuNum, "123", ssmt.PasswordHash(Arg_Password))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Account Info: %+v", info)
+	fmt.Println()
 }
