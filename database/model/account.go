@@ -16,6 +16,6 @@ type Account struct {
 
 	DeviceID   uint      `gorm:"NOT NULL"`
 	Status     string    `gorm:"NOT NULL"`
-	LastResult string    `gorm:"NOT NULL"`
-	LastTime   time.Time `gorm:"NOT NULL"`
+	LastResult string
+	LastTime   time.Time
 }
