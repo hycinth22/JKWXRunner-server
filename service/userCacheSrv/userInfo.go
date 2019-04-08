@@ -16,6 +16,11 @@ var (
 
 type CacheUserInfo = model.CacheUserInfo
 
+const (
+	UserRole_Normal = iota
+	UserRole_Cheater
+)
+
 // 从数据库获取缓存的信息（通常是上次登录时保存的）
 func GetCacheUserInfo(db *database.DB, userID int64) (CacheUserInfo, error) {
 	var info CacheUserInfo

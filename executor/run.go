@@ -39,11 +39,15 @@ execute:
 			accLogSrv.AddLogFail(db, uid, "获取UserInfo失败："+dumpStruct(err))
 			return err
 		}
+		if acc.CheckCheatMarked && userInfo.UserRoleID == userCacheSrv.UserRole_Cheater {
+			accLogSrv.AddLogFail(db, uid, "该帐号已被标记作弊！停止执行")
+			return
+		}
 		limit := ssmt.GetDefaultLimitParams(userInfo.Sex)
 
 		r, err := recordResultBeforeRun(db, acc.ID, s)
 		if err == ssmt.ErrTokenExpired {
-			accLogSrv.AddLogInfo(db, uid, "Session失效，尝试更新Session。Old Session Dump: %s" + dumpStruct(*s))
+			accLogSrv.AddLogInfo(db, uid, "Session失效，尝试更新Session。Old Session Dump: %s"+dumpStruct(*s))
 			err = sessionSrv.UpdateSession(db, *acc)
 			if err != nil {
 				accLogSrv.AddLogFail(db, uid, "更新Session失败："+dumpStruct(err))
