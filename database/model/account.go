@@ -13,7 +13,7 @@ type Account struct {
 	Password string `gorm:"NOT NULL"`
 
 	RunDistance      float64 `gorm:"NOT NULL"`
-	CheckCheatMarked bool    `gorm:"NOT NULL;default:true"`
+	CheckCheatMarked bool    `gorm:"NOT NULL;default:1"`
 
 	DeviceID   uint      `gorm:"NOT NULL"`
 	Status     string    `gorm:"NOT NULL"`
