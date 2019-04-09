@@ -16,6 +16,7 @@ import (
 var (
 	ErrFinished        = errors.New("已完成跑步，不需要再执行任务")
 	ErrWrongLibVersion = errors.New("错误的库版本")
+	ErrCheatMarked 	   = errors.New("该帐号已被标记作弊！")
 )
 
 func runAccountTask(db *database.DB, acc *accountSrv.Account) (err error) {
@@ -41,7 +42,7 @@ execute:
 		}
 		if acc.CheckCheatMarked && userInfo.UserRoleID == userCacheSrv.UserRole_Cheater {
 			accLogSrv.AddLogFail(db, uid, "该帐号已被标记作弊！停止执行")
-			return
+			return ErrCheatMarked
 		}
 		limit := ssmt.GetDefaultLimitParams(userInfo.Sex)
 
