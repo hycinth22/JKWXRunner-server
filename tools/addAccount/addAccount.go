@@ -42,7 +42,7 @@ func mustParseArgs() {
 		Arg_Status = os.Args[5]
 	}
 	if Arg_Status == "" {
-		Arg_Status = accountSrv.StatusSuspend
+		Arg_Status = accountSrv.StatusNormal
 	}
 }
 
