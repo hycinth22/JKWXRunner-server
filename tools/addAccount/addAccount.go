@@ -20,8 +20,10 @@ var (
 
 func mustParseArgs() {
 	var err error
-	if len(os.Args) < 5 {
+	if len(os.Args) < 4 {
 		panic("too few arguments")
+	} else if len(os.Args) > 5 {
+		panic("too many arguments")
 	}
 	Arg_SchoolID, err = strconv.ParseInt(os.Args[1], 10, 64)
 	if err != nil {
@@ -29,9 +31,11 @@ func mustParseArgs() {
 	}
 	Arg_StuNum = os.Args[2]
 	Arg_Password = os.Args[3]
-	Arg_RunDistance, err = strconv.ParseFloat(os.Args[4], 64)
-	if err != nil {
-		panic(err)
+	if len(os.Args) >= 5 {
+		Arg_RunDistance, err = strconv.ParseFloat(os.Args[4], 64)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -59,8 +63,17 @@ func main() {
 	}()
 
 	ssmtDevice := ssmt.GenerateDevice()
+	session := new(ssmt.Session)
+	session.Device = ssmtDevice
+	info, err := session.Login(Arg_SchoolID, Arg_StuNum, "123", ssmt.PasswordHash(Arg_Password))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Account Info: %+v", info)
+	fmt.Println()
+
 	dev := deviceSrv.FromSSMTDevice(*ssmtDevice)
-	err := deviceSrv.SaveDevice(tx, &dev)
+	err = deviceSrv.SaveDevice(tx, &dev)
 	if err != nil {
 		panic(err)
 	}
@@ -74,19 +87,14 @@ func main() {
 		DeviceID:    dev.ID,
 		Status:      accountSrv.StatusSuspend,
 	}
+	if acc.RunDistance == 0.0 {
+		limit := ssmt.GetDefaultLimitParams(info.Sex)
+		acc.RunDistance = limit.LimitTotalDistance.Max - 0.1
+	}
 	err = accountSrv.SaveAccount(tx, acc)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Account %d: %+v", acc.ID, acc)
-	fmt.Println()
-
-	session := new(ssmt.Session)
-	session.Device = ssmtDevice
-	info, err := session.Login(Arg_SchoolID, Arg_StuNum, "123", ssmt.PasswordHash(Arg_Password))
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Account Info: %+v", info)
 	fmt.Println()
 }
