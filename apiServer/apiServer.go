@@ -6,19 +6,11 @@ import (
 )
 
 func Run(engine *gin.Engine) error {
-	registerRoute(engine, RouteRegisterFunctions...)
-	engine.Use(cacheControlMiddleWare)
+	registerRequestRoutersTable(engine)
+	engine.Use(addCacheControlHeader)
 	return engine.Run(config.ListenAddr)
 }
 
-type RouteRegisterFunc func(router gin.IRouter)
-
-func registerRoute(engine *gin.Engine, allF ...RouteRegisterFunc) {
-	for _, f := range allF {
-		f(engine)
-	}
-}
-
-func cacheControlMiddleWare(c *gin.Context) {
+func addCacheControlHeader(c *gin.Context) {
 	c.Header("Cache-Control", "no-store, max-age=0")
 }

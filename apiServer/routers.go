@@ -5,14 +5,7 @@ import (
 	"github.com/inkedawn/JKWXFucker-server/apiServer/handler"
 )
 
-// read-only, register action only happened at call Run()
-var RouteRegisterFunctions = []RouteRegisterFunc{
-	registerCORSRoute,
-	registerAccountRoute,
-	registerLogRoute,
-}
-
-func registerCORSRoute(router gin.IRouter) {
+func CORSRouter(router gin.IRouter) {
 	router.Use(func(context *gin.Context) {
 		context.Header("Access-Control-Allow-Origin", "*")
 		context.Header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS")
@@ -25,17 +18,17 @@ func registerCORSRoute(router gin.IRouter) {
 	})
 }
 
-func registerAccountRoute(router gin.IRouter) {
+func AccountRouter(router gin.IRouter) {
 	router.GET("/account", handler.ListAccounts)
-	router.POST("/account", handler.AddAccount)
-	router.PUT("/account", handler.UpdateAccount)
-	// router.DELETE("/account/:id", handler.DeleteAccount)
+	router.POST("/account", handler.NotImplemented)
+	router.PUT("/account", handler.NotImplemented)
+	router.DELETE("/account/:id", handler.NotImplemented)
 }
 
-func registerLogRoute(router gin.IRouter) {
-	router.GET("/log", handler.ListLogsByUsername)
+func AccountLogsRouter(router gin.IRouter) {
+	router.GET("/account/:uid/logs/", handler.ListLogsByUID)
 }
 
-func registerUserInfoRoute(router gin.IRouter) {
-	router.GET("/userInfo/:username", handler.ShowUserInfo)
+func UserInfoRouter(router gin.IRouter) {
+	router.GET("/userInfo/:username", handler.NotImplemented)
 }

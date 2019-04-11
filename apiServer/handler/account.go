@@ -15,9 +15,3 @@ func ListAccounts(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, acc)
 }
-func AddAccount(ctx *gin.Context) {
-
-}
-func UpdateAccount(ctx *gin.Context) {
-
-}
