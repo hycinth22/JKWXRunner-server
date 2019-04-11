@@ -34,6 +34,11 @@ func reportErr(msg string) {
 	}
 }
 
+func ListLogsForUID(db *database.DB, uid uint, offset, limit uint) (logs []model.AccountLog, err error) {
+	err = db.Where("uid = ?", uid).Offset(offset).Limit(limit).Find(&logs).Error
+	return
+}
+
 func AddLogNow(db *database.DB, uid uint, logType Type, text string) {
 	AddLog(db, uid, time.Now(), logType, text)
 }
