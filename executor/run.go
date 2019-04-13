@@ -83,6 +83,9 @@ execute:
 		if err != nil {
 			return err
 		}
+		if r.ActualDistance > r.QualifiedDistance {
+			return ErrFinished
+		}
 		break execute
 	}
 	return nil
