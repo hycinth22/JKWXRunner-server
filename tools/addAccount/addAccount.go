@@ -96,7 +96,7 @@ func main() {
 	}
 	if acc.RunDistance == 0.0 {
 		limit := ssmt.GetDefaultLimitParams(info.Sex)
-		acc.RunDistance = limit.LimitTotalDistance.Max - 0.1
+		acc.RunDistance = limit.LimitTotalDistance.Max - 0.1*randBetween0to1()
 	}
 	err = accountSrv.SaveAccount(tx, acc)
 	if err != nil {
