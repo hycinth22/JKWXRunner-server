@@ -32,7 +32,7 @@ type RunResult = string
 
 const (
 	RunSuccess       RunResult = "success"
-	RunErrorOccurred RunResult = "error "
+	RunErrorOccurred RunResult = "error"
 )
 
 func ListAccounts(db *database.DB, offset, num uint) ([]Account, error) {
