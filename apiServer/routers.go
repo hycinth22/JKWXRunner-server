@@ -44,5 +44,5 @@ func UserInfoRouter(router gin.IRouter) {
 }
 
 func SportResultRouter(router gin.IRouter) {
-	router.GET("/sportResult/", handler.QueryCacheUserSportResult)
+	router.GET("/sportResult/:uid", handler.QueryCacheUserSportResult)
 }

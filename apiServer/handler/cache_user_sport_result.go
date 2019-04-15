@@ -4,21 +4,32 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/inkedawn/JKWXFucker-server/database"
 	"github.com/inkedawn/JKWXFucker-server/service/userCacheSrv"
+	"github.com/inkedawn/JKWXFucker-server/service/userIDRelationSrv"
 	"net/http"
 	"strconv"
 )
 
 func QueryCacheUserSportResult(ctx *gin.Context) {
-	inputUserID := ctx.Query("remoteUserID")
-	if inputUserID == "" {
+	inputUID := ctx.Param("uid")
+	if inputUID == "" {
 		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
 	}
-	userID, err := strconv.ParseInt(inputUserID, 10, 64)
+	uid, err := strconv.ParseUint(inputUID, 10, 64)
 	if err != nil {
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
-	result, err := userCacheSrv.GetCacheSportResult(database.GetDB(), userID)
+	db := database.GetDB()
+	remoteUID, err := userIDRelationSrv.GetRemoteUserID(db, uint(uid))
+	if err == userIDRelationSrv.ErrNotFound {
+		ctx.AbortWithStatus(http.StatusNotFound)
+		return
+	} else if err != nil {
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+	result, err := userCacheSrv.GetCacheSportResult(db, remoteUID)
 	if err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
