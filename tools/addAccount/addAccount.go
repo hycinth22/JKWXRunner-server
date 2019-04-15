@@ -6,6 +6,7 @@ import (
 	"github.com/inkedawn/JKWXFucker-server/service"
 	"github.com/inkedawn/JKWXFucker-server/service/accountSrv"
 	"github.com/inkedawn/JKWXFucker-server/service/deviceSrv"
+	"github.com/inkedawn/JKWXFucker-server/service/userCacheSrv"
 	"github.com/inkedawn/go-sunshinemotion"
 	"os"
 	"strconv"
@@ -78,6 +79,9 @@ func main() {
 	}
 	fmt.Printf("Account Info: %+v", info)
 	fmt.Println()
+	if info.UserRoleID == userCacheSrv.UserRole_Cheater {
+		fmt.Println("[WARNING] The User Has been marked as a cheater!")
+	}
 
 	dev := deviceSrv.FromSSMTDevice(*ssmtDevice)
 	err = deviceSrv.SaveDevice(tx, &dev)
