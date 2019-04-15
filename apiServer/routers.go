@@ -11,6 +11,7 @@ func init() {
 		AccountRouter,
 		AccountLogsRouter,
 		UserInfoRouter,
+		SportResultRouter,
 	}
 }
 
@@ -40,4 +41,8 @@ func AccountLogsRouter(router gin.IRouter) {
 
 func UserInfoRouter(router gin.IRouter) {
 	router.GET("/userInfo/:username", handler.NotImplemented)
+}
+
+func SportResultRouter(router gin.IRouter) {
+	router.GET("/sportResult/", handler.QueryCacheUserSportResult)
 }
