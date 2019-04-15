@@ -5,6 +5,15 @@ import (
 	"github.com/inkedawn/JKWXFucker-server/apiServer/handler"
 )
 
+func init() {
+	RequestRoutersTable = []RequestRouter{
+		CORSRouter,
+		AccountRouter,
+		AccountLogsRouter,
+		UserInfoRouter,
+	}
+}
+
 func CORSRouter(router gin.IRouter) {
 	router.Use(func(context *gin.Context) {
 		context.Header("Access-Control-Allow-Origin", "*")
