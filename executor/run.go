@@ -16,7 +16,7 @@ import (
 var (
 	ErrFinished        = errors.New("已完成跑步，不需要再执行任务")
 	ErrWrongLibVersion = errors.New("错误的库版本")
-	ErrCheatMarked 	   = errors.New("该帐号已被标记作弊！")
+	ErrCheatMarked     = errors.New("该帐号已被标记作弊！")
 )
 
 func runAccountTask(db *database.DB, acc *accountSrv.Account) (err error) {
@@ -79,7 +79,7 @@ execute:
 			_, _ = recordResultAfterRun(db, acc.ID, s) // if fail, let it go
 			return err
 		}
-		_, err = recordResultAfterRun(db, acc.ID, s)
+		r, err = recordResultAfterRun(db, acc.ID, s)
 		if err != nil {
 			return err
 		}
