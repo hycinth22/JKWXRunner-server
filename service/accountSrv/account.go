@@ -20,13 +20,13 @@ var (
 type Status = string
 
 const (
-	StatusNormal     Status = "normal"
-	StatusPause      Status = "pause"
-	StatusRunning    Status = "running"
-	StatusFinished   Status = "finished"
-	StatusSuspend    Status = "suspend"
-	StatusTerminated Status = "terminated"
-	StatusAborted    Status = "aborted"
+	StatusNormal     Status = "normal"     // normal existence 
+	StatusPause      Status = "pause"      // pause due to  human-reason, long-period
+	StatusRunning    Status = "running"    // running, can't be fetch by other executors
+	StatusFinished   Status = "finished"   // finished normally
+	StatusSuspend    Status = "suspend"    // suspend due to software error, short-period
+	StatusTerminated Status = "terminated" // processed completely, task is ready to be deleted
+	StatusAborted    Status = "aborted"    // aborted due to human-reason
 )
 
 type RunResult = string
