@@ -26,6 +26,7 @@ const (
 	StatusFinished   Status = "finished"
 	StatusSuspend    Status = "suspend"
 	StatusTerminated Status = "terminated"
+	StatusAborted    Status = "aborted"
 )
 
 type RunResult = string
