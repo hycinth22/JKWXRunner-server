@@ -39,6 +39,11 @@ func ListLogsForUID(db *database.DB, uid uint, offset, limit uint) (logs []model
 	return
 }
 
+func CountLogsForUID(db *database.DB, uid uint) (n int, err error) {
+	err = db.Model(&Log{}).Where("uid = ?", uid).Count(&n).Error
+	return
+}
+
 func AddLogNow(db *database.DB, uid uint, logType Type, text string) {
 	AddLog(db, uid, time.Now(), logType, text)
 }

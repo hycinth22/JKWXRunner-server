@@ -29,5 +29,13 @@ func ListLogsByUID(context *gin.Context) {
 		_ = context.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	context.JSON(http.StatusOK, logs)
+	totalAmount, err := accLogSrv.CountLogsForUID(database.GetDB(), uint(uid))
+	if err != nil {
+		_ = context.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	context.JSON(http.StatusOK, struct {
+		TotalAmount int
+		Items       []accLogSrv.Log
+	}{totalAmount, logs})
 }
