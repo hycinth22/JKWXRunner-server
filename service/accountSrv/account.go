@@ -19,6 +19,7 @@ var (
 
 type Status = string
 
+//noinspection GoUnusedConst
 const (
 	StatusNormal     Status = "normal"     // normal existence
 	StatusPause      Status = "pause"      // pause due to  human-reason, long-period

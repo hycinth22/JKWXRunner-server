@@ -11,12 +11,12 @@ func ListAccounts(ctx *gin.Context) {
 	db := database.GetDB()
 	n, err := accountSrv.CountAccounts(db)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 	acc, err := accountSrv.ListAccounts(db, 0, n)
 	if err != nil {
-		ctx.AbortWithError(http.StatusInternalServerError, err)
+		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, acc)

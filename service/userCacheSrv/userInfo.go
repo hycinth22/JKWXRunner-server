@@ -16,6 +16,7 @@ var (
 
 type CacheUserInfo = model.CacheUserInfo
 
+//noinspection GoUnusedConst
 const (
 	UserRole_Normal = iota
 	UserRole_Cheater

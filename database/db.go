@@ -53,6 +53,7 @@ func init() {
 	}
 	// configure database connection
 	db.SetLogger(sqlLogger)
+	//noinspection GoBoolExpressions
 	db.LogMode(config.DBLogMode)
 	db.DB().SetMaxIdleConns(config.DBMaxIdleConn)
 	db.DB().SetMaxOpenConns(config.DBMaxOpenConn)
