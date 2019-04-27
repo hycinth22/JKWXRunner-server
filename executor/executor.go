@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const lib_version = 13
+const lib_version = ssmt.AppVersionID
 
 func main() {
 	// TODO: Watch Signal
@@ -79,7 +79,7 @@ func executeTask(db *database.DB, acc *accountSrv.Account, retryTimes uint) {
 	case ErrFinished:
 		setAccountLastResult(db, acc, accountSrv.RunSuccess)
 		setAccountStatus(db, acc, accountSrv.StatusFinished)
-	case ssmt.ErrTokenExpired:
+	case ssmt.ErrInvalidToken:
 		executeTask(db, acc, retryTimes-1)
 	default:
 		fmt.Println(acc.SchoolID, acc.StuNum, ": ", err.Error())

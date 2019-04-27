@@ -47,7 +47,7 @@ execute:
 		limit := ssmt.GetDefaultLimitParams(userInfo.Sex)
 
 		r, err := recordResultBeforeRun(db, acc.ID, s)
-		if err == ssmt.ErrTokenExpired {
+		if err == ssmt.ErrInvalidToken {
 			accLogSrv.AddLogInfo(db, uid, "Session失效，尝试更新Session。Old Session Dump: %s"+dumpStruct(*s))
 			err = sessionSrv.UpdateSession(db, *acc)
 			if err != nil {
@@ -72,7 +72,7 @@ execute:
 			return ErrWrongLibVersion
 		}
 
-		records := ssmt.SmartCreateRecords(s.User.UserID, s.User.SchoolID, limit, acc.RunDistance, time.Now().Add(1*time.Hour))
+		records := ssmt.SmartCreateRecordsAfter(s.User.UserID, s.User.SchoolID, limit, acc.RunDistance, time.Now())
 		err = uploadRecords(db, acc, s, records)
 
 		if err != nil {
