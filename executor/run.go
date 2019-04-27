@@ -67,7 +67,7 @@ execute:
 
 		info, err := s.GetAppInfo()
 		if info.VerNumber != lib_version {
-			log.Println("Latest App version: ", lib_version)
+			log.Println("Latest App version: ", info.VerNumber)
 			log.Println("Need to upgrade!!!")
 			return ErrWrongLibVersion
 		}
