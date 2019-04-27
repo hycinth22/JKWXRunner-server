@@ -51,7 +51,7 @@ func AddLogNow(db *database.DB, uid uint, logType Type, text string) {
 func AddLog(db *database.DB, uid uint, time time.Time, logType Type, text string) {
 	err := db.Create(&Log{UID: uid, Time: time, Type: logType, Content: text}).Error
 	if err != nil {
-		reportErr(fmt.Sprintf("[%s] UID: %d, Time:%v, logType:%d, Text:%s", serviceName, uid, time, logType, text))
+		reportErr(fmt.Sprintf("[%s] UID: %d, Time:%v, logType:%s, Text:%s", serviceName, uid, time, logType, text))
 	}
 }
 
