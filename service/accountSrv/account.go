@@ -20,7 +20,7 @@ var (
 type Status = string
 
 const (
-	StatusNormal     Status = "normal"     // normal existence 
+	StatusNormal     Status = "normal"     // normal existence
 	StatusPause      Status = "pause"      // pause due to  human-reason, long-period
 	StatusRunning    Status = "running"    // running, can't be fetch by other executors
 	StatusFinished   Status = "finished"   // finished normally
@@ -35,6 +35,11 @@ const (
 	RunSuccess       RunResult = "success"
 	RunErrorOccurred RunResult = "error"
 )
+
+func CountAccounts(db *database.DB) (n uint, err error) {
+	err = db.Model(&Account{}).Count(&n).Error
+	return
+}
 
 func ListAccounts(db *database.DB, offset, num uint) ([]Account, error) {
 	var accounts []Account

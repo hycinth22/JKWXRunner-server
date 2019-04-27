@@ -8,7 +8,13 @@ import (
 )
 
 func ListAccounts(ctx *gin.Context) {
-	acc, err := accountSrv.ListAccounts(database.GetDB(), 0, 100)
+	db := database.GetDB()
+	n, err := accountSrv.CountAccounts(db)
+	if err != nil {
+		ctx.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	acc, err := accountSrv.ListAccounts(db, 0, n)
 	if err != nil {
 		ctx.AbortWithError(http.StatusInternalServerError, err)
 		return
