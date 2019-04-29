@@ -49,7 +49,7 @@ func VersionCheck() bool {
 		log.Println("Can't get latest app info.", err)
 		return false
 	}
-	if info.VerNumber != lib_version {
+	if info.VerNumber > lib_version {
 		log.Println("Latest App version: ", info.VerNumber)
 		log.Println("Need to upgrade!!!")
 		return false
