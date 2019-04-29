@@ -75,7 +75,7 @@ execute:
 			return ErrWrongLibVersion
 		}
 
-		records := ssmt.SmartCreateRecordsAfter(s.User.UserID, s.User.SchoolID, limit, acc.RunDistance, time.Now())
+		records := ssmt.SmartCreateRecordsAfter(s.User.SchoolID, s.User.UserID, limit, acc.RunDistance, time.Now())
 		err = uploadRecords(db, acc, s, records)
 
 		if err != nil {
