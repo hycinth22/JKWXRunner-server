@@ -7,7 +7,7 @@ import (
 
 func init() {
 	RequestRoutersTable = []RequestRouter{
-		CORSRouter,
+		// CORSRouter, // default disabled by security cause. Only enable it if you need CORS actually.
 		AccountRouter,
 		AccountLogsRouter,
 		UserInfoRouter,
