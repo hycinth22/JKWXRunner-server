@@ -14,6 +14,7 @@ import (
 
 	"github.com/inkedawn/JKWXFucker-server/service/deviceSrv"
 	"github.com/inkedawn/JKWXFucker-server/service/userCacheSrv"
+	"github.com/inkedawn/JKWXFucker-server/utils"
 	"github.com/inkedawn/go-sunshinemotion"
 )
 
@@ -66,6 +67,49 @@ func SmartGetSession(db *database.DB, acc accountSrv.Account) (s *ssmt.Session, 
 	return s, nil
 }
 
+/*
+func smartGetSession(db *database.DB, schoolId int64, stuNum, password string, device *ssmt.Device) (s *ssmt.Session, err error) {
+	tx := db.Begin()
+	defer func() {
+		if err == nil {
+			tx.Commit()
+		} else {
+			tx.Rollback()
+		}
+	}()
+	device, err := deviceSrv.GetDevice(tx, acc.DeviceID)
+	if err != nil {
+		return nil, err
+	}
+	SSMTDevice := deviceSrv.ToSSMTDevice(device)
+
+	userToken, err := getTokenByUID(tx, acc.ID)
+	if err != nil {
+		if err == ErrNoToken {
+			// 新用户登录
+			return newSession(tx, acc, SSMTDevice)
+		} else {
+			return nil, err
+		}
+	}
+	SSMTToken := toSSMTToken(userToken)
+	if !tokenNotExpired(userToken) {
+		// 过期更新
+		return newSession(tx, acc, SSMTDevice)
+	}
+
+	// Resume Session
+	s = ssmt.CreateSession()
+	s.Device, s.Token = &SSMTDevice, &SSMTToken
+	s.User = &ssmt.UserIdentify{
+		UserID:   userToken.RemoteUserID,
+		SchoolID: acc.SchoolID,
+		StuNum:   acc.StuNum,
+	}
+	return s, nil
+}
+*/
+
 // 创建一个Session并保存到Session库。不管是否已有该账号的Session
 // 自动从service/device获取该Account的Device
 //
@@ -105,10 +149,10 @@ func newSession(db *database.DB, acc accountSrv.Account, SSMTDevice ssmt.Device)
 	s.Device = &SSMTDevice
 	info, err := s.Login(acc.SchoolID, acc.StuNum, PhoneNum, ssmt.PasswordHash(acc.Password))
 	if err != nil {
-		accLogSrv.AddLogFail(db, acc.ID, fmt.Sprintf("登录失败。Error: %#v ;Device Dump：%#v；;Token Dump：%#v", err, *s.Device, *s.Token))
+		accLogSrv.AddLogFail(db, acc.ID, fmt.Sprintf("登录失败。Error: %#v ;Device Dump：%s；;Token Dump：%s", err, utils.DumpStructValue(*s.Device), utils.DumpStructValue(*s.Token)))
 		return nil, err
 	}
-	accLogSrv.AddLogSuccess(db, acc.ID, fmt.Sprintf("登录成功。Device Dump：%#v；Token Dump：%#v", *s.Device, *s.Token))
+	accLogSrv.AddLogSuccess(db, acc.ID, fmt.Sprintf("登录成功。Device Dump：%s；Token Dump：%s", utils.DumpStructValue(*s.Device), utils.DumpStructValue(*s.Token)))
 	// save into session storage
 	err = saveToken(db, fromSSMTToken(s.User.UserID, *s.Token))
 	if err != nil {
