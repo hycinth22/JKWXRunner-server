@@ -14,8 +14,8 @@ github.com/gofrs/uuid v3.2.0+incompatible h1:y12jRkkFxsd7GpqdSZ+/KCs/fJbqpEXSGd4
 github.com/gofrs/uuid v3.2.0+incompatible/go.mod h1:b2aQJv3Z4Fp6yNu3cdSllBxTCLRxnplIgP/c0N/04lM=
 github.com/golang/protobuf v1.2.0 h1:P3YflyNX/ehuJFLhxviNdFxQPkGK5cDcApsge1SqnvM=
 github.com/golang/protobuf v1.2.0/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
-github.com/inkedawn/go-sunshinemotion v3.8.0+incompatible h1:a9M2WZLQ4BGNg9uqcEbsOpB9LtOkXuGaRyyqCx+qWA8=
-github.com/inkedawn/go-sunshinemotion v3.8.0+incompatible/go.mod h1:GptxzCzNeC0+7WBjxTzRE8QBgHx0z8b2MYo2Mnx0ASY=
+github.com/inkedawn/go-sunshinemotion v3.8.1+incompatible h1:cmYMfCefp1fWvXxk0dDZtEYsL2DKl1wa5v4MGl6RH/c=
+github.com/inkedawn/go-sunshinemotion v3.8.1+incompatible/go.mod h1:GptxzCzNeC0+7WBjxTzRE8QBgHx0z8b2MYo2Mnx0ASY=
 github.com/jinzhu/gorm v1.9.2 h1:lCvgEaqe/HVE+tjAR2mt4HbbHAZsQOv3XAZiEZV37iw=
 github.com/jinzhu/gorm v1.9.2/go.mod h1:Vla75njaFJ8clLU1W44h34PjIkijhjHIYnZxMqCdxqo=
 github.com/jinzhu/inflection v0.0.0-20180308033659-04140366298a h1:eeaG9XMUvRBYXJi4pg1ZKM7nxc5AfXfojeLLW7O5J3k=
