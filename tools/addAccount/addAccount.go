@@ -80,7 +80,7 @@ func main() {
 	fmt.Printf("Account Info: %+v", info)
 	fmt.Println()
 	if info.UserRoleID == userCacheSrv.UserRole_Cheater {
-		fmt.Println("[WARNING] The User Has been marked as a cheater!")
+		fmt.Println("!!![WARNING]!!! The User Has been marked as a cheater!")
 	}
 
 	dev := deviceSrv.FromSSMTDevice(*ssmtDevice)
