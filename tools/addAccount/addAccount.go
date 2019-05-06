@@ -10,6 +10,7 @@ import (
 	"github.com/inkedawn/go-sunshinemotion"
 	"os"
 	"strconv"
+	"time"
 )
 
 var (
@@ -110,7 +111,12 @@ func main() {
 	fmt.Printf("Account %d: %+v", acc.ID, acc)
 	fmt.Println()
 
-	sport, err := userCacheSrv.GetCacheSportResult(tx, session.User.UserID)
+	fetchTime := time.Now()
+	sport, err := session.GetSportResult()
+	if err != nil {
+		panic(err)
+	}
+	err = userCacheSrv.SaveCacheSportResult(tx, userCacheSrv.FromSSMTSportResult(*sport, session.User.UserID, fetchTime))
 	if err != nil {
 		panic(err)
 	}
