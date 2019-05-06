@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/inkedawn/JKWXFucker-server/database"
 	"github.com/inkedawn/JKWXFucker-server/service/accountSrv"
-	"fmt"
 )
 
 func main() {

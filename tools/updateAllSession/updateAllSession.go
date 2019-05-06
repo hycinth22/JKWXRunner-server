@@ -23,7 +23,7 @@ func main() {
 			if err != nil {
 				println(err.Error())
 			}
-			utils.SleepPartOfTotalTime(n, time.Duration(n) * 5 * time.Second)
+			utils.SleepPartOfTotalTime(n, time.Duration(n)*5*time.Second)
 		}
 	}
 }

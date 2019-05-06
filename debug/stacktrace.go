@@ -1,8 +1,8 @@
 package debug
 
 import (
-	"runtime"
 	"fmt"
+	"runtime"
 )
 
 func DumpStacks() {
