@@ -109,4 +109,11 @@ func main() {
 	}
 	fmt.Printf("Account %d: %+v", acc.ID, acc)
 	fmt.Println()
+
+	sport, err := userCacheSrv.GetCacheSportResult(tx, session.User.UserID)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("SportResult: %+v", sport)
+	fmt.Println()
 }
