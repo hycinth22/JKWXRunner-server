@@ -7,6 +7,7 @@ import (
 	"github.com/inkedawn/JKWXFucker-server/service/accountSrv"
 	"github.com/inkedawn/JKWXFucker-server/service/deviceSrv"
 	"github.com/inkedawn/JKWXFucker-server/service/userCacheSrv"
+	"github.com/inkedawn/JKWXFucker-server/service/userIDRelationSrv"
 	"github.com/inkedawn/go-sunshinemotion"
 	"os"
 	"strconv"
@@ -111,12 +112,17 @@ func main() {
 	fmt.Printf("Account %d: %+v", acc.ID, acc)
 	fmt.Println()
 
+	err = userIDRelationSrv.SaveRelation(tx, acc.ID, session.User.UserID)
+	if err != nil {
+		panic(err)
+	}
+
 	fetchTime := time.Now()
 	sport, err := session.GetSportResult()
 	if err != nil {
 		panic(err)
 	}
-	err = userCacheSrv.SaveCacheSportResult(tx, userCacheSrv.FromSSMTSportResult(*sport, session.User.UserID, fetchTime))
+	err = userCacheSrv.SaveCacheSportResult(database.GetDB(), userCacheSrv.FromSSMTSportResult(*sport, session.User.UserID, fetchTime))
 	if err != nil {
 		panic(err)
 	}
