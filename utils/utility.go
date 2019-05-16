@@ -11,6 +11,8 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
+var TimeZoneBeijing = time.FixedZone("Beijing Time", int((8 * time.Hour).Seconds()))
+
 func RandRangeInt63(min, max int64) int64 {
 	return min + rand.Int63()%(max-min+1)
 }
