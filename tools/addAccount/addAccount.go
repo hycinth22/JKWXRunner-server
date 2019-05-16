@@ -122,7 +122,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = userCacheSrv.SaveCacheSportResult(database.GetDB(), userCacheSrv.FromSSMTSportResult(*sport, session.User.UserID, fetchTime))
+	err = userCacheSrv.SaveCacheSportResult(tx, userCacheSrv.FromSSMTSportResult(*sport, session.User.UserID, fetchTime))
 	if err != nil {
 		panic(err)
 	}
