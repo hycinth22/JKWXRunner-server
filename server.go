@@ -3,13 +3,14 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/inkedawn/JKWXFucker-server/apiServer"
+	"github.com/inkedawn/JKWXFucker-server/config"
 	"log"
 	"os"
 )
 
 func init() {
-	_, err := os.Stat("debug")
-	if os.IsNotExist(err) {
+	//noinspection GoBoolExpressions
+	if config.Release {
 		gin.SetMode(gin.ReleaseMode)
 	} else {
 		gin.SetMode(gin.DebugMode)
