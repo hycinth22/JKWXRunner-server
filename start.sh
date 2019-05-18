@@ -3,7 +3,7 @@
 selfDir=$(dirname $0)
 srcDir=${selfDir}
 pidFile=${selfDir}/jkwxfucker.pid
-logDir=${selfDir}/log
+logDir=${selfDir}/data/logs/api
 logfile=${logDir}/api_`date +%Y%m%d_%s_%N`.log
 tmp_exec=$(mktemp)
 
