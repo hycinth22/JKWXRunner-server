@@ -61,7 +61,7 @@ execute:
 		if err != nil {
 			return err
 		}
-		if r.ActualDistance > r.QualifiedDistance {
+		if shouldFinished(acc, r) {
 			return ErrFinished
 		}
 
@@ -86,7 +86,7 @@ execute:
 		if err != nil {
 			return err
 		}
-		if r.ActualDistance > r.QualifiedDistance {
+		if shouldFinished(acc, r) {
 			return ErrFinished
 		}
 		break execute
@@ -136,4 +136,14 @@ func recordResultAfterRun(db *database.DB, uid uint, s *ssmt.Session) (result *s
 	_ = userCacheSrv.SaveCacheSportResult(db, userCacheSrv.FromSSMTSportResult(*result, s.User.UserID, time.Now()))
 	accLogSrv.AddLogInfo(db, uid, "上传后运动结果： "+dumpStructValue(*result))
 	return
+}
+
+func shouldFinished(acc *accountSrv.Account, result *ssmt.SportResult) bool {
+	if acc.FinishDistance != 0.0 && result.ActualDistance >= acc.FinishDistance {
+		return true
+	}
+	if result.ActualDistance >= result.QualifiedDistance {
+		return true
+	}
+	return false
 }
