@@ -19,4 +19,4 @@ if [[ $? -ne 0 ]]; then
 fi
 echo "build ok. "${tmp_exec}
 
-nohup ${tmp_exec} > ${logfile} & echo $! > ${pidFile}
+nohup ${tmp_exec} > ${logfile} 2>&1 & echo $! > ${pidFile}
