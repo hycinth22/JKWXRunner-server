@@ -20,6 +20,7 @@ var (
 	Arg_Password    string
 	Arg_RunDistance float64
 	Arg_Status      string
+	Arg_Memo        string
 )
 
 func mustParseArgs() {
@@ -46,6 +47,9 @@ func mustParseArgs() {
 	}
 	if Arg_Status == "" {
 		Arg_Status = accountSrv.StatusNormal
+	}
+	if len(os.Args) >= 7 {
+		Arg_Memo = os.Args[6]
 	}
 }
 
@@ -99,6 +103,7 @@ func main() {
 		RunDistance: Arg_RunDistance,
 		DeviceID:    dev.ID,
 		Status:      Arg_Status,
+		Memo:        Arg_Memo,
 	}
 	if acc.RunDistance == 0.0 {
 		limit := ssmt.GetDefaultLimitParams(info.Sex)
