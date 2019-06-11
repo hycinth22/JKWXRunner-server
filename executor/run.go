@@ -40,9 +40,12 @@ execute:
 			accLogSrv.AddLogFail(db, uid, "获取UserInfo失败："+dumpStruct(err))
 			return err
 		}
-		if acc.CheckCheatMarked && userInfo.UserRoleID == userCacheSrv.UserRole_Cheater {
-			accLogSrv.AddLogFail(db, uid, "该帐号已被标记作弊！停止执行")
-			return ErrCheatMarked
+		if userInfo.UserRoleID == userCacheSrv.UserRole_Cheater {
+			accLogSrv.AddLogInfo(db, uid, "检测到该帐号已被标记作弊！")
+			if acc.CheckCheatMarked {
+				accLogSrv.AddLogFail(db, uid, "根据标记作弊设定。停止执行")
+				return ErrCheatMarked
+			}
 		}
 		limit := ssmt.GetDefaultLimitParams(userInfo.Sex)
 
