@@ -27,8 +27,6 @@ func mustParseArgs() {
 	var err error
 	if len(os.Args) < 4 {
 		panic("too few arguments")
-	} else if len(os.Args) > 5 {
-		panic("too many arguments")
 	}
 	Arg_SchoolID, err = strconv.ParseInt(os.Args[1], 10, 64)
 	if err != nil {
