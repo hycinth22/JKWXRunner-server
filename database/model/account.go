@@ -16,7 +16,8 @@ type Account struct {
 	DeviceID         uint    `gorm:"NOT NULL"`
 	Status           string  `gorm:"NOT NULL;default:'normal''"`
 	RunDistance      float64 `gorm:"NOT NULL"`
-	FinishDistance   float64 `gorm:"NOT NULL;default:0.0"`
+	StartDistance    float64 `gorm:"NOT NULL"`
+	FinishDistance   float64 `gorm:"NOT NULL"`
 	CheckCheatMarked bool    `gorm:"NOT NULL;default:1"`
 
 	LastResult string    `gorm:"default:''"`
