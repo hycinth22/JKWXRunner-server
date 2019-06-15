@@ -87,6 +87,18 @@ func main() {
 		fmt.Println("!!![WARNING]!!! The User Has been marked as a cheater!")
 	}
 
+	fetchTime := time.Now()
+	sport, err := session.GetSportResult()
+	if err != nil {
+		panic(err)
+	}
+	err = userCacheSrv.SaveCacheSportResult(tx, userCacheSrv.FromSSMTSportResult(*sport, session.User.UserID, fetchTime))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("SportResult: %+v", sport)
+	fmt.Println()
+
 	dev := deviceSrv.FromSSMTDevice(*ssmtDevice)
 	err = deviceSrv.SaveDevice(tx, &dev)
 	if err != nil {
@@ -103,11 +115,14 @@ func main() {
 		Status:      Arg_Status,
 		Memo:        Arg_Memo,
 	}
-	if acc.RunDistance == 0.0 {
+	if Arg_RunDistance == 0.0 {
 		limit := ssmt.GetDefaultLimitParams(info.Sex)
 		acc.RunDistance = limit.LimitTotalDistance.Max
 	}
 	acc.RunDistance = ssmt.NormalizeDistance(acc.RunDistance)
+	acc.StartDistance = sport.ActualDistance
+	acc.FinishDistance = sport.QualifiedDistance
+
 	err = accountSrv.SaveAccount(tx, acc)
 	if err != nil {
 		panic(err)
@@ -120,15 +135,4 @@ func main() {
 		panic(err)
 	}
 
-	fetchTime := time.Now()
-	sport, err := session.GetSportResult()
-	if err != nil {
-		panic(err)
-	}
-	err = userCacheSrv.SaveCacheSportResult(tx, userCacheSrv.FromSSMTSportResult(*sport, session.User.UserID, fetchTime))
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("SportResult: %+v", sport)
-	fmt.Println()
 }
