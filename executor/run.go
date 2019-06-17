@@ -142,8 +142,8 @@ func recordResultAfterRun(db *database.DB, uid uint, s *ssmt.Session) (result *s
 }
 
 func shouldFinished(acc *accountSrv.Account, result *ssmt.SportResult) bool {
-	if acc.FinishDistance != 0.0 {
-		return result.ActualDistance >= acc.FinishDistance
+	if acc.FinishDistance == 0.0 {
+		acc.FinishDistance = result.QualifiedDistance
 	}
-	return result.ActualDistance >= result.QualifiedDistance
+	return result.ActualDistance >= acc.FinishDistance
 }
