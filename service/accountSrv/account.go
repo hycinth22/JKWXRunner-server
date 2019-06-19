@@ -28,6 +28,7 @@ const (
 	StatusSuspend    Status = "suspend"    // suspend due to software error, short-period
 	StatusTerminated Status = "terminated" // processed completely, task is ready to be deleted
 	StatusAborted    Status = "aborted"    // aborted due to human-reason
+	StatusInQueue    Status = "inqueue"    // waitting to run, can't be fetch by other executors
 )
 
 type RunResult = string
@@ -121,7 +122,7 @@ func ListAndSetRunStatusForAllAccountsWaitRun(db *database.DB) (accounts []Accou
 		// 返回空集
 		return []Account{}, nil
 	}
-	if err := tx.Model(&Account{}).Where("id in (?)", idGroup).Update(&Account{Status: StatusRunning}).Error; err != nil {
+	if err := tx.Model(&Account{}).Where("id in (?)", idGroup).Update(&Account{Status: StatusInQueue}).Error; err != nil {
 		return accounts, service.WrapAsInternalError(err)
 	}
 	if err := tx.Where("id in (?)", idGroup).Find(&accounts).Error; err != nil {

@@ -69,6 +69,7 @@ func executeTask(db *database.DB, acc *accountSrv.Account, retryTimes uint) {
 	if retryTimes < 0 {
 		return
 	}
+	setAccountStatus(db, acc, accountSrv.StatusRunning)
 	err := runAccountTask(db, acc)
 	setAccountLastTime(db, acc, time.Now())
 	switch err {
