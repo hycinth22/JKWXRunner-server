@@ -101,9 +101,15 @@ func uploadRecords(db *database.DB, acc *accountSrv.Account, s *ssmt.Session, re
 	uid := acc.ID
 	for i, r := range records {
 		n := i + 1
+		var recordNoPlaceHolder string
+		if len(records) > 1 {
+			recordNoPlaceHolder = fmt.Sprintf("第%d条记录", n)
+		} else {
+			recordNoPlaceHolder = "本次记录"
+		}
 		_, err := s.GetRandRoute()
 		if err != nil {
-			accLogSrv.AddLogFail(db, uid, fmt.Sprintf("第%d条记录GetRandRoute失败：%#v。", n, err))
+			accLogSrv.AddLogFail(db, uid, fmt.Sprintf("%sGetRandRoute失败：%#v。", recordNoPlaceHolder, err))
 			return errors.New("GetRandRoute" + err.Error())
 		}
 		log.Println(n, r)
@@ -111,10 +117,10 @@ func uploadRecords(db *database.DB, acc *accountSrv.Account, s *ssmt.Session, re
 		sleepUtil(r.EndTime)
 		err = s.UploadRecord(r)
 		if err != nil {
-			accLogSrv.AddLogFail(db, uid, fmt.Sprintf("上传第%d条记录失败：%#v。 RecordDump: %s", n, err, dumpStructValue(r)))
+			accLogSrv.AddLogFail(db, uid, fmt.Sprintf("上传%s失败：%#v。 RecordDump: %s", recordNoPlaceHolder, err, dumpStructValue(r)))
 			return err
 		}
-		accLogSrv.AddLogSuccess(db, uid, fmt.Sprintf("上传第%d条记录成功。 RecordDump: %s", n, dumpStructValue(r)))
+		accLogSrv.AddLogSuccess(db, uid, fmt.Sprintf("上传%s成功。 RecordDump: %s", recordNoPlaceHolder, dumpStructValue(r)))
 	}
 	return nil
 }
