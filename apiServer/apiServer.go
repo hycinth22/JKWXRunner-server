@@ -2,7 +2,7 @@ package apiServer
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/inkedawn/JKWXFucker-server/config"
+	"github.com/inkedawn/JKWXRunner-server/config"
 )
 
 func Run(engine *gin.Engine) error {

@@ -2,7 +2,7 @@ package database
 
 import (
 	"errors"
-	"github.com/inkedawn/JKWXFucker-server/config"
+	"github.com/inkedawn/JKWXRunner-server/config"
 	"github.com/jinzhu/gorm"
 	"log"
 	"os"

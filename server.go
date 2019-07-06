@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/inkedawn/JKWXFucker-server/apiServer"
-	"github.com/inkedawn/JKWXFucker-server/config"
+	"github.com/inkedawn/JKWXRunner-server/apiServer"
+	"github.com/inkedawn/JKWXRunner-server/config"
 	"log"
 	"os"
 )

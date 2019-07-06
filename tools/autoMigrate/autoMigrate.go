@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/inkedawn/JKWXFucker-server/database"
-	"github.com/inkedawn/JKWXFucker-server/database/model"
+	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/database/model"
 )
 
 func main() {

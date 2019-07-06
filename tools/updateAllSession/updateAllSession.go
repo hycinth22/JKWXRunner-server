@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/inkedawn/JKWXFucker-server/database"
-	"github.com/inkedawn/JKWXFucker-server/service/accountSrv"
-	"github.com/inkedawn/JKWXFucker-server/service/sessionSrv"
-	"github.com/inkedawn/JKWXFucker-server/utils"
+	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
+	"github.com/inkedawn/JKWXRunner-server/service/sessionSrv"
+	"github.com/inkedawn/JKWXRunner-server/utils"
 	"time"
 )
 

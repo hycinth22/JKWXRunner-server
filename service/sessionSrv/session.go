@@ -5,16 +5,16 @@ package sessionSrv
 
 import (
 	"fmt"
-	"github.com/inkedawn/JKWXFucker-server/database"
-	"github.com/inkedawn/JKWXFucker-server/service"
-	"github.com/inkedawn/JKWXFucker-server/service/accountSrv"
-	"github.com/inkedawn/JKWXFucker-server/service/accountSrv/accLogSrv"
-	"github.com/inkedawn/JKWXFucker-server/service/userIDRelationSrv"
+	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/service"
+	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
+	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
+	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
 	"time"
 
-	"github.com/inkedawn/JKWXFucker-server/service/deviceSrv"
-	"github.com/inkedawn/JKWXFucker-server/service/userCacheSrv"
-	"github.com/inkedawn/JKWXFucker-server/utils"
+	"github.com/inkedawn/JKWXRunner-server/service/deviceSrv"
+	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
+	"github.com/inkedawn/JKWXRunner-server/utils"
 	"github.com/inkedawn/go-sunshinemotion"
 )
 

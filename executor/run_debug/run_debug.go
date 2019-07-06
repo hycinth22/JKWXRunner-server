@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/inkedawn/JKWXFucker-server/utils"
+	"github.com/inkedawn/JKWXRunner-server/utils"
 	"github.com/inkedawn/go-sunshinemotion"
 	"time"
 )

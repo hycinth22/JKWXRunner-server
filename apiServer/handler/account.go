@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/inkedawn/JKWXFucker-server/database"
-	"github.com/inkedawn/JKWXFucker-server/service/accountSrv"
+	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
 	"net/http"
 )
 

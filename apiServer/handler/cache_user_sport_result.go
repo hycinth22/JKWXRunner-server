@@ -2,9 +2,9 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/inkedawn/JKWXFucker-server/database"
-	"github.com/inkedawn/JKWXFucker-server/service/userCacheSrv"
-	"github.com/inkedawn/JKWXFucker-server/service/userIDRelationSrv"
+	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
+	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
 	"net/http"
 	"strconv"
 )

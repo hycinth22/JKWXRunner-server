@@ -3,10 +3,10 @@ package accountSrv
 
 import (
 	"errors"
-	"github.com/inkedawn/JKWXFucker-server/database"
-	"github.com/inkedawn/JKWXFucker-server/database/model"
-	"github.com/inkedawn/JKWXFucker-server/service"
-	"github.com/inkedawn/JKWXFucker-server/service/accountSrv/accLogSrv"
+	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/database/model"
+	"github.com/inkedawn/JKWXRunner-server/service"
+	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
 
 	"time"
 )

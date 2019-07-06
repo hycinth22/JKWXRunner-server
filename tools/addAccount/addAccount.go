@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/inkedawn/JKWXFucker-server/database"
-	"github.com/inkedawn/JKWXFucker-server/service"
-	"github.com/inkedawn/JKWXFucker-server/service/accountSrv"
-	"github.com/inkedawn/JKWXFucker-server/service/deviceSrv"
-	"github.com/inkedawn/JKWXFucker-server/service/userCacheSrv"
-	"github.com/inkedawn/JKWXFucker-server/service/userIDRelationSrv"
+	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/service"
+	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
+	"github.com/inkedawn/JKWXRunner-server/service/deviceSrv"
+	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
+	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
 	"github.com/inkedawn/go-sunshinemotion"
 	"os"
 	"strconv"

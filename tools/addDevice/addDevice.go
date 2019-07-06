@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/inkedawn/JKWXFucker-server/database"
-	"github.com/inkedawn/JKWXFucker-server/service/deviceSrv"
+	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/service/deviceSrv"
 	"github.com/inkedawn/go-sunshinemotion"
 )
 

@@ -2,7 +2,7 @@ package apiServer
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/inkedawn/JKWXFucker-server/apiServer/handler"
+	"github.com/inkedawn/JKWXRunner-server/apiServer/handler"
 )
 
 func init() {
