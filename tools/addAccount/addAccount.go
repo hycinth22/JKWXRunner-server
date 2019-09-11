@@ -2,16 +2,16 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
+	"time"
+
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/service"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/deviceSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
-	"github.com/inkedawn/go-sunshinemotion"
-	"os"
-	"strconv"
-	"time"
 )
 
 var (
@@ -117,7 +117,7 @@ func main() {
 	}
 	if Arg_RunDistance == 0.0 {
 		limit := ssmt.GetDefaultLimitParams(info.Sex)
-		acc.RunDistance = limit.LimitTotalDistance.Max
+		acc.RunDistance = limit.LimitTotalMaxDistance
 	}
 	acc.RunDistance = ssmt.NormalizeDistance(acc.RunDistance)
 	acc.StartDistance = sport.ActualDistance
