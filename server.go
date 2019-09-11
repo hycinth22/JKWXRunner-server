@@ -1,11 +1,13 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/inkedawn/JKWXRunner-server/apiServer"
-	"github.com/inkedawn/JKWXRunner-server/config"
 	"log"
 	"os"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/inkedawn/JKWXRunner-server/api_server"
+	"github.com/inkedawn/JKWXRunner-server/config"
 )
 
 func init() {
