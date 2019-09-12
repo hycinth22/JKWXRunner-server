@@ -3,14 +3,16 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
+	"time"
+
+	"github.com/inkedawn/go-sunshinemotion/v3"
+
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/sessionSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
-	"github.com/inkedawn/go-sunshinemotion"
-	"log"
-	"time"
 )
 
 var (

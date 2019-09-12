@@ -5,17 +5,19 @@ package sessionSrv
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/service"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
-	"time"
+
+	"github.com/inkedawn/go-sunshinemotion/v3"
 
 	"github.com/inkedawn/JKWXRunner-server/service/deviceSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
 	"github.com/inkedawn/JKWXRunner-server/utils"
-	"github.com/inkedawn/go-sunshinemotion"
 )
 
 const PhoneNum = "123"

@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/inkedawn/JKWXRunner-server/utils"
-	"github.com/inkedawn/go-sunshinemotion"
 	"time"
+
+	"github.com/inkedawn/go-sunshinemotion/v3"
+
+	"github.com/inkedawn/JKWXRunner-server/utils"
 )
 
 var (

@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
-	"github.com/inkedawn/go-sunshinemotion"
 	"log"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/inkedawn/go-sunshinemotion/v3"
+
+	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
 )
 
 const lib_version = ssmt.AppVersionID

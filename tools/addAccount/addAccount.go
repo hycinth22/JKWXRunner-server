@@ -13,7 +13,7 @@ import (
 	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
 
-	ssmt "github.com/inkedawn/go-sunshinemotion"
+	"github.com/inkedawn/go-sunshinemotion/v3"
 )
 
 var (

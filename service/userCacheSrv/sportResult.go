@@ -2,11 +2,13 @@ package userCacheSrv
 
 import (
 	"errors"
+	"time"
+
+	"github.com/inkedawn/go-sunshinemotion/v3"
+
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/database/model"
 	"github.com/inkedawn/JKWXRunner-server/service"
-	"github.com/inkedawn/go-sunshinemotion"
-	"time"
 )
 
 var (

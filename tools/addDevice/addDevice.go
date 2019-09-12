@@ -1,9 +1,10 @@
 package main
 
 import (
+	"github.com/inkedawn/go-sunshinemotion/v3"
+
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/service/deviceSrv"
-	"github.com/inkedawn/go-sunshinemotion"
 )
 
 func main() {
