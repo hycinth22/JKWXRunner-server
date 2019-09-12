@@ -13,6 +13,7 @@ import (
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/sessionSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
+	"github.com/inkedawn/JKWXRunner-server/viewFormat"
 )
 
 var (
@@ -113,13 +114,14 @@ func uploadRecords(db *database.DB, acc *accountSrv.Account, s *ssmt.Session, re
 		} else {
 			recordNoPlaceHolder = "本次记录"
 		}
-		_, err := s.GetRandRoute()
+		route, err := s.GetRandRoute()
 		if err != nil {
 			accLogSrv.AddLogFail(db, uid, fmt.Sprintf("%sGetRandRoute失败：%#v。", recordNoPlaceHolder, err))
 			return errors.New("GetRandRoute" + err.Error())
 		}
-		log.Println(n, r)
-		log.Println("Sleep Util", r.EndTime)
+		accLogSrv.AddLogInfo(db, uid, fmt.Sprintf("%s获取到本次跑步路线：%+v。", recordNoPlaceHolder, route))
+		log.Println(uid, n, r, "Sleep Util", r.EndTime)
+		accLogSrv.AddLogInfo(db, uid, fmt.Sprintf("%s等待至%s。", recordNoPlaceHolder, viewFormat.TimeFormat(r.EndTime)))
 		sleepUtil(r.EndTime)
 		err = s.UploadRecord(r)
 		if err != nil {
