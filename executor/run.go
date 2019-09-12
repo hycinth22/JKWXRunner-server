@@ -79,7 +79,11 @@ execute:
 			log.Println("Need to upgrade!!!")
 			return ErrWrongLibVersion
 		}
-
+		stillNeed := r.QualifiedDistance - r.ActualDistance
+		if stillNeed < limit.LimitSingleDistance.Max {
+			limit.RandDistance.Min = stillNeed + 0.1
+			limit.RandDistance.Max = stillNeed + 0.8
+		}
 		records := ssmt.SmartCreateRecordsAfter(s.User.SchoolID, s.User.UserID, limit, acc.RunDistance, time.Now())
 		err = uploadRecords(db, acc, s, records)
 
