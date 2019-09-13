@@ -22,6 +22,7 @@ var (
 	ErrWrongLibVersion = errors.New("错误的库版本")
 	ErrCheatMarked     = errors.New("该帐号已被标记作弊！")
 )
+var enableRandomDistanceReduction = true
 
 func runAccountTask(db *database.DB, acc *accountSrv.Account) (err error) {
 	defer func() {
@@ -83,8 +84,25 @@ execute:
 		}
 		stillNeed := r.QualifiedDistance - r.ActualDistance
 		if stillNeed < limit.LimitSingleDistance.Max {
+			// 接近完成，就不跑满
 			limit.RandDistance.Min = stillNeed + 0.1
 			limit.RandDistance.Max = stillNeed + 0.8
+		} else if enableRandomDistanceReduction {
+			// 一定几率不跑满，触发几率
+			const (
+				// the trigger rate is triggerRateN/triggerRateM
+				triggerRateN = 2
+				triggerRateM = 18
+			)
+			if rand.Intn(triggerRateM) < triggerRateN {
+				const (
+					// the rate range is [0, maxMinusRate/reductionRateDivision)
+					maxReductionRate      = 2
+					reductionRateDivision = 10
+				)
+				minusRate := float64(rand.Intn(maxReductionRate*reductionRateDivision)) / reductionRateDivision
+				limit.RandDistance.Max = limit.RandDistance.Min + (limit.RandDistance.Max-limit.RandDistance.Min)*(1-minusRate)
+			}
 		}
 		records := ssmt.SmartCreateRecordsAfter(s.User.SchoolID, s.User.UserID, limit, acc.RunDistance, time.Now())
 		err = uploadRecords(db, acc, s, records)
