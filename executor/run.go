@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/inkedawn/go-sunshinemotion/v3"
@@ -121,14 +122,15 @@ func uploadRecords(db *database.DB, acc *accountSrv.Account, s *ssmt.Session, re
 		}
 		accLogSrv.AddLogInfo(db, uid, fmt.Sprintf("%s获取到本次跑步路线：%+v。", recordNoPlaceHolder, route))
 		log.Println(uid, n, r, "Sleep Util", r.EndTime)
-		accLogSrv.AddLogInfo(db, uid, fmt.Sprintf("%s等待至%s。", recordNoPlaceHolder, viewFormat.TimeFormat(r.EndTime)))
+		accLogSrv.AddLogInfo(db, uid, fmt.Sprintf("%s生成的记录是：%s", recordNoPlaceHolder, dumpStructValue(r)))
+		accLogSrv.AddLogInfo(db, uid, fmt.Sprintf("%s需等待至%s。", recordNoPlaceHolder, viewFormat.TimeFormat(r.EndTime)))
 		sleepUtil(r.EndTime)
 		err = s.UploadRecord(r)
 		if err != nil {
-			accLogSrv.AddLogFail(db, uid, fmt.Sprintf("上传%s失败：%#v。 RecordDump: %s", recordNoPlaceHolder, err, dumpStructValue(r)))
+			accLogSrv.AddLogFail(db, uid, fmt.Sprintf("上传%s失败：%#v", recordNoPlaceHolder, err))
 			return err
 		}
-		accLogSrv.AddLogSuccess(db, uid, fmt.Sprintf("上传%s成功。 RecordDump: %s", recordNoPlaceHolder, dumpStructValue(r)))
+		accLogSrv.AddLogSuccess(db, uid, fmt.Sprintf("上传%s成功", recordNoPlaceHolder))
 	}
 	return nil
 }
