@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -8,6 +9,13 @@ import (
 
 	"github.com/inkedawn/JKWXRunner-server/api_server"
 	"github.com/inkedawn/JKWXRunner-server/config"
+)
+
+// inject when build
+// go build/run -ldflags "-X 'main.lastCommit=hello lastCommit' -X 'main.lastCommitTime=hello lastCommitTime'"
+var (
+	lastCommit     = "not set(maybe test version)"
+	lastCommitTime = "not set(maybe test version)"
 )
 
 func init() {
@@ -26,6 +34,8 @@ func init() {
 }
 
 func main() {
+	fmt.Println("BuildVersion:", lastCommit)
+	fmt.Println("BuildVersionTime:", lastCommitTime)
 	err := apiServer.Run(gin.New())
 	if err != nil {
 		log.Fatal(err)
