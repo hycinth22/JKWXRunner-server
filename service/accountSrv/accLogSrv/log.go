@@ -3,11 +3,11 @@ package accLogSrv
 
 import (
 	"fmt"
+	"os"
+	"time"
+
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/database/model"
-	"os"
-
-	"time"
 )
 
 type Log = model.AccountLog
@@ -71,4 +71,17 @@ func AddLogInfo(db *database.DB, uid uint, text string) {
 }
 func AddLogDebug(db *database.DB, uid uint, text string) {
 	AddLogNow(db, uid, TypeDebug, text)
+}
+
+func AddLogSuccessF(db *database.DB, uid uint, format string, values ...interface{}) {
+	AddLogNow(db, uid, TypeSuccess, fmt.Sprintf(format, values...))
+}
+func AddLogFailF(db *database.DB, uid uint, format string, values ...interface{}) {
+	AddLogNow(db, uid, TypeFail, fmt.Sprintf(format, values...))
+}
+func AddLogInfoF(db *database.DB, uid uint, format string, values ...interface{}) {
+	AddLogNow(db, uid, TypeInfo, fmt.Sprintf(format, values...))
+}
+func AddLogDebugF(db *database.DB, uid uint, format string, values ...interface{}) {
+	AddLogNow(db, uid, TypeDebug, fmt.Sprintf(format, values...))
 }
