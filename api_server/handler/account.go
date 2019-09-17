@@ -2,18 +2,18 @@ package handler
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
+	"github.com/inkedawn/JKWXRunner-server/viewFormat"
 )
 
 type account struct {
 	ID               uint
-	CreatedAt        time.Time
+	CreatedAt        string
 	SchoolID         int64
 	StuNum           string
 	Memo             string
@@ -24,7 +24,7 @@ type account struct {
 	CurrentDistance  float64
 	CheckCheatMarked bool
 	LastResult       string
-	LastTime         time.Time
+	LastTime         string
 }
 
 func ListAccounts(ctx *gin.Context) {
@@ -50,7 +50,7 @@ func ListAccounts(ctx *gin.Context) {
 		}
 		resp = append(resp, account{
 			ID:               acc.ID,
-			CreatedAt:        acc.CreatedAt,
+			CreatedAt:        viewFormat.TimeFormat(acc.CreatedAt),
 			SchoolID:         acc.SchoolID,
 			StuNum:           acc.StuNum,
 			Memo:             acc.Memo,
@@ -61,7 +61,7 @@ func ListAccounts(ctx *gin.Context) {
 			CurrentDistance:  current,
 			CheckCheatMarked: acc.CheckCheatMarked,
 			LastResult:       acc.LastResult,
-			LastTime:         acc.LastTime,
+			LastTime:         viewFormat.TimeFormat(acc.LastTime),
 		})
 	}
 	ctx.JSON(http.StatusOK, resp)
