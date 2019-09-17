@@ -1,12 +1,13 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
-	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
 )
 
 func QueryCacheUserSportResult(ctx *gin.Context) {
@@ -21,15 +22,7 @@ func QueryCacheUserSportResult(ctx *gin.Context) {
 		return
 	}
 	db := database.GetDB()
-	remoteUID, err := userIDRelationSrv.GetRemoteUserID(db, uint(uid))
-	if err == userIDRelationSrv.ErrNotFound {
-		ctx.AbortWithStatus(http.StatusNotFound)
-		return
-	} else if err != nil {
-		ctx.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-	result, err := userCacheSrv.GetCacheSportResult(db, remoteUID)
+	result, err := userCacheSrv.GetLocalUserCacheSportResult(db, uint(uid))
 	if err != nil {
 		_ = ctx.AbortWithError(http.StatusInternalServerError, err)
 		return

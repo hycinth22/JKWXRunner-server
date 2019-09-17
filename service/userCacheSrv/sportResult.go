@@ -9,6 +9,7 @@ import (
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/database/model"
 	"github.com/inkedawn/JKWXRunner-server/service"
+	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
 )
 
 var (
@@ -48,4 +49,16 @@ func FromSSMTSportResult(info ssmt.SportResult, userID int64, fetchTime time.Tim
 		ComputedDistance:  info.ActualDistance,
 		LastTime:          info.LastTime,
 	}
+}
+
+func GetLocalUserCacheSportResult(db *database.DB, localUID uint) (info CacheSportResult, err error) {
+	remoteUID, err := userIDRelationSrv.GetRemoteUserID(db, localUID)
+	if err == userIDRelationSrv.ErrNotFound {
+		err = ErrNoSportResult
+		return
+	} else if err != nil {
+		return
+	}
+	info, err = GetCacheSportResult(db, remoteUID)
+	return
 }
