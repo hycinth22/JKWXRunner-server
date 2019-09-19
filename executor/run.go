@@ -95,7 +95,9 @@ execute:
 				triggerRateN = 2
 				triggerRateM = 18
 			)
-			if rand.Intn(triggerRateM) < triggerRateN {
+			triggerRand := rand.Intn(triggerRateM)
+			accLogSrv.AddLogDebug(db, uid, "triggerRand:", triggerRand)
+			if triggerRand < triggerRateN {
 				const (
 					// the rate range is [0, maxMinusRate/reductionRateDivision)
 					maxReductionRate      = 2
