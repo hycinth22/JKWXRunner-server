@@ -60,17 +60,17 @@ func AddLog(db *database.DB, uid uint, time time.Time, logType Type, text string
 	reducing the parameter number for convenience..
 */
 
-func AddLogSuccess(db *database.DB, uid uint, text string) {
-	AddLogNow(db, uid, TypeSuccess, text)
+func AddLogSuccess(db *database.DB, uid uint, values ...interface{}) {
+	AddLogNow(db, uid, TypeSuccess, fmt.Sprint(values...))
 }
-func AddLogFail(db *database.DB, uid uint, text string) {
-	AddLogNow(db, uid, TypeFail, text)
+func AddLogFail(db *database.DB, uid uint, values ...interface{}) {
+	AddLogNow(db, uid, TypeFail, fmt.Sprint(values...))
 }
-func AddLogInfo(db *database.DB, uid uint, text string) {
-	AddLogNow(db, uid, TypeInfo, text)
+func AddLogInfo(db *database.DB, uid uint, values ...interface{}) {
+	AddLogNow(db, uid, TypeInfo, fmt.Sprint(values...))
 }
-func AddLogDebug(db *database.DB, uid uint, text string) {
-	AddLogNow(db, uid, TypeDebug, text)
+func AddLogDebug(db *database.DB, uid uint, values ...interface{}) {
+	AddLogNow(db, uid, TypeDebug, fmt.Sprint(values...))
 }
 
 func AddLogSuccessF(db *database.DB, uid uint, format string, values ...interface{}) {
