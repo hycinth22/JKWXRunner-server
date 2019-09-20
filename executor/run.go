@@ -92,7 +92,7 @@ execute:
 			// 一定几率不跑满，触发几率
 			const (
 				// the trigger rate is triggerRateN/triggerRateM
-				triggerRateN = 2
+				triggerRateN = 4
 				triggerRateM = 18
 			)
 			triggerRand := rand.Intn(triggerRateM)
