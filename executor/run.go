@@ -103,9 +103,9 @@ execute:
 					maxReductionRate      = 2
 					reductionRateDivision = 10
 				)
-				reduceRate := float64(rand.Intn(maxReductionRate*reductionRateDivision)) / reductionRateDivision
+				reduceRate := float64(rand.Intn(maxReductionRate)) / reductionRateDivision
 				limit.RandDistance.Max = limit.RandDistance.Min + (limit.RandDistance.Max-limit.RandDistance.Min)*(1-reduceRate)
-				accLogSrv.AddLogFail(db, uid, fmt.Sprintf("本次触发不跑满策略，比率%v，最终上限%v", reduceRate, viewFormat.DistanceFormat(limit.RandDistance.Max)))
+				accLogSrv.AddLogInfoF(db, uid, "本次触发不跑满策略，比率%v，最终上限%v", reduceRate, viewFormat.DistanceFormat(limit.RandDistance.Max))
 			}
 		}
 		records := ssmt.SmartCreateRecordsAfter(s.User.SchoolID, s.User.UserID, limit, acc.RunDistance, time.Now())
