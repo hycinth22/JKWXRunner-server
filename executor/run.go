@@ -99,11 +99,11 @@ execute:
 			accLogSrv.AddLogDebug(db, uid, "triggerRand:", triggerRand, " triggerRateN:", triggerRateN, " triggerRateM:", triggerRateM)
 			if triggerRand < triggerRateN {
 				const (
-					// the rate range is [0, maxMinusRate/reductionRateDivision)
-					maxReductionRate      = 2
-					reductionRateDivision = 10
+					// the rate range is (0, maxMinusRate/reductionRateDivision)
+					maxReductionRate      = 20
+					reductionRateDivision = 100
 				)
-				reduceRate := float64(rand.Intn(maxReductionRate)) / reductionRateDivision
+				reduceRate := float64(1+rand.Intn(maxReductionRate)) / reductionRateDivision
 				limit.RandDistance.Max = limit.RandDistance.Min + (limit.RandDistance.Max-limit.RandDistance.Min)*(1-reduceRate)
 				accLogSrv.AddLogInfoF(db, uid, "本次触发不跑满策略，比率%v，最终上限%v", reduceRate, viewFormat.DistanceFormat(limit.RandDistance.Max))
 			}
