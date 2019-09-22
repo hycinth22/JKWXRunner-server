@@ -18,9 +18,10 @@ import (
 )
 
 var (
-	ErrFinished        = errors.New("已完成跑步，不需要再执行任务")
-	ErrWrongLibVersion = errors.New("错误的库版本")
-	ErrCheatMarked     = errors.New("该帐号已被标记作弊！")
+	ErrFinished           = errors.New("已完成跑步，不需要再执行任务")
+	ErrWrongLibVersion    = errors.New("错误的库版本")
+	ErrCheatMarked        = errors.New("该帐号已被标记作弊！")
+	ErrUnexpectedUserInfo = errors.New("帐号信息异常，可能是session存在问题。")
 )
 var enableRandomDistanceReduction = true
 
@@ -51,6 +52,10 @@ execute:
 				accLogSrv.AddLogFail(db, uid, "根据标记作弊设定。停止执行")
 				return ErrCheatMarked
 			}
+		}
+		if userInfo.Sex != "F" && userInfo.Sex != "M" {
+			accLogSrv.AddLogFail(db, uid, "未知的性别：", userInfo.Sex)
+			return ErrUnexpectedUserInfo
 		}
 		limit := ssmt.GetDefaultLimitParams(userInfo.Sex)
 
