@@ -16,7 +16,7 @@ type Account struct {
 
 	OwnerID          int     `gorm:"NOT NULL"`
 	DeviceID         uint    `gorm:"NOT NULL"`
-	Status           string  `gorm:"NOT NULL;default:'normal''"`
+	Status           string  `gorm:"NOT NULL;default:'normal'"`
 	RunDistance      float64 `gorm:"NOT NULL"`
 	StartDistance    float64 `gorm:"NOT NULL"`
 	FinishDistance   float64 `gorm:"NOT NULL"`
