@@ -14,7 +14,7 @@ type Account struct {
 	Password string `gorm:"NOT NULL"`
 	Memo     string `gorm:"NOT NULL;default:''"`
 
-	OwnerID          int     `gorm:"NOT NULL"`
+	OwnerID          int     `gorm:"NOT NULL;default:0"`
 	DeviceID         uint    `gorm:"NOT NULL"`
 	Status           string  `gorm:"NOT NULL;default:'normal'"`
 	RunDistance      float64 `gorm:"NOT NULL"`
