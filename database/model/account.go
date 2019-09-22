@@ -1,8 +1,9 @@
 package model
 
 import (
-	"github.com/jinzhu/gorm"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 type Account struct {
@@ -13,6 +14,7 @@ type Account struct {
 	Password string `gorm:"NOT NULL"`
 	Memo     string `gorm:"NOT NULL;default:''"`
 
+	OwnerID          int     `gorm:"NOT NULL"`
 	DeviceID         uint    `gorm:"NOT NULL"`
 	Status           string  `gorm:"NOT NULL;default:'normal''"`
 	RunDistance      float64 `gorm:"NOT NULL"`
