@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/database/model"
 )
@@ -9,10 +10,7 @@ import (
 func main() {
 	db := database.GetDB()
 	tx := db.Begin()
-	tx.AutoMigrate(&model.Account{}, &model.AccountLog{})
-	tx.AutoMigrate(&model.Token{}, &model.Device{})
-	tx.AutoMigrate(&model.UserIDRelation{}, &model.CacheUserInfo{}, &model.CacheUserSportResult{})
-
+	tx.AutoMigrate(model.ModelsCollection...)
 	errs := tx.GetErrors()
 	if len(errs) != 0 {
 		tx.Rollback()
