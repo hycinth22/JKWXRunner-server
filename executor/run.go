@@ -104,7 +104,7 @@ execute:
 					reductionRateDivision = 100
 				)
 				reduceRate := float64(1+rand.Intn(maxReductionRate)) / reductionRateDivision
-				limit.RandDistance.Max = limit.RandDistance.Min + (limit.RandDistance.Max-limit.RandDistance.Min)*(1-reduceRate)
+				limit.RandDistance.Max = limit.LimitSingleDistance.Min + (limit.RandDistance.Max-limit.LimitSingleDistance.Min)*(1-reduceRate)
 				accLogSrv.AddLogInfoF(db, uid, "本次触发不跑满策略，比率%v，最终上限%v", reduceRate, viewFormat.DistanceFormat(limit.RandDistance.Max))
 			}
 		}
