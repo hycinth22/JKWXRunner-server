@@ -8,7 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/golang/protobuf v1.3.1 // indirect
-	github.com/inkedawn/go-sunshinemotion/v3 v3.15.0
+	github.com/inkedawn/go-sunshinemotion/v3 v3.15.1
 	github.com/jinzhu/gorm v1.9.2
 	github.com/jinzhu/inflection v0.0.0-20190603042836-f5c5f50e6090 // indirect
 	github.com/jinzhu/now v1.0.0 // indirect
@@ -25,4 +25,4 @@ require (
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
 )
 
-go 1.13
+go 1.12
