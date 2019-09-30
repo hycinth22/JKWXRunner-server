@@ -9,7 +9,7 @@ logDir=${selfDir}/data/logs/exec
 logfile=${logDir}/exec_$(date +%Y%m%d_%s_%N).log
 
 echo Dir: "${selfDir}"
-pushed "${selfDir}" || exit
+pushd "${selfDir}" || exit
 nohup go run "${srcDir}" "${params}" >"${logfile}" 2>&1 &
 echo $! >"${pidFile}"
 popd || exit
