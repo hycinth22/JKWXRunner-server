@@ -92,7 +92,7 @@ execute:
 			// 接近完成，就不跑满
 			limit.RandDistance.Min = stillNeed + 0.1
 			limit.RandDistance.Max = stillNeed + 0.8
-			accLogSrv.AddLogFail(db, uid, fmt.Sprintf("即将完成。本次随机区间 %v~%v", viewFormat.DistanceFormat(limit.RandDistance.Min), viewFormat.DistanceFormat(limit.RandDistance.Max)))
+			accLogSrv.AddLogInfoF(db, uid, "即将完成。本次随机区间 %v~%v", viewFormat.DistanceFormat(limit.RandDistance.Min), viewFormat.DistanceFormat(limit.RandDistance.Max))
 		} else if enableRandomDistanceReduction {
 			// 一定几率不跑满，触发几率
 			const (
