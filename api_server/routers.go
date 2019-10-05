@@ -27,6 +27,10 @@ func CORSRouter(router gin.IRouter) {
 			context.Header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS")
 			context.Header("Access-Control-Allow-Headers", "*")
 			context.AbortWithStatus(http.StatusOK)
+		} else {
+			context.Header("Access-Control-Allow-Origin", "*")
+			context.Header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS")
+			context.Header("Access-Control-Allow-Headers", "*")
 		}
 	})
 }
