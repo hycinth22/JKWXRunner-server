@@ -1,0 +1,10 @@
+PUT http://localhost:8066/account/189/status
+Content-Type: application/json
+pragma: no-cache
+cache-control: no-cache
+user-agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Mobile Safari/537.36
+
+{"Status": "testStatus"}
+
+###
+

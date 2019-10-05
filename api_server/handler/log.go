@@ -1,15 +1,17 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
 	"net/http"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+
+	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
 )
 
-func ListLogsByUID(context *gin.Context) {
-	uid, err := strconv.ParseUint(context.Param("uid"), 10, 64)
+func ListLogsByID(context *gin.Context) {
+	uid, err := strconv.ParseUint(context.Param("id"), 10, 64)
 	if err != nil {
 		_ = context.AbortWithError(http.StatusBadRequest, err)
 		return

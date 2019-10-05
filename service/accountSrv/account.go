@@ -3,12 +3,14 @@ package accountSrv
 
 import (
 	"errors"
+	"time"
+
+	"github.com/jinzhu/gorm"
+
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/database/model"
 	"github.com/inkedawn/JKWXRunner-server/service"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
-
-	"time"
 )
 
 type Account = model.Account
@@ -55,6 +57,7 @@ func ListAccounts(db *database.DB, offset, num uint) ([]Account, error) {
 	return accounts, nil
 }
 
+// Save update value in database, if the value doesn't have primary key(id), will insert it
 func SaveAccount(db *database.DB, acc *Account) error {
 	newAcc := db.NewRecord(acc)
 	err := db.Save(&acc).Error
@@ -65,6 +68,19 @@ func SaveAccount(db *database.DB, acc *Account) error {
 		accLogSrv.AddLogSuccess(db, acc.ID, "创建成功")
 	}
 	return nil
+}
+
+// return ErrNoAccount if record not exist.
+func GetAccount(db *database.DB, id uint) (*Account, error) {
+	acc := new(Account)
+	err := db.Where("id=?", id).Find(&acc).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, ErrNoAccount
+	}
+	if err != nil {
+		return nil, service.WrapAsInternalError(err)
+	}
+	return acc, nil
 }
 
 func ListAllAccountsWaitRun(db *database.DB) (accounts []Account, err error) {
@@ -142,10 +158,6 @@ func SetStatus(db *database.DB, acc *Account, status Status) error {
 	}
 	acc.Status = status
 	return nil
-}
-
-func SetStatusNormal(db *database.DB, acc *Account) error {
-	return SetStatus(db, acc, StatusNormal)
 }
 
 func SetLastTime(db *database.DB, acc *Account, lastTime time.Time) error {
