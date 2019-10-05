@@ -24,6 +24,7 @@ func CORSRouter(router gin.IRouter) {
 	router.Use(func(context *gin.Context) {
 		context.Header("Access-Control-Allow-Origin", "*")
 		context.Header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS")
+		context.Header("Access-Control-Allow-Headers", "content-type")
 		if context.Request.Method == http.MethodOptions {
 			context.AbortWithStatus(http.StatusOK)
 		}
