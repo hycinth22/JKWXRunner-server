@@ -1,16 +1,14 @@
 package apiServer
 
 import (
-	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 
 	"github.com/inkedawn/JKWXRunner-server/api_server/handler"
 	"github.com/inkedawn/JKWXRunner-server/service"
 )
-
-var cors = false
 
 func init() {
 	RequestRoutersTable = []RequestRouter{
@@ -19,9 +17,6 @@ func init() {
 		UserInfoRouter,
 		SportResultRouter,
 		ErrorsCollect,
-	}
-	if cors {
-		RequestRoutersTable = append(RequestRoutersTable, CORSRouter)
 	}
 }
 
@@ -35,17 +30,14 @@ func CORSRouter(router gin.IRouter) {
 		context.Header("Access-Control-Allow-Origin", "*")
 		context.Header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS")
 		context.Header("Access-Control-Allow-Headers", "*")
+		context.Status(http.StatusOK)
 	})
 }
 
 func ErrorsCollect(router gin.IRouter) {
-	fmt.Println("s0.0")
 	router.Use(func(context *gin.Context) {
-		fmt.Println("s0")
 		context.Next()
-		fmt.Println("s1")
 		for _, err := range context.Errors {
-			fmt.Println("s2")
 			if service.IsInternalError(err) {
 				log.Println(*context.Request, err, service.UnwrapInternalError(err))
 			} else {
