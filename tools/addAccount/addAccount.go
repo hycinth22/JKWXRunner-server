@@ -115,7 +115,6 @@ func main() {
 		fmt.Println("!!![WARNING]!!! Disable CheckCheatMarked! Confirm?")
 		fmt.Println("Confirm? Enter to continue...")
 		_, _ = fmt.Scanln()
-		tx.Commit()
 	}
 
 	err = accountSrv.SaveAccount(tx, acc)
