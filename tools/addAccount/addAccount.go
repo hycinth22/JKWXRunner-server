@@ -113,8 +113,9 @@ func main() {
 	acc.FinishDistance = sport.QualifiedDistance
 	if info.UserRoleID == userCacheSrv.UserRole_Cheater {
 		fmt.Println("!!![WARNING]!!! Disable CheckCheatMarked! Confirm?")
-		fmt.Println("Confirm? Enter to continue...")
+		fmt.Println("Enter to continue...")
 		_, _ = fmt.Scanln()
+		acc.CheckCheatMarked = false
 	}
 
 	err = accountSrv.SaveAccount(tx, acc)
