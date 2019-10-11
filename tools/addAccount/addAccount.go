@@ -99,17 +99,24 @@ func main() {
 	fmt.Println()
 	limit := ssmt.GetDefaultLimitParams(info.Sex)
 	acc := &accountSrv.Account{
-		SchoolID:    Arg_SchoolID,
-		StuNum:      Arg_StuNum,
-		Password:    Arg_Password,
-		RunDistance: limit.LimitTotalMaxDistance,
-		DeviceID:    dev.ID,
-		Status:      accountSrv.StatusNormal,
-		Memo:        "",
+		SchoolID:         Arg_SchoolID,
+		StuNum:           Arg_StuNum,
+		Password:         Arg_Password,
+		RunDistance:      limit.LimitTotalMaxDistance,
+		DeviceID:         dev.ID,
+		Status:           accountSrv.StatusNormal,
+		Memo:             "",
+		CheckCheatMarked: true,
 	}
 	acc.RunDistance = ssmt.NormalizeDistance(acc.RunDistance)
 	acc.StartDistance = sport.ActualDistance
 	acc.FinishDistance = sport.QualifiedDistance
+	if info.UserRoleID == userCacheSrv.UserRole_Cheater {
+		fmt.Println("!!![WARNING]!!! Disable CheckCheatMarked! Confirm?")
+		fmt.Println("Confirm? Enter to continue...")
+		_, _ = fmt.Scanln()
+		tx.Commit()
+	}
 
 	err = accountSrv.SaveAccount(tx, acc)
 	if err != nil {
