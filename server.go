@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/inkedawn/JKWXRunner-server/api_server"
 	"github.com/inkedawn/JKWXRunner-server/config"
+	"github.com/inkedawn/JKWXRunner-server/web"
 )
 
 // inject when build
@@ -36,7 +36,7 @@ func init() {
 func main() {
 	fmt.Println("BuildVersion:", lastCommit)
 	fmt.Println("BuildVersionTime:", lastCommitTime)
-	err := apiServer.Run(gin.New())
+	err := web.Run(gin.New())
 	if err != nil {
 		log.Fatal(err)
 	}
