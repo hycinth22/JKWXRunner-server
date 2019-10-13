@@ -4,12 +4,12 @@ import (
 	"errors"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/database/model"
+	"github.com/inkedawn/JKWXRunner-server/datamodels"
 
 	"github.com/inkedawn/go-sunshinemotion/v3"
 )
 
-type token = model.Token
+type token = datamodels.Token
 
 var (
 	ErrNoToken = errors.New("没有找到该用户的Token")
@@ -24,8 +24,8 @@ func getToken(db *database.DB, remoteUserID int64) (token, error) {
 	return userToken, err
 }
 func getTokenByUID(db *database.DB, uid uint) (t token, err error) {
-	var userID model.UserIDRelation
-	err = db.First(&userID, model.UserIDRelation{
+	var userID datamodels.UserIDRelation
+	err = db.First(&userID, datamodels.UserIDRelation{
 		UID: uid,
 	}).Error
 	if err != nil {

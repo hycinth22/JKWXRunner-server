@@ -4,13 +4,13 @@ import (
 	"fmt"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/database/model"
+	"github.com/inkedawn/JKWXRunner-server/datamodels"
 )
 
 func main() {
 	db := database.GetDB()
 	tx := db.Begin()
-	tx.CreateTable(model.ModelsCollection...)
+	tx.CreateTable(datamodels.ModelsCollection...)
 	errs := tx.GetErrors()
 	if len(errs) != 0 {
 		tx.Rollback()

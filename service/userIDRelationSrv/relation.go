@@ -2,8 +2,9 @@ package userIDRelationSrv
 
 import (
 	"errors"
+
 	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/database/model"
+	"github.com/inkedawn/JKWXRunner-server/datamodels"
 	"github.com/inkedawn/JKWXRunner-server/service"
 )
 
@@ -12,8 +13,8 @@ var (
 )
 
 func GetLocalUID(db *database.DB, remoteUserID int64) (uint, error) {
-	result := model.UserIDRelation{}
-	err := db.First(&result, &model.UserIDRelation{RemoteUserID: remoteUserID}).Error
+	result := datamodels.UserIDRelation{}
+	err := db.First(&result, &datamodels.UserIDRelation{RemoteUserID: remoteUserID}).Error
 	if err != nil {
 		if database.IsRecordNotFoundError(err) {
 			return 0, ErrNotFound
@@ -25,8 +26,8 @@ func GetLocalUID(db *database.DB, remoteUserID int64) (uint, error) {
 
 // 保存UserInfo到缓存（通常在登录后保存）
 func GetRemoteUserID(db *database.DB, uid uint) (int64, error) {
-	result := model.UserIDRelation{}
-	err := db.First(&result, &model.UserIDRelation{UID: uid}).Error
+	result := datamodels.UserIDRelation{}
+	err := db.First(&result, &datamodels.UserIDRelation{UID: uid}).Error
 	if err != nil {
 		if database.IsRecordNotFoundError(err) {
 			return 0, ErrNotFound
@@ -37,7 +38,7 @@ func GetRemoteUserID(db *database.DB, uid uint) (int64, error) {
 }
 
 func SaveRelation(db *database.DB, localUID uint, remoteUserID int64) error {
-	rel := model.UserIDRelation{
+	rel := datamodels.UserIDRelation{
 		UID:          localUID,
 		RemoteUserID: remoteUserID,
 	}

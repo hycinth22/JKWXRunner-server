@@ -8,12 +8,12 @@ import (
 	"github.com/jinzhu/gorm"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/database/model"
+	"github.com/inkedawn/JKWXRunner-server/datamodels"
 	"github.com/inkedawn/JKWXRunner-server/service"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
 )
 
-type Account = model.Account
+type Account = datamodels.Account
 
 var (
 	ErrNoAccount = errors.New("没有找到帐号")

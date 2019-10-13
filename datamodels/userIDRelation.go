@@ -1,4 +1,4 @@
-package model
+package datamodels
 
 type UserIDRelation struct {
 	UID          uint  `gorm:"primary_key"`

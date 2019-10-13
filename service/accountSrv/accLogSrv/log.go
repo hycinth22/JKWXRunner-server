@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/database/model"
+	"github.com/inkedawn/JKWXRunner-server/datamodels"
 )
 
-type Log = model.AccountLog
+type Log = datamodels.AccountLog
 
 type Type = string
 
@@ -34,7 +34,7 @@ func reportErr(msg string) {
 	}
 }
 
-func ListLogsForUID(db *database.DB, uid uint, offset, limit uint) (logs []model.AccountLog, err error) {
+func ListLogsForUID(db *database.DB, uid uint, offset, limit uint) (logs []datamodels.AccountLog, err error) {
 	err = db.Where("uid = ?", uid).Offset(offset).Limit(limit).Order("time desc").Find(&logs).Error
 	return
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/inkedawn/go-sunshinemotion/v3"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/database/model"
+	"github.com/inkedawn/JKWXRunner-server/datamodels"
 	"github.com/inkedawn/JKWXRunner-server/service"
 	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
 )
@@ -16,7 +16,7 @@ var (
 	ErrNoSportResult = errors.New("没有找到该用户缓存的运动结果")
 )
 
-type CacheSportResult = model.CacheUserSportResult
+type CacheSportResult = datamodels.CacheUserSportResult
 
 // 从数据库获取缓存的信息（通常是上次执行运动任务时更新的）
 func GetCacheSportResult(db *database.DB, userID int64) (CacheSportResult, error) {

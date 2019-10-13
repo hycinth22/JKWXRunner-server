@@ -1,4 +1,4 @@
-package model
+package datamodels
 
 import "github.com/jinzhu/gorm"
 

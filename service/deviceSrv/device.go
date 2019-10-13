@@ -7,18 +7,18 @@ import (
 	"github.com/inkedawn/go-sunshinemotion/v3"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/database/model"
+	"github.com/inkedawn/JKWXRunner-server/datamodels"
 	"github.com/inkedawn/JKWXRunner-server/service"
 )
 
-type Device = model.Device
+type Device = datamodels.Device
 
 var (
 	ErrNoDevice = errors.New("没有找到该用户的设备")
 )
 
 func GetDevice(db *database.DB, deviceID uint) (Device, error) {
-	device := model.Device{}
+	device := datamodels.Device{}
 	device.ID = deviceID
 	if err := db.First(&device).Error; err != nil {
 		if database.IsRecordNotFoundError(err) {

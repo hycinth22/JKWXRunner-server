@@ -8,7 +8,7 @@ import (
 	"github.com/inkedawn/go-sunshinemotion/v3"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/database/model"
+	"github.com/inkedawn/JKWXRunner-server/datamodels"
 	"github.com/inkedawn/JKWXRunner-server/service"
 )
 
@@ -16,7 +16,7 @@ var (
 	ErrNoUserInfo = errors.New("没有找到该用户缓存的用户信息")
 )
 
-type CacheUserInfo = model.CacheUserInfo
+type CacheUserInfo = datamodels.CacheUserInfo
 
 //noinspection GoUnusedConst
 const (
