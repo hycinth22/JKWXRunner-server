@@ -5,12 +5,9 @@ import (
 	"errors"
 	"time"
 
-	"github.com/jinzhu/gorm"
-
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/datamodels"
 	"github.com/inkedawn/JKWXRunner-server/service"
-	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
 )
 
 type Account = datamodels.Account
@@ -41,46 +38,21 @@ const (
 )
 
 func CountAccounts(db *database.DB) (n uint, err error) {
-	err = db.Model(&Account{}).Count(&n).Error
-	return
+	return service.NewAccountServiceOn(db).CountAccounts()
 }
 
 func ListAccounts(db *database.DB, offset, num uint) ([]Account, error) {
-	var accounts []Account
-	if err := db.Offset(offset).Limit(num).Find(&accounts).Error; err != nil {
-		if database.IsRecordNotFoundError(err) {
-			// 返回空集
-			return accounts, nil
-		}
-		return accounts, service.WrapAsInternalError(err)
-	}
-	return accounts, nil
+	return service.NewAccountServiceOn(db).ListAccountsRange(offset, num)
 }
 
 // Save update value in database, if the value doesn't have primary key(id), will insert it
 func SaveAccount(db *database.DB, acc *Account) error {
-	newAcc := db.NewRecord(acc)
-	err := db.Save(&acc).Error
-	if err != nil {
-		return service.WrapAsInternalError(err)
-	}
-	if newAcc {
-		accLogSrv.AddLogSuccess(db, acc.ID, "创建成功")
-	}
-	return nil
+	return service.NewAccountServiceOn(db).SaveAccount(acc)
 }
 
 // return ErrNoAccount if record not exist.
 func GetAccount(db *database.DB, id uint) (*Account, error) {
-	acc := new(Account)
-	err := db.Where("id=?", id).Find(&acc).Error
-	if err == gorm.ErrRecordNotFound {
-		return nil, ErrNoAccount
-	}
-	if err != nil {
-		return nil, service.WrapAsInternalError(err)
-	}
-	return acc, nil
+	return service.NewAccountServiceOn(db).GetAccount(id)
 }
 
 func ListAllAccountsWaitRun(db *database.DB) (accounts []Account, err error) {
