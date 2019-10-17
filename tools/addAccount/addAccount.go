@@ -24,6 +24,7 @@ var (
 )
 
 func mustParseArgs() {
+	const defaultOwnerID = 1
 	var err error
 	if len(os.Args) < 4 {
 		panic("too few arguments")
@@ -39,6 +40,8 @@ func mustParseArgs() {
 		if err != nil {
 			panic(err)
 		}
+	} else {
+		Arg_OwnerID = defaultOwnerID
 	}
 }
 
