@@ -102,6 +102,7 @@ func main() {
 	fmt.Println()
 	limit := ssmt.GetDefaultLimitParams(info.Sex)
 	acc := &accountSrv.Account{
+		OwnerID:          Arg_OwnerID,
 		SchoolID:         Arg_SchoolID,
 		StuNum:           Arg_StuNum,
 		Password:         Arg_Password,
