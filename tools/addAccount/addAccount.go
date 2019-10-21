@@ -47,6 +47,19 @@ func mustParseArgs() {
 
 func main() {
 	mustParseArgs()
+	accSrv := service.NewAccountService()
+	acc, err := accSrv.GetAccountByStuNum(Arg_SchoolID, Arg_StuNum)
+	switch err {
+	case service.ErrNoAccount:
+		break
+	case nil:
+		if acc != nil {
+			fmt.Println("帐号已存在. 状态是：", acc.Status)
+			return
+		}
+	default:
+		panic(err)
+	}
 	tx := database.GetDB().Begin()
 	defer func() {
 		x := recover()

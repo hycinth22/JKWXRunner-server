@@ -18,8 +18,9 @@ type IAccountService interface {
 	CountAccounts() (n uint, err error)
 	ListAccounts() ([]datamodels.Account, error)
 	ListAccountsRange(offset, num uint) ([]datamodels.Account, error)
-	SaveAccount(cc *datamodels.Account) error        // Save update value in database, if the value doesn't have primary key(id), will insert it
-	GetAccount(id uint) (*datamodels.Account, error) // return ErrNoAccount if record not exist.
+	SaveAccount(cc *datamodels.Account) error                                              // Save update value in database, if the value doesn't have primary key(id), will insert it
+	GetAccount(id uint) (*datamodels.Account, error)                                       // return ErrNoAccount if record not exist.
+	GetAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) // return ErrNoAccount if record not exist.
 }
 
 type accountService struct {
@@ -29,6 +30,18 @@ type accountService struct {
 func (a accountService) GetAccount(id uint) (acc *datamodels.Account, err error) {
 	acc = new(datamodels.Account)
 	err = a.db.Where("id=?", id).Find(&acc).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, ErrNoAccount
+	}
+	if err != nil {
+		return nil, WrapAsInternalError(err)
+	}
+	return acc, nil
+}
+
+func (a accountService) GetAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) {
+	acc = new(datamodels.Account)
+	err = a.db.Where("school_id = ? AND stu_num = ?", schoolID, stuNum).Find(&acc).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, ErrNoAccount
 	}
