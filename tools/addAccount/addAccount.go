@@ -128,12 +128,6 @@ func main() {
 	acc.RunDistance = ssmt.NormalizeDistance(acc.RunDistance)
 	acc.StartDistance = sport.ActualDistance
 	acc.FinishDistance = sport.QualifiedDistance
-	if info.UserRoleID == userCacheSrv.UserRole_Cheater {
-		fmt.Println("!!![WARNING]!!! Disable CheckCheatMarked! Confirm?")
-		fmt.Println("Enter to continue...")
-		_, _ = fmt.Scanln()
-		acc.CheckCheatMarked = false
-	}
 
 	err = accountSrv.SaveAccount(tx, acc)
 	if err != nil {
@@ -141,10 +135,15 @@ func main() {
 	}
 	fmt.Printf("Account %d: %+v", acc.ID, acc)
 	fmt.Println()
-
 	err = userIDRelationSrv.SaveRelation(tx, acc.ID, session.User.UserID)
 	if err != nil {
 		panic(err)
 	}
 
+	if info.UserRoleID == userCacheSrv.UserRole_Cheater {
+		fmt.Println("!!![WARNING]!!! Disable CheckCheatMarked! Confirm?")
+		fmt.Println("Enter to continue...")
+
+		_, _ = fmt.Scanln()
+	}
 }
