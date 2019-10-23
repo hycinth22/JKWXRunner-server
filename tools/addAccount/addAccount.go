@@ -143,7 +143,10 @@ func main() {
 	if info.UserRoleID == userCacheSrv.UserRole_Cheater {
 		fmt.Println("!!![WARNING]!!! Disable CheckCheatMarked! Confirm?")
 		fmt.Println("Enter to continue...")
-
 		_, _ = fmt.Scanln()
+		err = accSrv.SetCheckCheaterFlag(acc.ID, false)
+		if err != nil {
+			fmt.Println("[ERROR] an error occurred when set flag. ", err)
+		}
 	}
 }

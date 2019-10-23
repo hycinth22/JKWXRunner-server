@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/jinzhu/gorm"
 
@@ -21,13 +22,24 @@ type IAccountService interface {
 	SaveAccount(cc *datamodels.Account) error                                              // Save update value in database, if the value doesn't have primary key(id), will insert it
 	GetAccount(id uint) (*datamodels.Account, error)                                       // return ErrNoAccount if record not exist.
 	GetAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) // return ErrNoAccount if record not exist.
+	SetCheckCheaterFlag(id uint, check bool) error
 }
 
 type accountService struct {
 	db *database.DB
+	sync.Locker
+}
+
+func (a accountService) SetCheckCheaterFlag(id uint, check bool) error {
+	a.Lock()
+	defer a.Unlock()
+	a.db.Model(&datamodels.Account{}).Select("check_cheat_marked").Updates(map[string]interface{}{"check_cheat_marked": false})
+	return a.db.Error
 }
 
 func (a accountService) GetAccount(id uint) (acc *datamodels.Account, err error) {
+	a.Lock()
+	defer a.Unlock()
 	acc = new(datamodels.Account)
 	err = a.db.Where("id=?", id).Find(&acc).Error
 	if err == gorm.ErrRecordNotFound {
@@ -40,6 +52,8 @@ func (a accountService) GetAccount(id uint) (acc *datamodels.Account, err error)
 }
 
 func (a accountService) GetAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) {
+	a.Lock()
+	defer a.Unlock()
 	acc = new(datamodels.Account)
 	err = a.db.Where("school_id = ? AND stu_num = ?", schoolID, stuNum).Find(&acc).Error
 	if err == gorm.ErrRecordNotFound {
@@ -52,11 +66,15 @@ func (a accountService) GetAccountByStuNum(schoolID int64, stuNum string) (acc *
 }
 
 func (a accountService) CountAccounts() (n uint, err error) {
+	a.Lock()
+	defer a.Unlock()
 	err = a.db.Model(&datamodels.Account{}).Count(&n).Error
 	return
 }
 
 func (a accountService) ListAccounts() ([]datamodels.Account, error) {
+	a.Lock()
+	defer a.Unlock()
 	var accounts []datamodels.Account
 	if err := a.db.Find(&accounts).Error; err != nil {
 		if database.IsRecordNotFoundError(err) {
@@ -69,6 +87,8 @@ func (a accountService) ListAccounts() ([]datamodels.Account, error) {
 }
 
 func (a accountService) ListAccountsRange(offset, num uint) ([]datamodels.Account, error) {
+	a.Lock()
+	defer a.Unlock()
 	var accounts []datamodels.Account
 	if err := a.db.Offset(offset).Limit(num).Find(&accounts).Error; err != nil {
 		if database.IsRecordNotFoundError(err) {
@@ -81,6 +101,8 @@ func (a accountService) ListAccountsRange(offset, num uint) ([]datamodels.Accoun
 }
 
 func (a accountService) SaveAccount(acc *datamodels.Account) error {
+	a.Lock()
+	defer a.Unlock()
 	newAcc := a.db.NewRecord(acc)
 	err := a.db.Save(&acc).Error
 	if err != nil {
@@ -93,7 +115,7 @@ func (a accountService) SaveAccount(acc *datamodels.Account) error {
 }
 
 func NewAccountService() IAccountService {
-	return &accountService{db: database.GetDB()}
+	return NewAccountServiceOn(database.GetDB())
 }
 
 func NewAccountServiceOn(db *database.DB) IAccountService {
