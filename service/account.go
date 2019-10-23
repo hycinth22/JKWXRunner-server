@@ -119,5 +119,5 @@ func NewAccountService() IAccountService {
 }
 
 func NewAccountServiceOn(db *database.DB) IAccountService {
-	return &accountService{db: db}
+	return &accountService{db: db, Locker: &sync.Mutex{}}
 }
