@@ -114,7 +114,7 @@ func main() {
 	fmt.Printf("Device %d: %+v", dev.ID, dev)
 	fmt.Println()
 	limit := ssmt.GetDefaultLimitParams(info.Sex)
-	acc := &accountSrv.Account{
+	acc = &accountSrv.Account{
 		OwnerID:          Arg_OwnerID,
 		SchoolID:         Arg_SchoolID,
 		StuNum:           Arg_StuNum,
