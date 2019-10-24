@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 	"strconv"
@@ -47,19 +48,6 @@ func mustParseArgs() {
 
 func main() {
 	mustParseArgs()
-	accSrv := service.NewAccountService()
-	acc, err := accSrv.GetAccountByStuNum(Arg_SchoolID, Arg_StuNum)
-	switch err {
-	case service.ErrNoAccount:
-		break
-	case nil:
-		if acc != nil {
-			fmt.Println("帐号已存在. 状态是：", acc.Status)
-			return
-		}
-	default:
-		panic(err)
-	}
 	tx := database.GetDB().Begin()
 	defer func() {
 		x := recover()
@@ -80,7 +68,19 @@ func main() {
 			tx.Commit()
 		}
 	}()
-
+	accSrv := service.NewAccountServiceOn(tx)
+	acc, err := accSrv.GetAccountByStuNum(Arg_SchoolID, Arg_StuNum)
+	switch err {
+	case service.ErrNoAccount:
+		break
+	case nil:
+		if acc != nil {
+			fmt.Println("帐号已存在. 状态是：", acc.Status)
+			return
+		}
+	default:
+		panic(err)
+	}
 	ssmtDevice := ssmt.GenerateDevice()
 	session := new(ssmt.Session)
 	session.Device = ssmtDevice
@@ -123,7 +123,7 @@ func main() {
 		DeviceID:         dev.ID,
 		Status:           accountSrv.StatusNormal,
 		Memo:             "",
-		CheckCheatMarked: true,
+		CheckCheatMarked: sql.NullBool{Valid: false},
 	}
 	acc.RunDistance = ssmt.NormalizeDistance(acc.RunDistance)
 	acc.StartDistance = sport.ActualDistance
@@ -142,7 +142,6 @@ func main() {
 
 	if info.UserRoleID == userCacheSrv.UserRole_Cheater {
 		fmt.Println("!!![WARNING]!!! Disable CheckCheatMarked! Confirm?")
-		fmt.Println("Enter to continue...")
 		_, _ = fmt.Scanln()
 		err = accSrv.SetCheckCheaterFlag(acc.ID, false)
 		if err != nil {

@@ -60,7 +60,7 @@ func ListAccounts(ctx *gin.Context) {
 			StartDistance:    acc.StartDistance,
 			FinishDistance:   acc.FinishDistance,
 			CurrentDistance:  current,
-			CheckCheatMarked: acc.CheckCheatMarked,
+			CheckCheatMarked: acc.CheckCheatMarked.Valid && acc.CheckCheatMarked.Bool,
 			LastResult:       acc.LastResult,
 			LastTime:         viewFormat.TimeFormat(acc.LastTime),
 		})

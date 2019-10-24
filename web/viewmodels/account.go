@@ -35,7 +35,7 @@ func NewAccount(acc *datamodels.Account, currentDistance float64) *Account {
 		StartDistance:    acc.StartDistance,
 		FinishDistance:   acc.FinishDistance,
 		CurrentDistance:  currentDistance,
-		CheckCheatMarked: acc.CheckCheatMarked,
+		CheckCheatMarked: acc.CheckCheatMarked.Valid && acc.CheckCheatMarked.Bool,
 		LastResult:       acc.LastResult,
 		LastTime:         viewFormat.TimeFormat(acc.LastTime),
 	}

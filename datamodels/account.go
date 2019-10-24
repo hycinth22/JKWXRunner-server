@@ -1,6 +1,7 @@
 package datamodels
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -14,13 +15,13 @@ type Account struct {
 	Password string `gorm:"NOT NULL"`
 	Memo     string `gorm:"NOT NULL;default:''"`
 
-	OwnerID          int     `gorm:"NOT NULL;default:0"`
-	DeviceID         uint    `gorm:"NOT NULL"`
-	Status           string  `gorm:"NOT NULL;default:'normal'"`
-	RunDistance      float64 `gorm:"NOT NULL"`
-	StartDistance    float64 `gorm:"NOT NULL"`
-	FinishDistance   float64 `gorm:"NOT NULL"`
-	CheckCheatMarked bool    `gorm:"NOT NULL;default:1"`
+	OwnerID          int          `gorm:"NOT NULL;default:0"`
+	DeviceID         uint         `gorm:"NOT NULL"`
+	Status           string       `gorm:"NOT NULL;default:'normal'"`
+	RunDistance      float64      `gorm:"NOT NULL"`
+	StartDistance    float64      `gorm:"NOT NULL"`
+	FinishDistance   float64      `gorm:"NOT NULL"`
+	CheckCheatMarked sql.NullBool `gorm:"NOT NULL;default:1"`
 
 	LastResult string    `gorm:"default:''"`
 	LastTime   time.Time `gorm:"default:0"`
