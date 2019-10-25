@@ -2,6 +2,7 @@
 package accountSrv
 
 import (
+	"database/sql"
 	"errors"
 	"time"
 
@@ -137,7 +138,7 @@ func SetLastTime(db *database.DB, acc *Account, lastTime time.Time) error {
 	if err != nil {
 		return service.WrapAsInternalError(err)
 	}
-	acc.LastTime = lastTime
+	acc.LastTime = sql.NullTime{Valid: true, Time: lastTime}
 	return nil
 }
 
@@ -146,6 +147,6 @@ func SetLastResult(db *database.DB, acc *Account, r RunResult) error {
 	if err != nil {
 		return service.WrapAsInternalError(err)
 	}
-	acc.LastResult = r
+	acc.LastResult = sql.NullString{Valid: true, String: r}
 	return nil
 }

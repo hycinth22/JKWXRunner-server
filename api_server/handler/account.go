@@ -61,8 +61,8 @@ func ListAccounts(ctx *gin.Context) {
 			FinishDistance:   acc.FinishDistance,
 			CurrentDistance:  current,
 			CheckCheatMarked: acc.CheckCheatMarked.Valid && acc.CheckCheatMarked.Bool,
-			LastResult:       acc.LastResult,
-			LastTime:         viewFormat.TimeFormat(acc.LastTime),
+			LastResult:       acc.LastResult.String,
+			LastTime:         viewFormat.TimeFormat(acc.LastTime.Time),
 		})
 	}
 	ctx.JSON(http.StatusOK, resp)

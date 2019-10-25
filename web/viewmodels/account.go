@@ -23,7 +23,7 @@ type Account struct {
 }
 
 func NewAccount(acc *datamodels.Account, currentDistance float64) *Account {
-	return &Account{
+	view := &Account{
 		ID:               acc.ID,
 		OwnerID:          acc.OwnerID,
 		CreatedAt:        viewFormat.TimeFormat(acc.CreatedAt),
@@ -36,7 +36,16 @@ func NewAccount(acc *datamodels.Account, currentDistance float64) *Account {
 		FinishDistance:   acc.FinishDistance,
 		CurrentDistance:  currentDistance,
 		CheckCheatMarked: acc.CheckCheatMarked.Valid && acc.CheckCheatMarked.Bool,
-		LastResult:       acc.LastResult,
-		LastTime:         viewFormat.TimeFormat(acc.LastTime),
 	}
+	if acc.LastResult.Valid {
+		view.LastResult = acc.LastResult.String
+	} else {
+		view.LastResult = ""
+	}
+	if acc.LastTime.Valid {
+		view.LastTime = viewFormat.TimeFormat(acc.LastTime.Time)
+	} else {
+		view.LastTime = ""
+	}
+	return view
 }
