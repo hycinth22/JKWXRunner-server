@@ -22,6 +22,6 @@ type Account struct {
 	FinishDistance   float64      `gorm:"NOT NULL"`
 	CheckCheatMarked sql.NullBool `gorm:"NOT NULL;default:1"`
 
-	LastResult sql.NullString `gorm:"default:''"`
-	LastTime   sql.NullTime   `gorm:"default:0"`
+	LastResult sql.NullString
+	LastTime   sql.NullTime
 }
