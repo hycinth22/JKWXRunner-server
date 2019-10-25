@@ -29,14 +29,14 @@ func main() {
 	for _, acc := range accounts {
 		log.Println(dumpStructValue(acc))
 	}
-
+	const retryTimes = 3
 	var wg sync.WaitGroup
 	wg.Add(len(accounts))
 	if len(accounts) >= 1 {
-		startupTaskWorker(db, &accounts[0], &wg)
+		startupTaskWorker(db, &accounts[0], &wg, retryTimes)
 		for i := range accounts[1:] {
 			sleepPartOfTotalTime(int64(len(accounts)), 6*time.Hour)
-			startupTaskWorker(db, &accounts[1+i], &wg)
+			startupTaskWorker(db, &accounts[1+i], &wg, retryTimes)
 		}
 	}
 	wg.Wait()
@@ -59,55 +59,35 @@ func VersionCheck() bool {
 	return true
 }
 
-func startupTaskWorker(db *database.DB, acc *accountSrv.Account, wg *sync.WaitGroup) {
+func startupTaskWorker(db *database.DB, acc *accountSrv.Account, wg *sync.WaitGroup, retryTimes int) {
 	log.Println("runAccountTask", acc.SchoolID, acc.StuNum)
 	go func() {
 		defer wg.Done()
-		executeTask(db, acc, 3)
+		setAccountStatus(db, acc, accountSrv.StatusRunning)
+		failCnt := 0
+		forceUpdateSession := false
+	execute:
+		for failCnt < retryTimes {
+			err := newTask(db, acc, forceUpdateSession).Exec()
+			setAccountLastTime(db, acc, time.Now())
+			switch err {
+			case nil:
+				log.Println("runAccountTask", acc.SchoolID, acc.StuNum, "has been completed Successfully.")
+				setAccountLastResult(db, acc, accountSrv.RunSuccess)
+				setAccountStatus(db, acc, accountSrv.StatusNormal)
+			case ErrFinished:
+				setAccountLastResult(db, acc, accountSrv.RunSuccess)
+				setAccountStatus(db, acc, accountSrv.StatusFinished)
+			case ssmt.ErrInvalidToken:
+				forceUpdateSession = true
+				failCnt++
+				continue execute
+			default:
+				fmt.Println(acc.SchoolID, acc.StuNum, ": ", err.Error())
+				setAccountLastResult(db, acc, accountSrv.RunErrorOccurred)
+				setAccountStatus(db, acc, accountSrv.StatusSuspend)
+			}
+			break execute // exit normally
+		}
 	}()
-}
-
-func executeTask(db *database.DB, acc *accountSrv.Account, retryTimes uint) {
-	if retryTimes < 0 {
-		return
-	}
-	setAccountStatus(db, acc, accountSrv.StatusRunning)
-	err := runAccountTask(db, acc)
-	setAccountLastTime(db, acc, time.Now())
-	switch err {
-	case nil:
-		log.Println("runAccountTask", acc.SchoolID, acc.StuNum, "has been completed Successfully.")
-		setAccountLastResult(db, acc, accountSrv.RunSuccess)
-		setAccountStatus(db, acc, accountSrv.StatusNormal)
-	case ErrFinished:
-		setAccountLastResult(db, acc, accountSrv.RunSuccess)
-		setAccountStatus(db, acc, accountSrv.StatusFinished)
-	case ssmt.ErrInvalidToken:
-		executeTask(db, acc, retryTimes-1)
-	default:
-		fmt.Println(acc.SchoolID, acc.StuNum, ": ", err.Error())
-		setAccountLastResult(db, acc, accountSrv.RunErrorOccurred)
-		setAccountStatus(db, acc, accountSrv.StatusSuspend)
-	}
-}
-
-func setAccountStatus(db *database.DB, acc *accountSrv.Account, status accountSrv.Status) {
-	err := accountSrv.SetStatus(db, acc, status)
-	if err != nil {
-		log.Println("account ", acc.SchoolID, acc.StuNum, "failed to set status to", status)
-	}
-}
-
-func setAccountLastTime(db *database.DB, acc *accountSrv.Account, t time.Time) {
-	err := accountSrv.SetLastTime(db, acc, t)
-	if err != nil {
-		log.Println("account ", acc.SchoolID, acc.StuNum, "failed to set lastTime to", t)
-	}
-}
-
-func setAccountLastResult(db *database.DB, acc *accountSrv.Account, r accountSrv.RunResult) {
-	err := accountSrv.SetLastResult(db, acc, r)
-	if err != nil {
-		log.Println("account ", acc.SchoolID, acc.StuNum, "failed to set lastResult to", r)
-	}
 }
