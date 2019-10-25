@@ -48,7 +48,11 @@ execute:
 		}
 		if userInfo.UserRoleID == userCacheSrv.UserRole_Cheater {
 			accLogSrv.AddLogInfo(db, uid, "检测到该帐号已被标记作弊！")
-			if acc.CheckCheatMarked {
+			// 从数据库取回的应当必定该字段有效
+			if !acc.CheckCheatMarked.Valid {
+				panic("标记作弊设定异常")
+			}
+			if acc.CheckCheatMarked.Bool {
 				accLogSrv.AddLogFail(db, uid, "根据标记作弊设定。停止执行")
 				return ErrCheatMarked
 			}
