@@ -6,7 +6,7 @@ import (
 	"syscall"
 )
 
-func SetupSigusr1Trap() {
+func SetupSigUsr1Trap() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGUSR1)
 	go func() {
