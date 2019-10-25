@@ -13,3 +13,4 @@ pushd "${selfDir}" || exit
 nohup go run "${srcDir}" "${params}" >"${logfile}" 2>&1 &
 echo $! >"${pidFile}"
 popd || exit
+tailf "${logfile}"
