@@ -128,14 +128,17 @@ func (t *task) Exec() (err error) {
 	}
 	records := ssmt.SmartCreateRecordsAfter(s.User.SchoolID, s.User.UserID, limit, acc.RunDistance, time.Now())
 	err = uploadRecords(db, acc, s, records)
-
 	if err != nil {
-		_, _ = recordResultAfterRun(db, acc.ID, s) // if fail, let it go
+		// still record distance if upload records fail
+		_, _ = recordResultAfterRun(db, acc.ID, s) // but if record fail also, let it go
 		return err
 	}
+	// major operation has been completed successfully.
 	r, err = recordResultAfterRun(db, acc.ID, s)
 	if err != nil {
-		return err
+		accLogSrv.AddLogFailF(db, acc.ID, "结束后记录距离时遇到错误。", err)
+		// only log but not return
+		return nil
 	}
 	if shouldFinished(acc, r) {
 		return ErrFinished

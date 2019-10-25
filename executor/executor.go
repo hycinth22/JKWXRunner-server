@@ -65,27 +65,26 @@ func startupTaskWorker(db *database.DB, acc *accountSrv.Account, wg *sync.WaitGr
 		defer wg.Done()
 		setAccountStatus(db, acc, accountSrv.StatusRunning)
 		failCnt := 0
-		forceUpdateSession := false
+		task := newTask(db, acc, false)
 	execute:
 		for failCnt < retryTimes {
-			err := newTask(db, acc, forceUpdateSession).Exec()
+			err := task.Exec()
 			setAccountLastTime(db, acc, time.Now())
 			switch err {
 			case nil:
 				log.Println("runAccountTask", acc.SchoolID, acc.StuNum, "has been completed Successfully.")
 				setAccountLastResult(db, acc, accountSrv.RunSuccess)
-				setAccountStatus(db, acc, accountSrv.StatusNormal)
-			case ErrFinished:
-				setAccountLastResult(db, acc, accountSrv.RunSuccess)
-				setAccountStatus(db, acc, accountSrv.StatusFinished)
 			case ssmt.ErrInvalidToken:
-				forceUpdateSession = true
+				task.forceUpdateSession = true
 				failCnt++
 				continue execute
+			case ErrFinished:
+				setAccountLastResult(db, acc, accountSrv.RunSuccess)
+				setAccountStatus(db, acc, accountSrv.StatusFinished) // 超出距离自动更改为结束状态。
 			default:
 				fmt.Println(acc.SchoolID, acc.StuNum, ": ", err.Error())
 				setAccountLastResult(db, acc, accountSrv.RunErrorOccurred)
-				setAccountStatus(db, acc, accountSrv.StatusSuspend)
+				setAccountStatus(db, acc, accountSrv.StatusSuspend) // 遇到未知错误将自动挂起
 			}
 			break execute // exit normally
 		}
