@@ -68,7 +68,7 @@ func ListAllAccountsWaitRun(db *database.DB) (accounts []Account, err error) {
 		}
 	}()
 	var idGroup []uint
-	if err := tx.Model(&Account{}).Where("status = ? AND last_time < ?", StatusNormal, todayZero).Pluck("id", &idGroup).Error; err != nil {
+	if err := tx.Model(&Account{}).Where("status = ? AND (last_time < ? OR last_time IS NULL)", StatusNormal, todayZero).Pluck("id", &idGroup).Error; err != nil {
 		if database.IsRecordNotFoundError(err) {
 			// 返回空集
 			return []Account{}, nil
@@ -100,7 +100,7 @@ func ListAndSetRunStatusForAllAccountsWaitRun(db *database.DB) (accounts []Accou
 		}
 	}()
 	var idGroup []uint
-	if err := tx.Model(&Account{}).Where("status = ? AND last_time < ?", StatusNormal, todayZero).Pluck("id", &idGroup).Error; err != nil {
+	if err := tx.Model(&Account{}).Where("status = ? AND (last_time < ? OR last_time IS NULL)", StatusNormal, todayZero).Pluck("id", &idGroup).Error; err != nil {
 		if database.IsRecordNotFoundError(err) {
 			// 返回空集
 			return []Account{}, nil
