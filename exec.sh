@@ -14,4 +14,4 @@ echo "" >"${logfile}" # create or clear file
 nohup go run "${srcDir}" "${params}" >"${logfile}" 2>&1 &
 echo $! >"${pidFile}"
 popd || exit
-tailf "${logfile}"
+echo the logfile is "${logfile}"
