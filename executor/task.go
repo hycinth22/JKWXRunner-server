@@ -53,6 +53,7 @@ func (t *task) Exec() (err error) {
 			accLogSrv.AddLogFail(db, uid, "更新Session失败："+dumpStruct(err))
 			return err
 		}
+		accLogSrv.AddLogInfo(db, uid, "更新Session成功："+dumpStruct(err))
 	} else {
 		s, err = sessionSrv.SmartGetSession(db, *acc)
 		if err != nil {
