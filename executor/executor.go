@@ -74,6 +74,7 @@ func startupTaskWorker(db *database.DB, acc *accountSrv.Account, wg *sync.WaitGr
 			case nil:
 				log.Println("runAccountTask", acc.SchoolID, acc.StuNum, "has been completed Successfully.")
 				setAccountLastResult(db, acc, accountSrv.RunSuccess)
+				setAccountStatus(db, acc, accountSrv.StatusNormal) // 从Running状态恢复。
 			case ssmt.ErrInvalidToken:
 				task.forceUpdateSession = true
 				failCnt++
