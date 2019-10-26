@@ -48,12 +48,12 @@ func (t *task) Exec() (err error) {
 	uid := t.acc.ID
 	var s *ssmt.Session
 	if t.forceUpdateSession {
-		err = sessionSrv.UpdateSession(db, *acc)
+		s, err = sessionSrv.NewSession(db, *acc)
 		if err != nil {
 			accLogSrv.AddLogFail(db, uid, "更新Session失败："+dumpStruct(err))
 			return err
 		}
-		accLogSrv.AddLogInfo(db, uid, "更新Session成功："+dumpStruct(err))
+		accLogSrv.AddLogInfo(db, uid, "更新Session成功："+dumpStruct(s))
 	} else {
 		s, err = sessionSrv.SmartGetSession(db, *acc)
 		if err != nil {
