@@ -34,7 +34,7 @@ type accountService struct {
 func (a accountService) SetCheckCheaterFlag(id uint, check bool) error {
 	a.Lock()
 	defer a.Unlock()
-	a.db.Model(&datamodels.Account{}).Select("check_cheat_marked").Updates(map[string]interface{}{"check_cheat_marked": sql.NullBool{Valid: true, Bool: check}})
+	a.db.Model(&datamodels.Account{}).Select("check_cheat_marked").Where("id=?", id).Updates(map[string]interface{}{"check_cheat_marked": sql.NullBool{Valid: true, Bool: check}})
 	return a.db.Error
 }
 
