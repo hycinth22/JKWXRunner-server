@@ -4,16 +4,23 @@ import (
 	"database/sql"
 	"errors"
 	"sync"
+	"time"
 
+	ssmt "github.com/inkedawn/go-sunshinemotion/v3"
 	"github.com/jinzhu/gorm"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/datamodels"
+	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
+	"github.com/inkedawn/JKWXRunner-server/service/deviceSrv"
+	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
+	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
 )
 
 var (
-	ErrNoAccount = errors.New("没有找到帐号")
+	ErrNoAccount    = errors.New("没有找到帐号")
+	ErrExistAlready = errors.New("帐号已存在")
 )
 
 type IAccountService interface {
@@ -24,6 +31,7 @@ type IAccountService interface {
 	GetAccount(id uint) (*datamodels.Account, error)                                       // return ErrNoAccount if record not exist.
 	GetAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) // return ErrNoAccount if record not exist.
 	SetCheckCheaterFlag(id uint, check bool) error
+	CreateAccount(SchoolID int64, StuNum string, Password string) (*datamodels.Account, error)
 }
 
 type accountService struct {
@@ -34,13 +42,24 @@ type accountService struct {
 func (a accountService) SetCheckCheaterFlag(id uint, check bool) error {
 	a.Lock()
 	defer a.Unlock()
-	a.db.Model(&datamodels.Account{}).Select("check_cheat_marked").Where("id=?", id).Updates(map[string]interface{}{"check_cheat_marked": sql.NullBool{Valid: true, Bool: check}})
-	return a.db.Error
+	return a.setCheckCheaterFlagLocked(id, check)
+}
+
+func (a accountService) setCheckCheaterFlagLocked(id uint, check bool) error {
+	return a.db.Model(&datamodels.Account{}).
+		Select("check_cheat_marked").
+		Where("id=?", id).
+		Updates(map[string]interface{}{"check_cheat_marked": sql.NullBool{Valid: true, Bool: check}}).
+		Error
 }
 
 func (a accountService) GetAccount(id uint) (acc *datamodels.Account, err error) {
 	a.Lock()
 	defer a.Unlock()
+	return a.getAccountLocked(id)
+}
+
+func (a accountService) getAccountLocked(id uint) (acc *datamodels.Account, err error) {
 	acc = new(datamodels.Account)
 	err = a.db.Where("id=?", id).Find(&acc).Error
 	if err == gorm.ErrRecordNotFound {
@@ -55,6 +74,10 @@ func (a accountService) GetAccount(id uint) (acc *datamodels.Account, err error)
 func (a accountService) GetAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) {
 	a.Lock()
 	defer a.Unlock()
+	return a.getAccountByStuNumLocked(schoolID, stuNum)
+}
+
+func (a accountService) getAccountByStuNumLocked(schoolID int64, stuNum string) (acc *datamodels.Account, err error) {
 	acc = new(datamodels.Account)
 	err = a.db.Where("school_id = ? AND stu_num = ?", schoolID, stuNum).Find(&acc).Error
 	if err == gorm.ErrRecordNotFound {
@@ -104,6 +127,10 @@ func (a accountService) ListAccountsRange(offset, num uint) ([]datamodels.Accoun
 func (a accountService) SaveAccount(acc *datamodels.Account) error {
 	a.Lock()
 	defer a.Unlock()
+	return a.saveAccountLocked(acc)
+}
+
+func (a accountService) saveAccountLocked(acc *datamodels.Account) error {
 	newAcc := a.db.NewRecord(acc)
 	err := a.db.Save(&acc).Error
 	if err != nil {
@@ -113,6 +140,98 @@ func (a accountService) SaveAccount(acc *datamodels.Account) error {
 		accLogSrv.AddLogSuccess(a.db, acc.ID, "创建成功")
 	}
 	return nil
+}
+
+func (a accountService) CreateAccount(SchoolID int64, StuNum string, Password string) (acc *datamodels.Account, err error) {
+	a.Lock()
+	defer a.Unlock()
+	return a.createAccountLocked(SchoolID, StuNum, Password)
+}
+
+func (a accountService) createAccountLocked(SchoolID int64, StuNum string, Password string) (acc *datamodels.Account, err error) {
+	tx := a.db.Begin()
+	defer func() {
+		// panic recovery
+		if x := recover(); x != nil {
+			tx.Rollback()
+			err = x.(error)
+		}
+		// transaction finish
+		if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+	acc = &datamodels.Account{
+		SchoolID: SchoolID,
+		StuNum:   StuNum,
+		Password: Password,
+	}
+	acc, err = a.getAccountByStuNumLocked(SchoolID, StuNum)
+	switch err {
+	case ErrNoAccount:
+		break // okay, continue to create
+	case nil:
+		return acc, ErrExistAlready
+	default:
+		panic(err)
+	}
+	ssmtDevice := ssmt.GenerateDevice()
+	session := new(ssmt.Session)
+	session.Device = ssmtDevice
+	info, err := session.Login(SchoolID, StuNum, "123", ssmt.PasswordHash(Password))
+	if err != nil {
+		panic(err)
+	}
+
+	fetchTime := time.Now()
+	sport, err := session.GetSportResult()
+	if err != nil {
+		panic(err)
+	}
+	err = userCacheSrv.SaveCacheSportResult(tx, userCacheSrv.FromSSMTSportResult(*sport, session.User.UserID, fetchTime))
+	if err != nil {
+		panic(err)
+	}
+
+	dev := deviceSrv.FromSSMTDevice(*ssmtDevice)
+	err = deviceSrv.SaveDevice(tx, &dev)
+	if err != nil {
+		panic(err)
+	}
+
+	const defaultOwnerID = 1
+	limit := ssmt.GetDefaultLimitParams(info.Sex)
+	acc = &accountSrv.Account{
+		OwnerID:          defaultOwnerID,
+		SchoolID:         SchoolID,
+		StuNum:           StuNum,
+		Password:         Password,
+		RunDistance:      limit.LimitTotalMaxDistance,
+		DeviceID:         dev.ID,
+		Status:           accountSrv.StatusNormal,
+		Memo:             "",
+		CheckCheatMarked: sql.NullBool{Valid: false},
+	}
+	acc.RunDistance = ssmt.NormalizeDistance(acc.RunDistance)
+	acc.StartDistance = sport.ActualDistance
+	acc.FinishDistance = sport.QualifiedDistance
+
+	err = accountSrv.SaveAccount(tx, acc)
+	if err != nil {
+		panic(err)
+	}
+	err = userIDRelationSrv.SaveRelation(tx, acc.ID, session.User.UserID)
+	if err != nil {
+		panic(err)
+	}
+	if info.UserRoleID == userCacheSrv.UserRole_Cheater {
+		err = a.setCheckCheaterFlagLocked(acc.ID, false)
+		if err != nil {
+		}
+	}
+	return acc, nil
 }
 
 func NewAccountService() IAccountService {

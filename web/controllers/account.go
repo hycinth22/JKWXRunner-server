@@ -32,7 +32,24 @@ func (AccountRouter) RegisterToRouter(router gin.IRouter) {
 		}
 		context.JSON(http.StatusOK, resp)
 	})
-	router.POST("/account", notImplementedHandler)
+	router.POST("/account", func(context *gin.Context) {
+		var param struct {
+			SchoolID int64
+			StuNum   string
+			Password string
+		}
+		if err := context.Bind(&param); err != nil {
+			context.Error(err)
+			return
+		}
+		srv := service.NewAccountService()
+		acc, err := srv.CreateAccount(param.SchoolID, param.StuNum, param.Password)
+		if err != nil {
+			context.Error(err)
+			return
+		}
+		context.JSON(http.StatusCreated, acc)
+	})
 	router.PUT("/account", notImplementedHandler)
 	router.DELETE("/account/:id", notImplementedHandler)
 }
