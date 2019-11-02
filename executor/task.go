@@ -102,7 +102,7 @@ func (t *task) Exec() (err error) {
 		return ErrWrongLibVersion
 	}
 	stillNeed := r.QualifiedDistance - r.ActualDistance
-	if stillNeed < limit.LimitSingleDistance.Max {
+	if stillNeed < acc.RunDistance {
 		// 接近完成，就不跑满
 		limit.RandDistance.Min = stillNeed + 0.1
 		limit.RandDistance.Max = stillNeed + 0.8
