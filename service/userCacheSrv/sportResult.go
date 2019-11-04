@@ -1,7 +1,6 @@
 package userCacheSrv
 
 import (
-	"errors"
 	"time"
 
 	"github.com/inkedawn/go-sunshinemotion/v3"
@@ -13,11 +12,14 @@ import (
 )
 
 var (
-	ErrNoSportResult = errors.New("没有找到该用户缓存的运动结果")
+	// DEPRECATED: use service.ErrNoUserSportResult
+	ErrNoSportResult = service.ErrNoUserSportResult
 )
 
+// DEPRECATED: use datamodels.CacheUserSportResult
 type CacheSportResult = datamodels.CacheUserSportResult
 
+// DEPRECATED: use service.IUserSportResultService
 // 从数据库获取缓存的信息（通常是上次执行运动任务时更新的）
 func GetCacheSportResult(db *database.DB, userID int64) (CacheSportResult, error) {
 	var info CacheSportResult
@@ -30,6 +32,7 @@ func GetCacheSportResult(db *database.DB, userID int64) (CacheSportResult, error
 	return info, nil
 }
 
+// DEPRECATED: use service.IUserSportResultService
 // 保存SportResult到缓存（通常是上次执行运动任务时更新的）
 func SaveCacheSportResult(db *database.DB, info CacheSportResult) error {
 	err := db.Save(&info).Error
@@ -39,18 +42,12 @@ func SaveCacheSportResult(db *database.DB, info CacheSportResult) error {
 	return nil
 }
 
+// DEPRECATED: use datamodels.CacheUserSportResultFromSSMTSportResult
 func FromSSMTSportResult(info ssmt.SportResult, userID int64, fetchTime time.Time) CacheSportResult {
-	return CacheSportResult{
-		RemoteUserID:      userID,
-		FetchTime:         fetchTime,
-		Year:              info.Year,
-		Term:              info.Term,
-		QualifiedDistance: info.QualifiedDistance,
-		ComputedDistance:  info.ActualDistance,
-		LastTime:          info.LastTime,
-	}
+	return datamodels.CacheUserSportResultFromSSMTSportResult(info, userID, fetchTime)
 }
 
+// DEPRECATED: use service.IUserSportResultService
 func GetLocalUserCacheSportResult(db *database.DB, localUID uint) (info CacheSportResult, err error) {
 	remoteUID, err := userIDRelationSrv.GetRemoteUserID(db, localUID)
 	if err == userIDRelationSrv.ErrNotFound {

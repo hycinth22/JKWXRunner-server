@@ -2,6 +2,8 @@ package datamodels
 
 import (
 	"time"
+
+	ssmt "github.com/inkedawn/go-sunshinemotion/v3"
 )
 
 // 缓存的UserInfo信息（通常是上次登录时保存的）
@@ -24,4 +26,25 @@ type CacheUserInfo struct {
 	Sex           string `gorm:"NOT NULL"`
 	PhoneNumber   string `gorm:"NOT NULL"`
 	UserRoleID    int    `gorm:"NOT NULL"`
+}
+
+func CacheUserInfoFromSSMTUserInfo(info ssmt.UserInfo, userID int64, fetchTime time.Time) CacheUserInfo {
+	return CacheUserInfo{
+		RemoteUserID:  userID,
+		FetchTime:     fetchTime,
+		ClassID:       info.ClassID,
+		ClassName:     info.ClassName,
+		CollegeID:     info.CollegeID,
+		CollegeName:   info.CollegeName,
+		SchoolID:      info.SchoolID,
+		SchoolName:    info.SchoolName,
+		SchoolNumber:  info.SchoolNumber,
+		NickName:      info.NickName,
+		StudentName:   info.StudentName,
+		StudentNumber: info.StudentNumber,
+		IsTeacher:     info.IsTeacher,
+		Sex:           info.Sex,
+		PhoneNumber:   info.PhoneNumber,
+		UserRoleID:    info.UserRoleID,
+	}
 }

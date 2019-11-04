@@ -11,16 +11,32 @@ import (
 
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/datamodels"
-	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
-	"github.com/inkedawn/JKWXRunner-server/service/deviceSrv"
-	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
-	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
 )
 
 var (
-	ErrNoAccount    = errors.New("没有找到帐号")
-	ErrExistAlready = errors.New("帐号已存在")
+	ErrNoAccount           = errors.New("没有找到帐号")
+	ErrAccountExistAlready = errors.New("帐号已存在")
+)
+
+type AccountStatus = string
+
+//noinspection GoUnusedConst
+const (
+	AccountStatusNormal     AccountStatus = "normal"     // normal existence
+	AccountStatusPause      AccountStatus = "pause"      // pause due to  human-reason, long-period
+	AccountStatusRunning    AccountStatus = "running"    // running, can't be fetch by other executors
+	AccountStatusFinished   AccountStatus = "finished"   // finished normally
+	AccountStatusSuspend    AccountStatus = "suspend"    // suspend due to software error, short-period
+	AccountStatusTerminated AccountStatus = "terminated" // processed completely, task is ready to be deleted
+	AccountStatusAborted    AccountStatus = "aborted"    // aborted due to human-reason
+	AccountStatusInQueue    AccountStatus = "inqueue"    // waitting to run, can't be fetch by other executors
+)
+
+//noinspection GoUnusedConst
+const (
+	UserRole_Normal = iota
+	UserRole_Cheater
 )
 
 type IAccountService interface {
@@ -173,7 +189,7 @@ func (a accountService) createAccountLocked(SchoolID int64, StuNum string, Passw
 	case ErrNoAccount:
 		break // okay, continue to create
 	case nil:
-		return acc, ErrExistAlready
+		return acc, ErrAccountExistAlready
 	default:
 		panic(err)
 	}
@@ -190,27 +206,26 @@ func (a accountService) createAccountLocked(SchoolID int64, StuNum string, Passw
 	if err != nil {
 		panic(err)
 	}
-	err = userCacheSrv.SaveCacheSportResult(tx, userCacheSrv.FromSSMTSportResult(*sport, session.User.UserID, fetchTime))
+	err = NewUserSportResultServiceOn(tx).SaveCacheSportResult(datamodels.CacheUserSportResultFromSSMTSportResult(*sport, session.User.UserID, fetchTime))
 	if err != nil {
 		panic(err)
 	}
-
-	dev := deviceSrv.FromSSMTDevice(*ssmtDevice)
-	err = deviceSrv.SaveDevice(tx, &dev)
+	dev := datamodels.DeviceFromSSMTDevice(*ssmtDevice)
+	err = NewDeviceServiceOn(tx).SaveDevice(&dev)
 	if err != nil {
 		panic(err)
 	}
 
 	const defaultOwnerID = 1
 	limit := ssmt.GetDefaultLimitParams(info.Sex)
-	acc = &accountSrv.Account{
+	acc = &datamodels.Account{
 		OwnerID:          defaultOwnerID,
 		SchoolID:         SchoolID,
 		StuNum:           StuNum,
 		Password:         Password,
 		RunDistance:      limit.LimitTotalMaxDistance,
 		DeviceID:         dev.ID,
-		Status:           accountSrv.StatusNormal,
+		Status:           AccountStatusNormal,
 		Memo:             "",
 		CheckCheatMarked: sql.NullBool{Valid: false},
 	}
@@ -218,15 +233,15 @@ func (a accountService) createAccountLocked(SchoolID int64, StuNum string, Passw
 	acc.StartDistance = sport.ActualDistance
 	acc.FinishDistance = sport.QualifiedDistance
 
-	err = accountSrv.SaveAccount(tx, acc)
+	err = NewAccountServiceOn(tx).SaveAccount(acc)
 	if err != nil {
 		panic(err)
 	}
-	err = userIDRelationSrv.SaveRelation(tx, acc.ID, session.User.UserID)
+	err = NewUserIDRelServiceOn(tx).SaveRelation(acc.ID, session.User.UserID)
 	if err != nil {
 		panic(err)
 	}
-	if info.UserRoleID == userCacheSrv.UserRole_Cheater {
+	if info.UserRoleID == UserRole_Cheater {
 		err = a.setCheckCheaterFlagLocked(acc.ID, false)
 		if err != nil {
 		}

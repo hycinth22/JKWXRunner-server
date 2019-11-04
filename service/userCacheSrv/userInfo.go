@@ -13,15 +13,19 @@ import (
 )
 
 var (
+	// DEPRECATED: use service.ErrNoUserInfo
 	ErrNoUserInfo = errors.New("没有找到该用户缓存的用户信息")
 )
 
+// DEPRECATED: use datamodels.CacheUserInfo
 type CacheUserInfo = datamodels.CacheUserInfo
 
 //noinspection GoUnusedConst
 const (
-	UserRole_Normal = iota
-	UserRole_Cheater
+	// DEPRECATED: use service.UserRole_Normal
+	UserRole_Normal = service.UserRole_Normal
+	// DEPRECATED: use service.UserRole_Cheater
+	UserRole_Cheater = service.UserRole_Cheater
 )
 
 // 从数据库获取缓存的信息（通常是上次登录时保存的）
@@ -45,23 +49,7 @@ func SaveCacheUserInfo(db *database.DB, info CacheUserInfo) error {
 	return nil
 }
 
+// DEPRECATED: use datamodels.CacheUserInfoFromSSMTUserInfo
 func FromSSMTUserInfo(info ssmt.UserInfo, userID int64, fetchTime time.Time) CacheUserInfo {
-	return CacheUserInfo{
-		RemoteUserID:  userID,
-		FetchTime:     fetchTime,
-		ClassID:       info.ClassID,
-		ClassName:     info.ClassName,
-		CollegeID:     info.CollegeID,
-		CollegeName:   info.CollegeName,
-		SchoolID:      info.SchoolID,
-		SchoolName:    info.SchoolName,
-		SchoolNumber:  info.SchoolNumber,
-		NickName:      info.NickName,
-		StudentName:   info.StudentName,
-		StudentNumber: info.StudentNumber,
-		IsTeacher:     info.IsTeacher,
-		Sex:           info.Sex,
-		PhoneNumber:   info.PhoneNumber,
-		UserRoleID:    info.UserRoleID,
-	}
+	return datamodels.CacheUserInfoFromSSMTUserInfo(info, userID, fetchTime)
 }

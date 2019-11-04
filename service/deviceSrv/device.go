@@ -2,8 +2,6 @@
 package deviceSrv
 
 import (
-	"errors"
-
 	"github.com/inkedawn/go-sunshinemotion/v3"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
@@ -11,49 +9,30 @@ import (
 	"github.com/inkedawn/JKWXRunner-server/service"
 )
 
+// DEPRECATED, use datamodels.Device
 type Device = datamodels.Device
 
 var (
-	ErrNoDevice = errors.New("没有找到该用户的设备")
+	// DEPRECATED, use service.ErrNoDevice
+	ErrNoDevice = service.ErrNoDevice
 )
 
+// DEPRECATED, use service.IDeviceService instead
 func GetDevice(db *database.DB, deviceID uint) (Device, error) {
-	device := datamodels.Device{}
-	device.ID = deviceID
-	if err := db.First(&device).Error; err != nil {
-		if database.IsRecordNotFoundError(err) {
-			return device, ErrNoDevice
-		}
-		return device, service.WrapAsInternalError(err)
-	}
-	return device, nil
+	return service.NewDeviceServiceOn(db).GetDevice(deviceID)
 }
 
+// DEPRECATED, use service.IDeviceService instead
 func SaveDevice(db *database.DB, device *Device) error {
-	err := db.Save(device).Error
-	if err != nil {
-		return service.WrapAsInternalError(err)
-	}
-	return nil
+	return service.NewDeviceServiceOn(db).SaveDevice(device)
 }
 
+// DEPRECATED, use datamodels.DeviceFromSSMTDevice instead
 func FromSSMTDevice(device ssmt.Device) Device {
-	return Device{
-		DeviceName: device.DeviceName,
-		ModelType:  device.ModelType,
-		Screen:     device.Screen,
-		IMEI:       device.IMEI,
-		IMSI:       device.IMSI,
-		UserAgent:  device.UserAgent,
-	}
+	return datamodels.DeviceFromSSMTDevice(device)
 }
+
+// DEPRECATEDuse datamodels.DeviceToSSMTDevice instead
 func ToSSMTDevice(device Device) ssmt.Device {
-	return ssmt.Device{
-		DeviceName: device.DeviceName,
-		ModelType:  device.ModelType,
-		Screen:     device.Screen,
-		IMEI:       device.IMEI,
-		IMSI:       device.IMSI,
-		UserAgent:  device.UserAgent,
-	}
+	return datamodels.DeviceToSSMTDevice(device)
 }
