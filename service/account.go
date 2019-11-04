@@ -43,9 +43,10 @@ type IAccountService interface {
 	CountAccounts() (n uint, err error)
 	ListAccounts() ([]datamodels.Account, error)
 	ListAccountsRange(offset, num uint) ([]datamodels.Account, error)
-	SaveAccount(cc *datamodels.Account) error                                              // Save update value in database, if the value doesn't have primary key(id), will insert it
-	GetAccount(id uint) (*datamodels.Account, error)                                       // return ErrNoAccount if record not exist.
-	GetAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) // return ErrNoAccount if record not exist.
+	SaveAccount(cc *datamodels.Account) error                                                    // Save update value in database, if the value doesn't have primary key(id), will insert it
+	GetAccount(id uint) (*datamodels.Account, error)                                             // return ErrNoAccount if record not exist.
+	GetAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error)       // return ErrNoAccount if record not exist.
+	GetActiveAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) // return ErrNoAccount if record not exist.
 	SetCheckCheaterFlag(id uint, check bool) error
 	CreateAccount(SchoolID int64, StuNum string, Password string) (*datamodels.Account, error)
 }
@@ -53,6 +54,25 @@ type IAccountService interface {
 type accountService struct {
 	db *database.DB
 	sync.Locker
+}
+
+func (a accountService) GetActiveAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) {
+	a.Lock()
+	defer a.Unlock()
+	acc = new(datamodels.Account)
+	err = a.db.Where("school_id = ? AND stu_num = ? AND status IN (?)", schoolID, stuNum, []string{
+		AccountStatusNormal,
+		AccountStatusRunning,
+		AccountStatusInQueue,
+		AccountStatusFinished,
+	}).Find(&acc).Error
+	if err == gorm.ErrRecordNotFound {
+		return nil, ErrNoAccount
+	}
+	if err != nil {
+		return nil, WrapAsInternalError(err)
+	}
+	return acc, nil
 }
 
 func (a accountService) SetCheckCheaterFlag(id uint, check bool) error {

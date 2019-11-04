@@ -9,8 +9,8 @@ import (
 type Account struct {
 	gorm.Model
 
-	SchoolID int64  `gorm:"unique_index:schoolID_stuNum;NOT NULL"`
-	StuNum   string `gorm:"unique_index:schoolID_stuNum;NOT NULL"`
+	SchoolID int64  `gorm:"index:personalID;NOT NULL"`
+	StuNum   string `gorm:"index:personalID;NOT NULL"`
 	Password string `gorm:"NOT NULL"`
 	Memo     string `gorm:"NOT NULL;default:''"`
 

@@ -69,7 +69,7 @@ func main() {
 		}
 	}()
 	accSrv := service.NewAccountServiceOn(tx)
-	acc, err := accSrv.GetAccountByStuNum(Arg_SchoolID, Arg_StuNum)
+	acc, err := accSrv.GetActiveAccountByStuNum(Arg_SchoolID, Arg_StuNum)
 	switch err {
 	case service.ErrNoAccount:
 		break

@@ -2,5 +2,5 @@ package datamodels
 
 type UserIDRelation struct {
 	UID          uint  `gorm:"primary_key"`
-	RemoteUserID int64 `gorm:"UNIQUE_INDEX;NOT NULL"`
+	RemoteUserID int64 `gorm:"index;NOT NULL"`
 }
