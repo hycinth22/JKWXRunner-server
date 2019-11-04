@@ -24,11 +24,11 @@ func (AccountRouter) RegisterToRouter(router gin.IRouter) {
 		var resp []*viewmodels.Account
 		for _, acc := range accList {
 			sport, err := userCacheSrv.GetLocalUserCacheSportResult(database.GetDB(), acc.ID)
-			current := 0.0
+			var current, qualified = -0.0, -0.0
 			if err == nil {
-				current = sport.ComputedDistance
+				current, qualified = sport.ComputedDistance, sport.QualifiedDistance
 			}
-			resp = append(resp, viewmodels.NewAccount(&acc, current))
+			resp = append(resp, viewmodels.AccountView(&acc, current, qualified))
 		}
 		context.JSON(http.StatusOK, resp)
 	})
