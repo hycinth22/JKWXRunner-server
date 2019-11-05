@@ -10,6 +10,8 @@ import (
 	"github.com/inkedawn/go-sunshinemotion/v3"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/datamodels"
+	"github.com/inkedawn/JKWXRunner-server/service"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
 )
 
@@ -59,11 +61,11 @@ func VersionCheck() bool {
 	return true
 }
 
-func startupTaskWorker(db *database.DB, acc *accountSrv.Account, wg *sync.WaitGroup, retryTimes int) {
+func startupTaskWorker(db *database.DB, acc *datamodels.Account, wg *sync.WaitGroup, retryTimes int) {
 	log.Println("runAccountTask", acc.SchoolID, acc.StuNum)
 	go func() {
 		defer wg.Done()
-		setAccountStatus(db, acc, accountSrv.StatusRunning)
+		setAccountStatus(db, acc, service.AccountStatusRunning)
 		failCnt := 0
 		task := newTask(db, acc, false)
 	execute:
@@ -73,19 +75,24 @@ func startupTaskWorker(db *database.DB, acc *accountSrv.Account, wg *sync.WaitGr
 			switch err {
 			case nil:
 				log.Println("runAccountTask", acc.SchoolID, acc.StuNum, "has been completed Successfully.")
-				setAccountLastResult(db, acc, accountSrv.RunSuccess)
-				setAccountStatus(db, acc, accountSrv.StatusNormal) // 从Running状态恢复。
+				setAccountLastResult(db, acc, service.TaskRunSuccess)
+				setAccountStatus(db, acc, service.AccountStatusNormal) // 从Running状态恢复。
 			case ssmt.ErrInvalidToken:
 				task.forceUpdateSession = true
 				failCnt++
-				continue execute
+				if failCnt < retryTimes {
+					continue execute
+				} else {
+					setAccountLastResult(db, acc, service.TaskRunErrorOccurred)
+					setAccountStatus(db, acc, service.AccountStatusSuspend)
+				}
 			case ErrFinished:
-				setAccountLastResult(db, acc, accountSrv.RunSuccess)
-				setAccountStatus(db, acc, accountSrv.StatusFinished) // 超出距离自动更改为结束状态。
+				setAccountLastResult(db, acc, service.TaskRunSuccess)
+				setAccountStatus(db, acc, service.AccountStatusFinished) // 超出距离自动更改为结束状态。
 			default:
 				fmt.Println(acc.SchoolID, acc.StuNum, ": ", err.Error())
-				setAccountLastResult(db, acc, accountSrv.RunErrorOccurred)
-				setAccountStatus(db, acc, accountSrv.StatusSuspend) // 遇到未知错误将自动挂起
+				setAccountLastResult(db, acc, service.TaskRunErrorOccurred)
+				setAccountStatus(db, acc, service.AccountStatusSuspend) // 遇到未知错误将自动挂起
 			}
 			break execute // exit normally
 		}
