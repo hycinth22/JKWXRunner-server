@@ -68,30 +68,31 @@ func GetAccount(db *database.DB, id uint) (*Account, error) {
 func ListAllAccountsWaitRun(db *database.DB) (accounts []Account, err error) {
 	now := time.Now()
 	todayZero := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
-	tx := db.Begin()
+	common := service.NewCommonService()
+	tx := common.Begin()
 	defer func() {
 		if err == nil {
-			tx.Commit()
+			common.Commit()
 		} else {
-			tx.Rollback()
+			common.Rollback()
 		}
 	}()
 	var idGroup []uint
-	if err := tx.Model(&Account{}).Where("status = ? AND (last_time < ? OR last_time IS NULL)", StatusNormal, todayZero).Pluck("id", &idGroup).Error; err != nil {
+	if err := tx.Model(&datamodels.Account{}).Where("status = ? AND (last_time < ? OR last_time IS NULL)", StatusNormal, todayZero).Pluck("id", &idGroup).Error; err != nil {
 		if database.IsRecordNotFoundError(err) {
 			// 返回空集
-			return []Account{}, nil
+			return []datamodels.Account{}, nil
 		}
 		return accounts, service.WrapAsInternalError(err)
 	}
 	if len(idGroup) == 0 {
 		// 返回空集
-		return []Account{}, nil
+		return []datamodels.Account{}, nil
 	}
 	if err := tx.Where("id in (?)", idGroup).Find(&accounts).Error; err != nil {
 		if database.IsRecordNotFoundError(err) {
 			// 返回空集
-			return []Account{}, nil
+			return []datamodels.Account{}, nil
 		}
 		return accounts, service.WrapAsInternalError(err)
 	}
@@ -100,33 +101,34 @@ func ListAllAccountsWaitRun(db *database.DB) (accounts []Account, err error) {
 func ListAndSetRunStatusForAllAccountsWaitRun(db *database.DB) (accounts []Account, err error) {
 	now := time.Now()
 	todayZero := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
-	tx := db.Begin()
+	common := service.NewCommonService()
+	tx := common.Begin()
 	defer func() {
 		if err == nil {
-			tx.Commit()
+			common.Commit()
 		} else {
-			tx.Rollback()
+			common.Rollback()
 		}
 	}()
 	var idGroup []uint
-	if err := tx.Model(&Account{}).Where("status = ? AND (last_time < ? OR last_time IS NULL)", StatusNormal, todayZero).Pluck("id", &idGroup).Error; err != nil {
+	if err := tx.Model(&datamodels.Account{}).Where("status = ? AND (last_time < ? OR last_time IS NULL)", StatusNormal, todayZero).Pluck("id", &idGroup).Error; err != nil {
 		if database.IsRecordNotFoundError(err) {
 			// 返回空集
-			return []Account{}, nil
+			return []datamodels.Account{}, nil
 		}
 		return accounts, service.WrapAsInternalError(err)
 	}
 	if len(idGroup) == 0 {
 		// 返回空集
-		return []Account{}, nil
+		return []datamodels.Account{}, nil
 	}
-	if err := tx.Model(&Account{}).Where("id in (?)", idGroup).Update(&Account{Status: StatusInQueue}).Error; err != nil {
+	if err := tx.Model(&datamodels.Account{}).Where("id in (?)", idGroup).Update(&datamodels.Account{Status: service.AccountStatusInQueue}).Error; err != nil {
 		return accounts, service.WrapAsInternalError(err)
 	}
 	if err := tx.Where("id in (?)", idGroup).Find(&accounts).Error; err != nil {
 		if database.IsRecordNotFoundError(err) {
 			// 返回空集
-			return []Account{}, nil
+			return []datamodels.Account{}, nil
 		}
 		return accounts, service.WrapAsInternalError(err)
 	}

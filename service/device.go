@@ -12,12 +12,14 @@ var (
 )
 
 type IDeviceService interface {
+	ICommonService
 	GetDevice(deviceID uint) (datamodels.Device, error)
 	SaveDevice(device *datamodels.Device) error
 }
 
 type deviceService struct {
-	db *database.DB
+	ICommonService
+	db database.TX
 }
 
 func (d *deviceService) GetDevice(deviceID uint) (datamodels.Device, error) {
@@ -41,9 +43,13 @@ func (d *deviceService) SaveDevice(device *datamodels.Device) error {
 }
 
 func NewDeviceService() IDeviceService {
-	return NewDeviceServiceOn(database.GetDB())
+	return NewDeviceServiceUpon(NewCommonService())
 }
 
 func NewDeviceServiceOn(db *database.DB) IDeviceService {
-	return &deviceService{db: db}
+	return NewDeviceServiceUpon(NewCommonServiceOn(db))
+}
+
+func NewDeviceServiceUpon(commonService ICommonService) IDeviceService {
+	return &deviceService{ICommonService: commonService, db: commonService.GetDB()}
 }

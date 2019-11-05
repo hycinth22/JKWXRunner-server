@@ -12,13 +12,15 @@ var (
 )
 
 type IUserSportResultService interface {
+	ICommonService
 	GetCacheSportResult(userID int64) (datamodels.CacheUserSportResult, error)
 	SaveCacheSportResult(info datamodels.CacheUserSportResult) error
 	GetLocalUserCacheSportResult(localUID uint) (info datamodels.CacheUserSportResult, err error)
 }
 
 type userSportResultSrv struct {
-	db *database.DB
+	ICommonService
+	db database.TX
 }
 
 // 从数据库获取缓存的信息（通常是上次执行运动任务时更新的）
@@ -44,7 +46,7 @@ func (u *userSportResultSrv) SaveCacheSportResult(info datamodels.CacheUserSport
 }
 
 func (u *userSportResultSrv) GetLocalUserCacheSportResult(localUID uint) (info datamodels.CacheUserSportResult, err error) {
-	remoteUID, err := NewUserIDRelServiceOn(u.db).GetRemoteUserID(localUID)
+	remoteUID, err := NewUserIDRelServiceUpon(u).GetRemoteUserID(localUID)
 	if err == ErrUserIDRelNotFound {
 		err = ErrNoUserSportResult
 		return
@@ -56,8 +58,13 @@ func (u *userSportResultSrv) GetLocalUserCacheSportResult(localUID uint) (info d
 }
 
 func NewUserSportResultService() IUserSportResultService {
-	return NewUserSportResultServiceOn(database.GetDB())
+	return NewUserSportResultServiceUpon(NewCommonService())
 }
+
 func NewUserSportResultServiceOn(db *database.DB) IUserSportResultService {
-	return &userSportResultSrv{db: db}
+	return NewUserSportResultServiceUpon(NewCommonServiceOn(db))
+}
+
+func NewUserSportResultServiceUpon(commonService ICommonService) IUserSportResultService {
+	return &userSportResultSrv{ICommonService: commonService, db: commonService.GetDB()}
 }

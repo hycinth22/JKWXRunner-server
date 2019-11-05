@@ -12,13 +12,15 @@ var (
 )
 
 type IUserIDRelService interface {
+	ICommonService
 	GetLocalUID(remoteUserID int64) (uint, error)
 	GetRemoteUserID(uid uint) (int64, error)
 	SaveRelation(localUID uint, remoteUserID int64) error
 }
 
 type userIDRelService struct {
-	db *database.DB
+	ICommonService
+	db database.TX
 }
 
 func (u userIDRelService) GetLocalUID(remoteUserID int64) (uint, error) {
@@ -58,8 +60,13 @@ func (u userIDRelService) SaveRelation(localUID uint, remoteUserID int64) error 
 }
 
 func NewUserIDRelService() IUserIDRelService {
-	return &userIDRelService{db: database.GetDB()}
+	return NewUserIDRelServiceUpon(NewCommonService())
 }
+
 func NewUserIDRelServiceOn(db *database.DB) IUserIDRelService {
-	return &userIDRelService{db: db}
+	return NewUserIDRelServiceUpon(NewCommonServiceOn(db))
+}
+
+func NewUserIDRelServiceUpon(commonService ICommonService) IUserIDRelService {
+	return &userIDRelService{ICommonService: commonService, db: commonService.GetDB()}
 }

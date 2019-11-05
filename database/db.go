@@ -1,19 +1,86 @@
 package database
 
 import (
+	"database/sql"
 	"errors"
-	"github.com/inkedawn/JKWXRunner-server/config"
-	"github.com/jinzhu/gorm"
 	"log"
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/jinzhu/gorm"
+
+	"github.com/inkedawn/JKWXRunner-server/config"
 
 	// _ "github.com/jinzhu/gorm/dialects/mysql"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 type DB = gorm.DB
+
+type TX interface {
+	Where(query interface{}, args ...interface{}) *gorm.DB
+	Or(query interface{}, args ...interface{}) *gorm.DB
+	Not(query interface{}, args ...interface{}) *gorm.DB
+	Limit(limit interface{}) *gorm.DB
+	Offset(offset interface{}) *gorm.DB
+	Order(value interface{}, reorder ...bool) *gorm.DB
+	Select(query interface{}, args ...interface{}) *gorm.DB
+	Omit(columns ...string) *gorm.DB
+	Group(query string) *gorm.DB
+	Having(query interface{}, values ...interface{}) *gorm.DB
+	Joins(query string, args ...interface{}) *gorm.DB
+	Scopes(funcs ...func(*gorm.DB) *gorm.DB) *gorm.DB
+	Unscoped() *gorm.DB
+	Attrs(attrs ...interface{}) *gorm.DB
+	Assign(attrs ...interface{}) *gorm.DB
+	First(out interface{}, where ...interface{}) *gorm.DB
+	Take(out interface{}, where ...interface{}) *gorm.DB
+	Last(out interface{}, where ...interface{}) *gorm.DB
+	Find(out interface{}, where ...interface{}) *gorm.DB
+	Preloads(out interface{}) *gorm.DB
+	Scan(dest interface{}) *gorm.DB
+	Row() *sql.Row
+	Rows() (*sql.Rows, error)
+	ScanRows(rows *sql.Rows, result interface{}) error
+	Pluck(column string, value interface{}) *gorm.DB
+	Count(value interface{}) *gorm.DB
+	Related(value interface{}, foreignKeys ...string) *gorm.DB
+	FirstOrInit(out interface{}, where ...interface{}) *gorm.DB
+	FirstOrCreate(out interface{}, where ...interface{}) *gorm.DB
+	Update(attrs ...interface{}) *gorm.DB
+	Updates(values interface{}, ignoreProtectedAttrs ...bool) *gorm.DB
+	UpdateColumn(attrs ...interface{}) *gorm.DB
+	UpdateColumns(values interface{}) *gorm.DB
+	Save(value interface{}) *gorm.DB
+	Create(value interface{}) *gorm.DB
+	Delete(value interface{}, where ...interface{}) *gorm.DB
+	Raw(sql string, values ...interface{}) *gorm.DB
+	Exec(sql string, values ...interface{}) *gorm.DB
+	Model(value interface{}) *gorm.DB
+	Table(name string) *gorm.DB
+	NewRecord(value interface{}) bool
+	RecordNotFound() bool
+	CreateTable(models ...interface{}) *gorm.DB
+	DropTable(values ...interface{}) *gorm.DB
+	DropTableIfExists(values ...interface{}) *gorm.DB
+	HasTable(value interface{}) bool
+	AutoMigrate(values ...interface{}) *gorm.DB
+	ModifyColumn(column string, typ string) *gorm.DB
+	DropColumn(column string) *gorm.DB
+	AddIndex(indexName string, columns ...string) *gorm.DB
+	AddUniqueIndex(indexName string, columns ...string) *gorm.DB
+	RemoveIndex(indexName string) *gorm.DB
+	AddForeignKey(field string, dest string, onDelete string, onUpdate string) *gorm.DB
+	RemoveForeignKey(field string, dest string) *gorm.DB
+	Association(column string) *gorm.Association
+	Preload(column string, conditions ...interface{}) *gorm.DB
+	Set(name string, value interface{}) *gorm.DB
+	InstantSet(name string, value interface{}) *gorm.DB
+	Get(name string) (value interface{}, ok bool)
+	AddError(err error) error
+	GetErrors() []error
+}
 
 var (
 	db     *DB

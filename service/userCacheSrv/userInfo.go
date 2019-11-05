@@ -41,7 +41,7 @@ func GetCacheUserInfo(db *database.DB, userID int64) (CacheUserInfo, error) {
 }
 
 // 保存UserInfo到缓存（通常在登录后保存）
-func SaveCacheUserInfo(db *database.DB, info CacheUserInfo) error {
+func SaveCacheUserInfo(db database.TX, info CacheUserInfo) error {
 	err := db.Save(&info).Error
 	if err != nil {
 		return service.WrapAsInternalError(err)

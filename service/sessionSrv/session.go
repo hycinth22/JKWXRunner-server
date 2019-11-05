@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
+	"github.com/inkedawn/JKWXRunner-server/datamodels"
 	"github.com/inkedawn/JKWXRunner-server/service"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
-	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
 
 	"github.com/inkedawn/go-sunshinemotion/v3"
 
@@ -29,25 +29,27 @@ const PhoneNum = "123"
 // 注意，该函数只检查Token的过期时间，并不会实际发送请求来验证Token有效性。
 // 如果返回的Session包含失效Token，需要手动调用NewSession来完成更新。
 func SmartGetSession(db *database.DB, acc accountSrv.Account) (s *ssmt.Session, err error) {
-	tx := db.Begin()
+	common := service.NewCommonServiceOn(db)
+	common.Begin()
 	defer func() {
 		if err == nil {
-			tx.Commit()
+			common.Commit()
 		} else {
-			tx.Rollback()
+			common.Rollback()
 		}
 	}()
-	device, err := deviceSrv.GetDevice(tx, acc.DeviceID)
+	devSrv := service.NewDeviceServiceUpon(common)
+	device, err := devSrv.GetDevice(acc.DeviceID)
 	if err != nil {
 		return nil, err
 	}
 	SSMTDevice := deviceSrv.ToSSMTDevice(device)
 
-	userToken, err := getTokenByUID(tx, acc.ID)
+	userToken, err := getTokenByUID(common.GetDB(), acc.ID)
 	if err != nil {
 		if err == ErrNoToken {
 			// 新用户登录
-			return newSession(tx, acc, SSMTDevice)
+			return newSession(common, acc, SSMTDevice)
 		} else {
 			return nil, err
 		}
@@ -55,7 +57,7 @@ func SmartGetSession(db *database.DB, acc accountSrv.Account) (s *ssmt.Session, 
 	SSMTToken := toSSMTToken(userToken)
 	if !tokenNotExpired(userToken) {
 		// 过期更新
-		return newSession(tx, acc, SSMTDevice)
+		return newSession(common, acc, SSMTDevice)
 	}
 
 	// Resume Session
@@ -117,20 +119,22 @@ func smartGetSession(db *database.DB, schoolId int64, stuNum, password string, d
 //
 // 返回的error可以直接与SSMT提供error比较
 func NewSession(db *database.DB, acc accountSrv.Account) (s *ssmt.Session, err error) {
-	tx := db.Begin()
+	common := service.NewCommonServiceOn(db)
+	common.Begin()
 	defer func() {
 		if err == nil {
-			tx.Commit()
+			common.Commit()
 		} else {
-			tx.Rollback()
+			common.Rollback()
 		}
 	}()
-	device, err := deviceSrv.GetDevice(tx, acc.DeviceID)
+	devSrv := service.NewDeviceServiceUpon(common)
+	device, err := devSrv.GetDevice(acc.DeviceID)
 	if err != nil {
 		return nil, err
 	}
-	SSMTDevice := deviceSrv.ToSSMTDevice(device)
-	s, err = newSession(tx, acc, SSMTDevice)
+	SSMTDevice := datamodels.DeviceToSSMTDevice(device)
+	s, err = newSession(common, acc, SSMTDevice)
 	if err != nil {
 		return nil, err
 	}
@@ -146,27 +150,27 @@ func UpdateSession(db *database.DB, acc accountSrv.Account) (err error) {
 	return
 }
 
-func newSession(db *database.DB, acc accountSrv.Account, SSMTDevice ssmt.Device) (*ssmt.Session, error) {
+func newSession(common service.ICommonService, acc accountSrv.Account, SSMTDevice ssmt.Device) (*ssmt.Session, error) {
 	s := ssmt.CreateSession()
 	s.Device = &SSMTDevice
 	info, err := s.Login(acc.SchoolID, acc.StuNum, PhoneNum, ssmt.PasswordHash(acc.Password))
 	if err != nil {
-		accLogSrv.AddLogFail(db, acc.ID, fmt.Sprintf("登录失败。Error: %#v ;Device Dump：%s；;Token Dump：%s", err, utils.DumpStructValue(*s.Device), utils.DumpStructValue(*s.Token)))
+		accLogSrv.AddLogFail(common.GetDB(), acc.ID, fmt.Sprintf("登录失败。Error: %#v ;Device Dump：%s；;Token Dump：%s", err, utils.DumpStructValue(*s.Device), utils.DumpStructValue(*s.Token)))
 		return nil, err
 	}
-	accLogSrv.AddLogSuccess(db, acc.ID, fmt.Sprintf("登录成功。Device Dump：%s；Token Dump：%s", utils.DumpStructValue(*s.Device), utils.DumpStructValue(*s.Token)))
+	accLogSrv.AddLogSuccess(common.GetDB(), acc.ID, fmt.Sprintf("登录成功。Device Dump：%s；Token Dump：%s", utils.DumpStructValue(*s.Device), utils.DumpStructValue(*s.Token)))
 	// save into session storage
-	err = saveToken(db, fromSSMTToken(s.User.UserID, *s.Token))
+	err = saveToken(common.GetDB(), fromSSMTToken(s.User.UserID, *s.Token))
 	if err != nil {
 		return nil, service.WrapAsInternalError(err)
 	}
 	// update userInfo cache
-	err = userCacheSrv.SaveCacheUserInfo(db, userCacheSrv.FromSSMTUserInfo(info, s.User.UserID, time.Now()))
+	err = userCacheSrv.SaveCacheUserInfo(common.GetDB(), userCacheSrv.FromSSMTUserInfo(info, s.User.UserID, time.Now()))
 	if err != nil {
 		return nil, err
 	}
 	// update userID relation
-	err = userIDRelationSrv.SaveRelation(db, acc.ID, s.User.UserID)
+	err = service.NewUserIDRelServiceUpon(common).SaveRelation(acc.ID, s.User.UserID)
 	if err != nil {
 		return nil, err
 	}

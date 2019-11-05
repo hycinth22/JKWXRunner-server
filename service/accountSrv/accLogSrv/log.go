@@ -34,21 +34,21 @@ func reportErr(msg string) {
 	}
 }
 
-func ListLogsForUID(db *database.DB, uid uint, offset, limit uint) (logs []datamodels.AccountLog, err error) {
+func ListLogsForUID(db database.TX, uid uint, offset, limit uint) (logs []datamodels.AccountLog, err error) {
 	err = db.Where("uid = ?", uid).Offset(offset).Limit(limit).Order("time desc").Find(&logs).Error
 	return
 }
 
-func CountLogsForUID(db *database.DB, uid uint) (n int, err error) {
+func CountLogsForUID(db database.TX, uid uint) (n int, err error) {
 	err = db.Model(&Log{}).Where("uid = ?", uid).Count(&n).Error
 	return
 }
 
-func AddLogNow(db *database.DB, uid uint, logType Type, text string) {
+func AddLogNow(db database.TX, uid uint, logType Type, text string) {
 	AddLog(db, uid, time.Now(), logType, text)
 }
 
-func AddLog(db *database.DB, uid uint, time time.Time, logType Type, text string) {
+func AddLog(db database.TX, uid uint, time time.Time, logType Type, text string) {
 	err := db.Create(&Log{UID: uid, Time: time, Type: logType, Content: text}).Error
 	if err != nil {
 		reportErr(fmt.Sprintf("[%s] UID: %d, Time:%v, logType:%s, Text:%s", serviceName, uid, time, logType, text))
@@ -60,28 +60,28 @@ func AddLog(db *database.DB, uid uint, time time.Time, logType Type, text string
 	reducing the parameter number for convenience..
 */
 
-func AddLogSuccess(db *database.DB, uid uint, values ...interface{}) {
+func AddLogSuccess(db database.TX, uid uint, values ...interface{}) {
 	AddLogNow(db, uid, TypeSuccess, fmt.Sprint(values...))
 }
-func AddLogFail(db *database.DB, uid uint, values ...interface{}) {
+func AddLogFail(db database.TX, uid uint, values ...interface{}) {
 	AddLogNow(db, uid, TypeFail, fmt.Sprint(values...))
 }
-func AddLogInfo(db *database.DB, uid uint, values ...interface{}) {
+func AddLogInfo(db database.TX, uid uint, values ...interface{}) {
 	AddLogNow(db, uid, TypeInfo, fmt.Sprint(values...))
 }
-func AddLogDebug(db *database.DB, uid uint, values ...interface{}) {
+func AddLogDebug(db database.TX, uid uint, values ...interface{}) {
 	AddLogNow(db, uid, TypeDebug, fmt.Sprint(values...))
 }
 
-func AddLogSuccessF(db *database.DB, uid uint, format string, values ...interface{}) {
+func AddLogSuccessF(db database.TX, uid uint, format string, values ...interface{}) {
 	AddLogNow(db, uid, TypeSuccess, fmt.Sprintf(format, values...))
 }
-func AddLogFailF(db *database.DB, uid uint, format string, values ...interface{}) {
+func AddLogFailF(db database.TX, uid uint, format string, values ...interface{}) {
 	AddLogNow(db, uid, TypeFail, fmt.Sprintf(format, values...))
 }
-func AddLogInfoF(db *database.DB, uid uint, format string, values ...interface{}) {
+func AddLogInfoF(db database.TX, uid uint, format string, values ...interface{}) {
 	AddLogNow(db, uid, TypeInfo, fmt.Sprintf(format, values...))
 }
-func AddLogDebugF(db *database.DB, uid uint, format string, values ...interface{}) {
+func AddLogDebugF(db database.TX, uid uint, format string, values ...interface{}) {
 	AddLogNow(db, uid, TypeDebug, fmt.Sprintf(format, values...))
 }

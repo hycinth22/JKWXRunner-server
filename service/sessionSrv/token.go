@@ -38,7 +38,7 @@ func getTokenByUID(db *database.DB, uid uint) (t token, err error) {
 	return getToken(db, userID.RemoteUserID)
 }
 
-func saveToken(db *database.DB, userToken token) (err error) {
+func saveToken(db database.TX, userToken token) (err error) {
 	err = db.Save(&userToken).Error
 	if err != nil {
 		return err

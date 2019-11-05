@@ -3,19 +3,19 @@ package main
 import (
 	"fmt"
 
-	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/datamodels"
+	"github.com/inkedawn/JKWXRunner-server/service"
 )
 
 func main() {
-	db := database.GetDB()
-	tx := db.Begin()
+	common := service.NewCommonService()
+	tx := common.Begin()
 	tx.CreateTable(datamodels.ModelsCollection...)
 	errs := tx.GetErrors()
 	if len(errs) != 0 {
-		tx.Rollback()
+		common.Rollback()
 		fmt.Println(errs)
 		return
 	}
-	tx.Commit()
+	common.Commit()
 }

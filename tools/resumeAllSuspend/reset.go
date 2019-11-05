@@ -1,21 +1,21 @@
 package main
 
 import (
-	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/service"
 )
 
 func main() {
-	tx := database.GetDB().Begin()
+	common := service.NewCommonService()
+	common.Begin()
 	defer func() {
 		if x := recover(); x != nil {
-			tx.Rollback()
+			common.Rollback()
 		}
 	}()
-	accSrv := service.NewAccountServiceOn(tx)
+	accSrv := service.NewAccountServiceUpon(common)
 	err := accSrv.ResumeAllSuspend()
 	if err != nil {
 		panic(err)
 	}
-	tx.Commit()
+	common.Commit()
 }

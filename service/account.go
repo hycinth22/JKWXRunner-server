@@ -46,6 +46,7 @@ const (
 )
 
 type IAccountService interface {
+	ICommonService
 	CountAccounts() (n uint, err error)
 	ListAccounts() ([]datamodels.Account, error)
 	ListAccountsRange(offset, num uint) ([]datamodels.Account, error)
@@ -59,7 +60,8 @@ type IAccountService interface {
 }
 
 type accountService struct {
-	db *database.DB
+	ICommonService
+	db database.TX
 }
 
 func (a accountService) ResumeAllSuspend() error {
@@ -162,18 +164,18 @@ func (a accountService) SaveAccount(acc *datamodels.Account) error {
 }
 
 func (a accountService) CreateAccount(SchoolID int64, StuNum string, Password string) (acc *datamodels.Account, err error) {
-	tx := a.db.Begin()
+	a.Begin()
 	defer func() {
 		// panic recovery
 		if x := recover(); x != nil {
-			tx.Rollback()
+			a.Rollback()
 			err = x.(error)
 		}
 		// transaction finish
 		if err != nil {
-			tx.Rollback()
+			a.Rollback()
 		} else {
-			tx.Commit()
+			a.Commit()
 		}
 	}()
 	acc = &datamodels.Account{
@@ -203,12 +205,12 @@ func (a accountService) CreateAccount(SchoolID int64, StuNum string, Password st
 	if err != nil {
 		panic(err)
 	}
-	err = NewUserSportResultServiceOn(tx).SaveCacheSportResult(datamodels.CacheUserSportResultFromSSMTSportResult(*sport, session.User.UserID, fetchTime))
+	err = NewUserSportResultServiceUpon(a).SaveCacheSportResult(datamodels.CacheUserSportResultFromSSMTSportResult(*sport, session.User.UserID, fetchTime))
 	if err != nil {
 		panic(err)
 	}
 	dev := datamodels.DeviceFromSSMTDevice(*ssmtDevice)
-	err = NewDeviceServiceOn(tx).SaveDevice(&dev)
+	err = NewDeviceServiceUpon(a).SaveDevice(&dev)
 	if err != nil {
 		panic(err)
 	}
@@ -230,11 +232,11 @@ func (a accountService) CreateAccount(SchoolID int64, StuNum string, Password st
 	acc.StartDistance = sport.ActualDistance
 	acc.FinishDistance = sport.QualifiedDistance
 
-	err = NewAccountServiceOn(tx).SaveAccount(acc)
+	err = NewAccountServiceUpon(a.ICommonService).SaveAccount(acc)
 	if err != nil {
 		panic(err)
 	}
-	err = NewUserIDRelServiceOn(tx).SaveRelation(acc.ID, session.User.UserID)
+	err = NewUserIDRelServiceUpon(a.ICommonService).SaveRelation(acc.ID, session.User.UserID)
 	if err != nil {
 		panic(err)
 	}
@@ -247,9 +249,13 @@ func (a accountService) CreateAccount(SchoolID int64, StuNum string, Password st
 }
 
 func NewAccountService() IAccountService {
-	return NewAccountServiceOn(database.GetDB())
+	return NewAccountServiceUpon(NewCommonService())
 }
 
 func NewAccountServiceOn(db *database.DB) IAccountService {
-	return &accountService{db: db}
+	return NewAccountServiceUpon(NewCommonServiceOn(db))
+}
+
+func NewAccountServiceUpon(commonService ICommonService) IAccountService {
+	return &accountService{ICommonService: commonService, db: commonService.GetDB()}
 }

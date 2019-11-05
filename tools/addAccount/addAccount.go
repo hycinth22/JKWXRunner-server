@@ -7,14 +7,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/service"
-	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
-	"github.com/inkedawn/JKWXRunner-server/service/deviceSrv"
-	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
-	"github.com/inkedawn/JKWXRunner-server/service/userIDRelationSrv"
-
 	"github.com/inkedawn/go-sunshinemotion/v3"
+
+	"github.com/inkedawn/JKWXRunner-server/datamodels"
+	"github.com/inkedawn/JKWXRunner-server/service"
 )
 
 var (
@@ -48,7 +44,8 @@ func mustParseArgs() {
 
 func main() {
 	mustParseArgs()
-	tx := database.GetDB().Begin()
+	common := service.NewCommonService()
+	common.Begin()
 	defer func() {
 		x := recover()
 
@@ -61,14 +58,14 @@ func main() {
 
 		if x != nil {
 			fmt.Println(x)
-			tx.Rollback()
+			common.Rollback()
 		} else {
 			fmt.Println("Confirm? Enter to continue...")
 			_, _ = fmt.Scanln()
-			tx.Commit()
+			common.Commit()
 		}
 	}()
-	accSrv := service.NewAccountServiceOn(tx)
+	accSrv := service.NewAccountServiceUpon(common)
 	acc, err := accSrv.GetActiveAccountByStuNum(Arg_SchoolID, Arg_StuNum)
 	switch err {
 	case service.ErrNoAccount:
@@ -90,7 +87,7 @@ func main() {
 	}
 	fmt.Printf("Account Info: %+v", info)
 	fmt.Println()
-	if info.UserRoleID == userCacheSrv.UserRole_Cheater {
+	if info.UserRoleID == service.UserRole_Cheater {
 		fmt.Println("!!![WARNING]!!! The User Has been marked as a cheater!")
 	}
 
@@ -99,29 +96,30 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = userCacheSrv.SaveCacheSportResult(tx, userCacheSrv.FromSSMTSportResult(*sport, session.User.UserID, fetchTime))
+
+	err = service.NewUserSportResultServiceUpon(common).SaveCacheSportResult(datamodels.CacheUserSportResultFromSSMTSportResult(*sport, session.User.UserID, fetchTime))
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("SportResult: %+v", sport)
 	fmt.Println()
 
-	dev := deviceSrv.FromSSMTDevice(*ssmtDevice)
-	err = deviceSrv.SaveDevice(tx, &dev)
+	dev := datamodels.DeviceFromSSMTDevice(*ssmtDevice)
+	err = service.NewDeviceServiceUpon(common).SaveDevice(&dev)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Device %d: %+v", dev.ID, dev)
 	fmt.Println()
 	limit := ssmt.GetDefaultLimitParams(info.Sex)
-	acc = &accountSrv.Account{
+	acc = &datamodels.Account{
 		OwnerID:          Arg_OwnerID,
 		SchoolID:         Arg_SchoolID,
 		StuNum:           Arg_StuNum,
 		Password:         Arg_Password,
 		RunDistance:      limit.LimitTotalMaxDistance,
 		DeviceID:         dev.ID,
-		Status:           accountSrv.StatusNormal,
+		Status:           service.AccountStatusNormal,
 		Memo:             "",
 		CheckCheatMarked: sql.NullBool{Valid: false},
 	}
@@ -129,18 +127,18 @@ func main() {
 	acc.StartDistance = sport.ActualDistance
 	acc.FinishDistance = sport.QualifiedDistance
 
-	err = accountSrv.SaveAccount(tx, acc)
+	err = accSrv.SaveAccount(acc)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Printf("Account %d: %+v", acc.ID, acc)
 	fmt.Println()
-	err = userIDRelationSrv.SaveRelation(tx, acc.ID, session.User.UserID)
+	err = service.NewUserIDRelServiceUpon(common).SaveRelation(acc.ID, session.User.UserID)
 	if err != nil {
 		panic(err)
 	}
 
-	if info.UserRoleID == userCacheSrv.UserRole_Cheater {
+	if info.UserRoleID == service.UserRole_Cheater {
 		fmt.Println("!!![WARNING]!!! Disable CheckCheatMarked! Confirm?")
 		_, _ = fmt.Scanln()
 		err = accSrv.SetCheckCheaterFlag(acc.ID, false)
