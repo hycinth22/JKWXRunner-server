@@ -3,7 +3,6 @@ package accountSrv
 
 import (
 	"database/sql"
-	"errors"
 	"time"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
@@ -11,17 +10,21 @@ import (
 	"github.com/inkedawn/JKWXRunner-server/service"
 )
 
-type Account = datamodels.Account
+// DEPRECATED
+type Account = datamodels.Account // DEPRECATED
 
+// DEPRECATED
 var (
-	ErrNoAccount = errors.New("没有找到帐号")
+	ErrNoAccount = service.ErrNoAccount
 )
 
-type Status = string
+// DEPRECATED
+type Status = service.AccountStatus
 
+// DEPRECATED
 //noinspection GoUnusedConst
 const (
-	StatusNormal     Status = "normal"     // normal existence
+	StatusNormal     Status = "normal"     // normal existence.
 	StatusPause      Status = "pause"      // pause due to  human-reason, long-period
 	StatusRunning    Status = "running"    // running, can't be fetch by other executors
 	StatusFinished   Status = "finished"   // finished normally
@@ -31,26 +34,32 @@ const (
 	StatusInQueue    Status = "inqueue"    // waitting to run, can't be fetch by other executors
 )
 
-type RunResult = string
+// DEPRECATED
+type RunResult = service.TaskRunResult
 
+// DEPRECATED
 const (
-	RunSuccess       RunResult = "success"
-	RunErrorOccurred RunResult = "error"
+	RunSuccess       = service.TaskRunSuccess
+	RunErrorOccurred = service.TaskRunErrorOccurred
 )
 
+// DEPRECATED
 func CountAccounts(db *database.DB) (n uint, err error) {
 	return service.NewAccountServiceOn(db).CountAccounts()
 }
 
+// DEPRECATED
 func ListAccounts(db *database.DB, offset, num uint) ([]Account, error) {
 	return service.NewAccountServiceOn(db).ListAccountsRange(offset, num)
 }
 
+// DEPRECATED
 // Save update value in database, if the value doesn't have primary key(id), will insert it
 func SaveAccount(db *database.DB, acc *Account) error {
 	return service.NewAccountServiceOn(db).SaveAccount(acc)
 }
 
+// DEPRECATED
 // return ErrNoAccount if record not exist.
 func GetAccount(db *database.DB, id uint) (*Account, error) {
 	return service.NewAccountServiceOn(db).GetAccount(id)

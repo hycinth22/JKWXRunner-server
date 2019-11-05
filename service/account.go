@@ -33,6 +33,13 @@ const (
 	AccountStatusInQueue    AccountStatus = "inqueue"    // waitting to run, can't be fetch by other executors
 )
 
+type TaskRunResult = string
+
+const (
+	TaskRunSuccess       TaskRunResult = "success"
+	TaskRunErrorOccurred TaskRunResult = "error"
+)
+
 //noinspection GoUnusedConst
 const (
 	UserRole_Normal = iota
@@ -49,11 +56,23 @@ type IAccountService interface {
 	GetActiveAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) // return ErrNoAccount if record not exist.
 	SetCheckCheaterFlag(id uint, check bool) error
 	CreateAccount(SchoolID int64, StuNum string, Password string) (*datamodels.Account, error)
+	ResumeAllSuspend() error
 }
 
 type accountService struct {
 	db *database.DB
 	sync.Locker
+}
+
+func (a accountService) ResumeAllSuspend() error {
+	a.Lock()
+	defer a.Unlock()
+	return a.db.Model(&datamodels.Account{}).
+		Where("status=? AND last_result=?", AccountStatusSuspend, TaskRunErrorOccurred).
+		Updates(&datamodels.Account{
+			Status:   AccountStatusNormal,
+			LastTime: sql.NullTime{Valid: false},
+		}).Error
 }
 
 func (a accountService) GetActiveAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) {
