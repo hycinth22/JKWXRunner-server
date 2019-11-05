@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"sync"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/datamodels"
@@ -20,7 +19,6 @@ type IUserSportResultService interface {
 
 type userSportResultSrv struct {
 	db *database.DB
-	sync.Locker
 }
 
 // 从数据库获取缓存的信息（通常是上次执行运动任务时更新的）
@@ -38,7 +36,6 @@ func (u *userSportResultSrv) GetCacheSportResult(userID int64) (datamodels.Cache
 
 // 保存SportResult到缓存（通常是上次执行运动任务时更新的）
 func (u *userSportResultSrv) SaveCacheSportResult(info datamodels.CacheUserSportResult) error {
-	// TODO: lock
 	err := u.db.Save(&info).Error
 	if err != nil {
 		return WrapAsInternalError(err)
@@ -47,7 +44,6 @@ func (u *userSportResultSrv) SaveCacheSportResult(info datamodels.CacheUserSport
 }
 
 func (u *userSportResultSrv) GetLocalUserCacheSportResult(localUID uint) (info datamodels.CacheUserSportResult, err error) {
-	// TODO: lock
 	remoteUID, err := NewUserIDRelServiceOn(u.db).GetRemoteUserID(localUID)
 	if err == ErrUserIDRelNotFound {
 		err = ErrNoUserSportResult

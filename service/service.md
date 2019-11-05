@@ -1,0 +1,2 @@
+所有service都是并发不安全的。
+不同的goroutine应当构造并持有自己的service

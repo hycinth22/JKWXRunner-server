@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"sync"
 
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/datamodels"
@@ -19,12 +18,9 @@ type IDeviceService interface {
 
 type deviceService struct {
 	db *database.DB
-	sync.Locker
 }
 
 func (d *deviceService) GetDevice(deviceID uint) (datamodels.Device, error) {
-	d.Lock()
-	defer d.Unlock()
 	device := datamodels.Device{}
 	device.ID = deviceID
 	if err := d.db.First(&device).Error; err != nil {
@@ -37,8 +33,6 @@ func (d *deviceService) GetDevice(deviceID uint) (datamodels.Device, error) {
 }
 
 func (d *deviceService) SaveDevice(device *datamodels.Device) error {
-	d.Lock()
-	defer d.Unlock()
 	err := d.db.Save(device).Error
 	if err != nil {
 		return WrapAsInternalError(err)
@@ -51,5 +45,5 @@ func NewDeviceService() IDeviceService {
 }
 
 func NewDeviceServiceOn(db *database.DB) IDeviceService {
-	return &deviceService{db: db, Locker: &sync.Mutex{}}
+	return &deviceService{db: db}
 }

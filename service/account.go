@@ -3,7 +3,6 @@ package service
 import (
 	"database/sql"
 	"errors"
-	"sync"
 	"time"
 
 	ssmt "github.com/inkedawn/go-sunshinemotion/v3"
@@ -61,12 +60,9 @@ type IAccountService interface {
 
 type accountService struct {
 	db *database.DB
-	sync.Locker
 }
 
 func (a accountService) ResumeAllSuspend() error {
-	a.Lock()
-	defer a.Unlock()
 	return a.db.Model(&datamodels.Account{}).
 		Where("status=? AND last_result=?", AccountStatusSuspend, TaskRunErrorOccurred).
 		Updates(&datamodels.Account{
@@ -76,8 +72,6 @@ func (a accountService) ResumeAllSuspend() error {
 }
 
 func (a accountService) GetActiveAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) {
-	a.Lock()
-	defer a.Unlock()
 	acc = new(datamodels.Account)
 	err = a.db.Where("school_id = ? AND stu_num = ? AND status IN (?)", schoolID, stuNum, []string{
 		AccountStatusNormal,
@@ -95,12 +89,6 @@ func (a accountService) GetActiveAccountByStuNum(schoolID int64, stuNum string) 
 }
 
 func (a accountService) SetCheckCheaterFlag(id uint, check bool) error {
-	a.Lock()
-	defer a.Unlock()
-	return a.setCheckCheaterFlagLocked(id, check)
-}
-
-func (a accountService) setCheckCheaterFlagLocked(id uint, check bool) error {
 	return a.db.Model(&datamodels.Account{}).
 		Select("check_cheat_marked").
 		Where("id=?", id).
@@ -109,12 +97,6 @@ func (a accountService) setCheckCheaterFlagLocked(id uint, check bool) error {
 }
 
 func (a accountService) GetAccount(id uint) (acc *datamodels.Account, err error) {
-	a.Lock()
-	defer a.Unlock()
-	return a.getAccountLocked(id)
-}
-
-func (a accountService) getAccountLocked(id uint) (acc *datamodels.Account, err error) {
 	acc = new(datamodels.Account)
 	err = a.db.Where("id=?", id).Find(&acc).Error
 	if err == gorm.ErrRecordNotFound {
@@ -127,12 +109,6 @@ func (a accountService) getAccountLocked(id uint) (acc *datamodels.Account, err 
 }
 
 func (a accountService) GetAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) {
-	a.Lock()
-	defer a.Unlock()
-	return a.getAccountByStuNumLocked(schoolID, stuNum)
-}
-
-func (a accountService) getAccountByStuNumLocked(schoolID int64, stuNum string) (acc *datamodels.Account, err error) {
 	acc = new(datamodels.Account)
 	err = a.db.Where("school_id = ? AND stu_num = ?", schoolID, stuNum).Find(&acc).Error
 	if err == gorm.ErrRecordNotFound {
@@ -145,15 +121,11 @@ func (a accountService) getAccountByStuNumLocked(schoolID int64, stuNum string) 
 }
 
 func (a accountService) CountAccounts() (n uint, err error) {
-	a.Lock()
-	defer a.Unlock()
 	err = a.db.Model(&datamodels.Account{}).Count(&n).Error
 	return
 }
 
 func (a accountService) ListAccounts() ([]datamodels.Account, error) {
-	a.Lock()
-	defer a.Unlock()
 	var accounts []datamodels.Account
 	if err := a.db.Find(&accounts).Error; err != nil {
 		if database.IsRecordNotFoundError(err) {
@@ -166,8 +138,6 @@ func (a accountService) ListAccounts() ([]datamodels.Account, error) {
 }
 
 func (a accountService) ListAccountsRange(offset, num uint) ([]datamodels.Account, error) {
-	a.Lock()
-	defer a.Unlock()
 	var accounts []datamodels.Account
 	if err := a.db.Offset(offset).Limit(num).Find(&accounts).Error; err != nil {
 		if database.IsRecordNotFoundError(err) {
@@ -180,12 +150,6 @@ func (a accountService) ListAccountsRange(offset, num uint) ([]datamodels.Accoun
 }
 
 func (a accountService) SaveAccount(acc *datamodels.Account) error {
-	a.Lock()
-	defer a.Unlock()
-	return a.saveAccountLocked(acc)
-}
-
-func (a accountService) saveAccountLocked(acc *datamodels.Account) error {
 	newAcc := a.db.NewRecord(acc)
 	err := a.db.Save(&acc).Error
 	if err != nil {
@@ -198,12 +162,6 @@ func (a accountService) saveAccountLocked(acc *datamodels.Account) error {
 }
 
 func (a accountService) CreateAccount(SchoolID int64, StuNum string, Password string) (acc *datamodels.Account, err error) {
-	a.Lock()
-	defer a.Unlock()
-	return a.createAccountLocked(SchoolID, StuNum, Password)
-}
-
-func (a accountService) createAccountLocked(SchoolID int64, StuNum string, Password string) (acc *datamodels.Account, err error) {
 	tx := a.db.Begin()
 	defer func() {
 		// panic recovery
@@ -223,7 +181,7 @@ func (a accountService) createAccountLocked(SchoolID int64, StuNum string, Passw
 		StuNum:   StuNum,
 		Password: Password,
 	}
-	acc, err = a.getAccountByStuNumLocked(SchoolID, StuNum)
+	acc, err = a.GetAccountByStuNum(SchoolID, StuNum)
 	switch err {
 	case ErrNoAccount:
 		break // okay, continue to create
@@ -281,7 +239,7 @@ func (a accountService) createAccountLocked(SchoolID int64, StuNum string, Passw
 		panic(err)
 	}
 	if info.UserRoleID == UserRole_Cheater {
-		err = a.setCheckCheaterFlagLocked(acc.ID, false)
+		err = a.SetCheckCheaterFlag(acc.ID, false)
 		if err != nil {
 		}
 	}
@@ -293,5 +251,5 @@ func NewAccountService() IAccountService {
 }
 
 func NewAccountServiceOn(db *database.DB) IAccountService {
-	return &accountService{db: db, Locker: &sync.Mutex{}}
+	return &accountService{db: db}
 }
