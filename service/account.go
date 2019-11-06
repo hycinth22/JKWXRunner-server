@@ -80,6 +80,7 @@ func (a accountService) GetActiveAccountByStuNum(schoolID int64, stuNum string) 
 		AccountStatusRunning,
 		AccountStatusInQueue,
 		AccountStatusFinished,
+		AccountStatusSuspend,
 	}).Find(&acc).Error
 	if err == gorm.ErrRecordNotFound {
 		return nil, ErrNoAccount
