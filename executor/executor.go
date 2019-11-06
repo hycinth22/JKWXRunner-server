@@ -34,7 +34,7 @@ func main() {
 		accounts[i], accounts[j] = accounts[j], accounts[i]
 	})
 	const (
-		nWorker    = 3
+		nWorker    = 1
 		retryTimes = 3
 	)
 	var accAllGroups [nWorker][]*datamodels.Account
