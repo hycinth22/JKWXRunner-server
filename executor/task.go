@@ -8,8 +8,8 @@ import (
 
 	ssmt "github.com/inkedawn/go-sunshinemotion/v3"
 
-	"github.com/inkedawn/JKWXRunner-server/database"
-	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
+	"github.com/inkedawn/JKWXRunner-server/datamodels"
+	"github.com/inkedawn/JKWXRunner-server/service"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv/accLogSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/sessionSrv"
 	"github.com/inkedawn/JKWXRunner-server/service/userCacheSrv"
@@ -24,28 +24,29 @@ var (
 )
 
 type task struct {
-	db                            *database.DB
-	acc                           *accountSrv.Account
+	dbSrv                         service.ICommonService
+	acc                           *datamodels.Account
 	enableRandomDistanceReduction bool
 	forceUpdateSession            bool
 }
 
-func newTask(db *database.DB, acc *accountSrv.Account, forceUpdateSession bool) *task {
-	return &task{db: db, acc: acc, enableRandomDistanceReduction: true, forceUpdateSession: forceUpdateSession}
+func newTask(dbSrv service.ICommonService, acc *datamodels.Account, forceUpdateSession bool) *task {
+	return &task{dbSrv: dbSrv, acc: acc, enableRandomDistanceReduction: true, forceUpdateSession: forceUpdateSession}
 }
 
 func (t *task) Exec() (err error) {
+	log.Println("runAccountTask", t.acc.SchoolID, t.acc.StuNum)
+	db := t.dbSrv.GetDB()
+	acc := t.acc
+	uid := t.acc.ID
 	defer func() {
 		if x := recover(); x != nil {
 			err, _ = x.(error)
 			if err == ssmt.ErrInvalidToken {
-				accLogSrv.AddLogInfo(t.db, t.acc.ID, "Session失效.")
+				accLogSrv.AddLogInfo(db, t.acc.ID, "Session失效.")
 			}
 		}
 	}()
-	db := t.db
-	acc := t.acc
-	uid := t.acc.ID
 	var s *ssmt.Session
 	if t.forceUpdateSession {
 		s, err = sessionSrv.NewSession(db, *acc)
@@ -67,7 +68,7 @@ func (t *task) Exec() (err error) {
 		accLogSrv.AddLogFail(db, uid, "获取UserInfo失败："+dumpStruct(err))
 		return err
 	}
-	if userInfo.UserRoleID == userCacheSrv.UserRole_Cheater {
+	if userInfo.UserRoleID == service.UserRole_Cheater {
 		accLogSrv.AddLogInfo(db, uid, "检测到该帐号已被标记作弊！")
 		// 从数据库取回的应当必定该字段有效
 		if !acc.CheckCheatMarked.Valid {
@@ -96,7 +97,7 @@ func (t *task) Exec() (err error) {
 	if err != nil {
 		return err
 	}
-	if info.VerNumber > lib_version {
+	if info.VerNumber > libVersion {
 		log.Println("Latest App version: ", info.VerNumber)
 		log.Println("Need to upgrade!!!")
 		return ErrWrongLibVersion
