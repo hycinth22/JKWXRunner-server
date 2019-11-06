@@ -17,6 +17,10 @@ import (
 
 const libVersion = ssmt.AppVersionID
 
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
+
 func main() {
 	// TODO: Watch Signal
 	if !VersionCheck() {
