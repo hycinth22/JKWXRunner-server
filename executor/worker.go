@@ -21,9 +21,13 @@ type worker struct {
 }
 
 func (w *worker) work() {
+	totalTime := time.Duration(len(w.tasks)) * 3 * time.Minute
+	if totalTime > 6*time.Hour {
+		totalTime = 6 * time.Hour
+	}
 	for i, task := range w.tasks {
 		if i != 0 {
-			sleepPartOfTotalTime(int64(len(w.tasks)), 6*time.Hour)
+			totalTime -= sleepPartOfTotalTime(int64(len(w.tasks)), totalTime)
 		}
 		w.ExecTask(task)
 	}
