@@ -27,6 +27,7 @@ func (w *worker) work() {
 		}
 		w.ExecTask(task)
 	}
+	w.resolved = true
 }
 
 func (w *worker) ExecTask(task *task) {
