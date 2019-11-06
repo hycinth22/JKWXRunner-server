@@ -38,20 +38,22 @@ func main() {
 	rand.Shuffle(len(accounts), func(i, j int) {
 		accounts[i], accounts[j] = accounts[j], accounts[i]
 	})
-	const (
-		nWorker    = 1
-		retryTimes = 3
-	)
-	var accAllGroups [nWorker][]*datamodels.Account
-	for i, acc := range accounts {
-		target := i % nWorker
-		accAllGroups[target] = append(accAllGroups[target], acc)
-	}
+	const retryTimes = 3
 	var wg sync.WaitGroup
-	for i, accGroup := range accAllGroups {
+	nWorker := len(accounts)
+	const (
+		eachAroundTime = 3 * time.Minute
+		timeLimit      = 6 * time.Hour
+	)
+	totalTime := time.Duration(nWorker) * eachAroundTime
+	if totalTime > timeLimit {
+		totalTime = timeLimit
+	}
+	for i, acc := range accounts {
 		if i != 0 {
-			sleepPartOfTotalTime(nWorker, nWorker*3*time.Minute)
+			totalTime -= sleepPartOfTotalTime(int64(nWorker), totalTime)
 		}
+		accGroup := []*datamodels.Account{acc}
 		startupTaskWorker(service.NewCommonService(), accGroup, &wg, retryTimes)
 		wg.Add(1)
 	}
