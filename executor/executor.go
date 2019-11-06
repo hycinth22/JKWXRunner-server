@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/inkedawn/go-sunshinemotion/v3"
 
@@ -43,7 +44,10 @@ func main() {
 		accAllGroups[target] = append(accAllGroups[target], acc)
 	}
 	var wg sync.WaitGroup
-	for _, accGroup := range accAllGroups {
+	for i, accGroup := range accAllGroups {
+		if i != 0 {
+			sleepPartOfTotalTime(nWorker, nWorker*3*time.Minute)
+		}
 		startupTaskWorker(service.NewCommonService(), accGroup, &wg, retryTimes)
 		wg.Add(1)
 	}
