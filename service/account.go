@@ -67,9 +67,9 @@ type accountService struct {
 func (a accountService) ResumeAllSuspend() error {
 	return a.db.Model(&datamodels.Account{}).
 		Where("status=? AND last_result=?", AccountStatusSuspend, TaskRunErrorOccurred).
-		Updates(&datamodels.Account{
-			Status:   AccountStatusNormal,
-			LastTime: sql.NullTime{Valid: false},
+		Updates(map[string]interface{}{
+			"status":    AccountStatusNormal,
+			"last_time": sql.NullTime{Valid: false},
 		}).Error
 }
 
