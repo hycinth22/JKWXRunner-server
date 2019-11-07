@@ -38,17 +38,6 @@ const (
 type RunResult = service.TaskRunResult
 
 // DEPRECATED
-const (
-	RunSuccess       = service.TaskRunSuccess
-	RunErrorOccurred = service.TaskRunErrorOccurred
-)
-
-// DEPRECATED
-func CountAccounts(db *database.DB) (n uint, err error) {
-	return service.NewAccountServiceOn(db).CountAccounts()
-}
-
-// DEPRECATED
 func ListAccounts(db *database.DB, offset, num uint) ([]Account, error) {
 	return service.NewAccountServiceOn(db).ListAccountsRange(offset, num)
 }
@@ -65,10 +54,10 @@ func GetAccount(db *database.DB, id uint) (*Account, error) {
 	return service.NewAccountServiceOn(db).GetAccount(id)
 }
 
-func ListAllAccountsWaitRun(db *database.DB) (accounts []Account, err error) {
+func ListAllAccountsWaitRun(db *database.DB) (accounts []datamodels.Account, err error) {
 	now := time.Now()
 	todayZero := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
-	common := service.NewCommonService()
+	common := service.NewCommonServiceOn(db)
 	tx := common.Begin()
 	defer func() {
 		if err == nil {
@@ -98,10 +87,9 @@ func ListAllAccountsWaitRun(db *database.DB) (accounts []Account, err error) {
 	}
 	return accounts, nil
 }
-func ListAndSetRunStatusForAllAccountsWaitRun(db *database.DB) (accounts []*Account, err error) {
+func ListAndSetRunStatusForAllAccountsWaitRun(common service.ICommonService) (accounts []*datamodels.Account, err error) {
 	now := time.Now()
 	todayZero := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
-	common := service.NewCommonService()
 	tx := common.Begin()
 	defer func() {
 		if err == nil {
@@ -111,7 +99,7 @@ func ListAndSetRunStatusForAllAccountsWaitRun(db *database.DB) (accounts []*Acco
 		}
 	}()
 	var idGroup []uint
-	if err := tx.Model(&datamodels.Account{}).Where("status = ? AND (last_time < ? OR last_time IS NULL)", StatusNormal, todayZero).Pluck("id", &idGroup).Error; err != nil {
+	if err := tx.Model(&datamodels.Account{}).Where("status = ? AND (last_time < ? OR last_time IS NULL)", service.AccountStatusNormal, todayZero).Pluck("id", &idGroup).Error; err != nil {
 		if database.IsRecordNotFoundError(err) {
 			// 返回空集
 			return []*datamodels.Account{}, nil

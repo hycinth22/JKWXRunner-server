@@ -9,7 +9,6 @@ import (
 
 	"github.com/inkedawn/go-sunshinemotion/v3"
 
-	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/datamodels"
 	"github.com/inkedawn/JKWXRunner-server/service"
 	"github.com/inkedawn/JKWXRunner-server/service/accountSrv"
@@ -26,8 +25,7 @@ func main() {
 	if !VersionCheck() {
 		os.Exit(1)
 	}
-	db := database.GetDB()
-	accounts, err := accountSrv.ListAndSetRunStatusForAllAccountsWaitRun(db)
+	accounts, err := accountSrv.ListAndSetRunStatusForAllAccountsWaitRun(service.NewCommonService())
 	if err != nil {
 		panic(err)
 	}
