@@ -14,10 +14,11 @@ import (
 )
 
 var (
-	Arg_SchoolID int64
-	Arg_StuNum   string
-	Arg_Password string
-	Arg_OwnerID  int
+	Arg_SchoolID       int64
+	Arg_StuNum         string
+	Arg_Password       string
+	Arg_FinishDistance float64
+	Arg_OwnerID        int
 )
 
 func mustParseArgs() {
@@ -33,7 +34,10 @@ func mustParseArgs() {
 	Arg_StuNum = os.Args[2]
 	Arg_Password = os.Args[3]
 	if len(os.Args) >= 5 {
-		Arg_OwnerID, err = strconv.Atoi(os.Args[4])
+		Arg_FinishDistance, _ = strconv.ParseFloat(os.Args[4], 64)
+	}
+	if len(os.Args) >= 6 {
+		Arg_OwnerID, err = strconv.Atoi(os.Args[5])
 		if err != nil {
 			panic(err)
 		}
@@ -126,6 +130,9 @@ func main() {
 	acc.RunDistance = ssmt.NormalizeDistance(acc.RunDistance)
 	acc.StartDistance = sport.ActualDistance
 	acc.FinishDistance = sport.QualifiedDistance
+	if Arg_FinishDistance != 0 {
+		acc.FinishDistance = Arg_FinishDistance
+	}
 
 	err = accSrv.SaveAccount(acc)
 	if err != nil {
