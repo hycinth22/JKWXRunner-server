@@ -85,14 +85,6 @@ func (t *task) Exec() (err error) {
 	}
 	limit := ssmt.GetDefaultLimitParams(userInfo.Sex)
 
-	r, err := recordResultBeforeRun(db, acc.ID, s)
-	if err != nil {
-		return err
-	}
-	if shouldFinished(acc, r) {
-		return ErrFinished
-	}
-
 	info, err := s.GetAppInfo()
 	if err != nil {
 		return err
@@ -101,6 +93,14 @@ func (t *task) Exec() (err error) {
 		log.Println("Latest App version: ", info.VerNumber)
 		log.Println("Need to upgrade!!!")
 		return ErrWrongLibVersion
+	}
+	sportResultSrv := service.NewUserSportResultServiceUpon(t.dbSrv)
+	r, err := recordResultBeforeExec(db, sportResultSrv, acc.ID, s)
+	if err != nil {
+		return err
+	}
+	if shouldFinished(acc, r) {
+		return ErrFinished
 	}
 	stillNeed := r.QualifiedDistance - r.ActualDistance
 	if stillNeed < acc.RunDistance {
@@ -129,14 +129,14 @@ func (t *task) Exec() (err error) {
 		}
 	}
 	records := ssmt.SmartCreateRecordsAfter(s.User.SchoolID, s.User.UserID, limit, acc.RunDistance, time.Now())
-	err = uploadRecords(db, acc, s, records)
+	err = uploadRecords(db, sportResultSrv, acc, s, records)
 	if err != nil {
 		// still record distance if upload records fail
-		_, _ = recordResultAfterRun(db, acc.ID, s) // but if record fail also, let it go
+		_, _ = recordResultAfterExec(db, sportResultSrv, acc.ID, s) // but if record fail also, let it go
 		return err
 	}
 	// major operation has been completed successfully.
-	r, err = recordResultAfterRun(db, acc.ID, s)
+	r, err = recordResultAfterExec(db, sportResultSrv, acc.ID, s)
 	if err != nil {
 		accLogSrv.AddLogFailF(db, acc.ID, "结束后记录距离时遇到错误。", err)
 		// only log but not return
