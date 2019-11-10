@@ -84,7 +84,7 @@ func (t *task) Exec() (err error) {
 		return ErrUnexpectedUserInfo
 	}
 	limit := ssmt.GetDefaultLimitParams(userInfo.Sex)
-
+	limit.RandDistance.Min, limit.RandDistance.Max = ssmt.DistanceRangeAround(acc.RunDistance, 2)
 	info, err := s.GetAppInfo()
 	if err != nil {
 		return err

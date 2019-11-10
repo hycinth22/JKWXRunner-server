@@ -8,7 +8,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/golang/protobuf v1.3.1 // indirect
-	github.com/inkedawn/go-sunshinemotion/v3 v3.17.5
+	github.com/inkedawn/go-sunshinemotion/v3 v3.18.0
 	github.com/jinzhu/gorm v1.9.2
 	github.com/jinzhu/inflection v0.0.0-20190603042836-f5c5f50e6090 // indirect
 	github.com/jinzhu/now v1.0.0 // indirect
@@ -19,7 +19,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.10.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
-	github.com/pkg/errors v0.8.0
 	github.com/ugorji/go v1.1.5-pre // indirect
 	golang.org/x/net v0.0.0-20190603091049-60506f45cf65 // indirect
 	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
