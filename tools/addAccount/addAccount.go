@@ -115,7 +115,7 @@ func main() {
 	}
 	fmt.Printf("Device %d: %+v", dev.ID, dev)
 	fmt.Println()
-	limit := ssmt.GetDefaultLimitParams(info.Sex)
+	limit := ssmt.GetDefaultLimitParams(info.SchoolID, info.Sex)
 	acc = &datamodels.Account{
 		OwnerID:          Arg_OwnerID,
 		SchoolID:         Arg_SchoolID,

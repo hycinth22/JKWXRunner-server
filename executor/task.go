@@ -83,7 +83,7 @@ func (t *task) Exec() (err error) {
 		accLogSrv.AddLogFail(db, uid, "未知的性别：", userInfo.Sex)
 		return ErrUnexpectedUserInfo
 	}
-	limit := ssmt.GetDefaultLimitParams(userInfo.Sex)
+	limit := ssmt.GetDefaultLimitParams(userInfo.SchoolID, userInfo.Sex)
 	limit.RandDistance.Min, limit.RandDistance.Max = ssmt.DistanceRangeAround(acc.RunDistance, 2)
 	info, err := s.GetAppInfo()
 	if err != nil {
