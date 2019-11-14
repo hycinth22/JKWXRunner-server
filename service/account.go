@@ -217,7 +217,7 @@ func (a accountService) CreateAccount(SchoolID int64, StuNum string, Password st
 	}
 
 	const defaultOwnerID = 1
-	limit := ssmt.GetDefaultLimitParams(info.Sex)
+	limit := ssmt.GetDefaultLimitParams(info.SchoolID, info.Sex)
 	acc = &datamodels.Account{
 		OwnerID:          defaultOwnerID,
 		SchoolID:         SchoolID,
