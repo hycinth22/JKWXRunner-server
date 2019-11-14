@@ -102,7 +102,7 @@ func (t *task) Exec() (err error) {
 	if shouldFinished(acc, r) {
 		return ErrFinished
 	}
-	stillNeed := r.QualifiedDistance - r.ActualDistance
+	stillNeed := acc.FinishDistance - r.ActualDistance
 	if stillNeed < acc.RunDistance {
 		// 接近完成，就不跑满
 		limit.RandDistance.Min = stillNeed + 0.1
