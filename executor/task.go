@@ -108,7 +108,7 @@ func (t *task) Exec() (err error) {
 		limit.RandDistance.Min = stillNeed + 0.1
 		limit.RandDistance.Max = stillNeed + 0.8
 		accLogSrv.AddLogInfoF(db, uid, "即将完成。本次随机区间 %v~%v", viewFormat.DistanceFormat(limit.RandDistance.Min), viewFormat.DistanceFormat(limit.RandDistance.Max))
-	} else if t.enableRandomDistanceReduction {
+	} else if t.enableRandomDistanceReduction && stillNeed > r.QualifiedDistance*0.4 {
 		// 一定几率不跑满，触发几率
 		const (
 			// the trigger rate is triggerRateN/triggerRateM
