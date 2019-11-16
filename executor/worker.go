@@ -8,7 +8,6 @@ import (
 
 	ssmt "github.com/inkedawn/go-sunshinemotion/v3"
 
-	"github.com/inkedawn/JKWXRunner-server/datamodels"
 	"github.com/inkedawn/JKWXRunner-server/service"
 )
 
@@ -69,11 +68,8 @@ execute:
 	}
 }
 
-func startupTaskWorker(dbSrv service.ICommonService, accounts []*datamodels.Account, wg *sync.WaitGroup, retryTimes int) *worker {
-	w := &worker{dbSrv: dbSrv, tasks: nil, retryTimes: retryTimes, wg: wg}
-	for _, acc := range accounts {
-		w.tasks = append(w.tasks, newTask(dbSrv, acc, false))
-	}
+func startupTaskWorker(dbSrv service.ICommonService, tasks []*task, wg *sync.WaitGroup, retryTimes int) *worker {
+	w := &worker{dbSrv: dbSrv, tasks: tasks, retryTimes: retryTimes, wg: wg}
 	go func() {
 		defer wg.Done()
 		w.work()

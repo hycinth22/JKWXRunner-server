@@ -51,8 +51,14 @@ func main() {
 		if i != 0 {
 			totalTime -= sleepPartOfTotalTime(int64(nWorker), totalTime)
 		}
-		accGroup := []*datamodels.Account{acc}
-		startupTaskWorker(service.NewCommonService(), accGroup, &wg, retryTimes)
+		go func(accounts []*datamodels.Account) {
+			var tasks []*task
+			dbSrv := service.NewCommonService()
+			for _, acc := range accounts {
+				tasks = append(tasks, newTask(dbSrv, acc, false))
+			}
+			startupTaskWorker(dbSrv, tasks, &wg, retryTimes)
+		}([]*datamodels.Account{acc})
 		wg.Add(1)
 	}
 	wg.Wait()
