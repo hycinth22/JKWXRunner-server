@@ -36,9 +36,12 @@ func uploadRecords(db *database.DB, sportResultSrv service.IUserSportResultServi
 		accLogSrv.AddLogInfo(db, uid, fmt.Sprintf("%s生成的记录是：%s", recordNoX, dumpStructValue(r)))
 		accLogSrv.AddLogInfo(db, uid, fmt.Sprintf("%s需等待至%s。", recordNoX, viewFormat.TimeFormat(r.EndTime)))
 		sleepUtil(r.EndTime)
-		_, err = recordResultBeforeUpload(db, sportResultSrv, acc.ID, s)
+		sr, err := recordResultBeforeUpload(db, sportResultSrv, acc.ID, s)
 		if err != nil {
 			return err
+		}
+		if checkComplete(db, acc, sr) {
+			return nil
 		}
 		err = s.UploadRecord(r)
 		if err != nil {
@@ -46,12 +49,23 @@ func uploadRecords(db *database.DB, sportResultSrv service.IUserSportResultServi
 			return err
 		}
 		accLogSrv.AddLogSuccess(db, uid, fmt.Sprintf("上传%s成功", recordNoX))
-		_, err = recordResultAfterUpload(db, sportResultSrv, acc.ID, s)
+		sr, err = recordResultAfterUpload(db, sportResultSrv, acc.ID, s)
 		if err != nil {
 			return err
 		}
+		if checkComplete(db, acc, sr) {
+			return nil
+		}
 	}
 	return nil
+}
+
+func checkComplete(db *database.DB, acc *datamodels.Account, sr *ssmt.SportResult) bool {
+	if sr.ActualDistance > acc.FinishDistance {
+		accLogSrv.AddLogInfo(db, acc.ID, fmt.Sprintf("已完成任务. 目标:%v, 当前:%v", viewFormat.DistanceFormat(acc.FinishDistance), viewFormat.DistanceFormat(sr.ActualDistance)))
+		return true
+	}
+	return false
 }
 
 func recordResultBeforeExec(db *database.DB, sportResultSrv service.IUserSportResultService, uid uint, s *ssmt.Session) (result *ssmt.SportResult, err error) {
