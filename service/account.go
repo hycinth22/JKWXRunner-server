@@ -50,6 +50,8 @@ type IAccountService interface {
 	CountAccounts() (n uint, err error)
 	ListAccounts() ([]datamodels.Account, error)
 	ListAccountsRange(offset, num uint) ([]datamodels.Account, error)
+	ListAccountsExceptStatus(status ...AccountStatus) ([]datamodels.Account, error)
+	ListAccountsExcept(pred func(*datamodels.Account) bool) ([]datamodels.Account, error)
 	SaveAccount(cc *datamodels.Account) error                                                    // Save update value in database, if the value doesn't have primary key(id), will insert it
 	GetAccount(id uint) (*datamodels.Account, error)                                             // return ErrNoAccount if record not exist.
 	GetAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error)       // return ErrNoAccount if record not exist.
@@ -150,6 +152,32 @@ func (a accountService) ListAccountsRange(offset, num uint) ([]datamodels.Accoun
 		return accounts, WrapAsInternalError(err)
 	}
 	return accounts, nil
+}
+
+func (a accountService) ListAccountsExceptStatus(status ...AccountStatus) ([]datamodels.Account, error) {
+	var accounts []datamodels.Account
+	if err := a.db.Where("status NOT IN (?)", status).Find(&accounts).Error; err != nil {
+		if database.IsRecordNotFoundError(err) {
+			// 返回空集
+			return accounts, nil
+		}
+		return accounts, WrapAsInternalError(err)
+	}
+	return accounts, nil
+}
+
+func (a accountService) ListAccountsExcept(pred func(*datamodels.Account) bool) ([]datamodels.Account, error) {
+	var result []datamodels.Account = nil
+	all, err := a.ListAccounts()
+	if err != nil {
+		return nil, err
+	}
+	for _, acc := range all {
+		if pred(&acc) {
+			result = append(result, acc)
+		}
+	}
+	return result, nil
 }
 
 func (a accountService) SaveAccount(acc *datamodels.Account) error {
