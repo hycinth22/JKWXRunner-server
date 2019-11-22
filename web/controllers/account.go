@@ -14,7 +14,7 @@ type AccountRouter struct{}
 
 func (AccountRouter) RegisterToRouter(router gin.IRouter) {
 	router.GET("/account", func(context *gin.Context) {
-		hideTerminated := context.GetBool("hideTerminated")
+		_, hideTerminated := context.GetQuery("hideTerminated")
 		dbSrv := service.NewCommonService()
 		leaperSrv := service.NewAccountServiceUpon(dbSrv)
 		sportSrv := service.NewUserSportResultServiceUpon(dbSrv)
