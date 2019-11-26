@@ -87,5 +87,21 @@ func (AccountRouter) RegisterToRouter(router gin.IRouter) {
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
+		ctx.Status(http.StatusAccepted)
+	})
+	router.POST("/account/:id/finishNow", func(ctx *gin.Context) {
+		tid, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+		if err != nil {
+			ctx.String(http.StatusBadRequest, err.Error())
+			return
+		}
+		id := uint(tid)
+		accSrv := service.NewAccountService()
+		err = accSrv.FinishAheadOfSchedule(id)
+		if err != nil {
+			ctx.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+		ctx.Status(http.StatusOK)
 	})
 }

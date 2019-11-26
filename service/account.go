@@ -60,11 +60,27 @@ type IAccountService interface {
 	CreateAccount(SchoolID int64, StuNum string, Password string) (*datamodels.Account, error)
 	UpdateAccountStatus(id uint, newStatus AccountStatus) error
 	ResumeAllSuspend() error
+	FinishAheadOfSchedule(id uint) error
 }
 
 type accountService struct {
 	ICommonService
 	db database.TX
+}
+
+func (a accountService) FinishAheadOfSchedule(id uint) error {
+	acc, err := a.GetAccount(id)
+	if err != nil {
+		return err
+	}
+	sportSrv := NewUserSportResultServiceUpon(a.ICommonService)
+	r, err := sportSrv.GetLocalUserCacheSportResult(id)
+	if err != nil {
+		return err
+	}
+	acc.FinishDistance = r.ComputedDistance
+	acc.Status = AccountStatusFinished
+	return a.SaveAccount(acc)
 }
 
 func (a accountService) UpdateAccountStatus(id uint, newStatus AccountStatus) error {
