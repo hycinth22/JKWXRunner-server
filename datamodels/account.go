@@ -25,3 +25,6 @@ type Account struct {
 	LastResult sql.NullString
 	LastTime   sql.NullTime
 }
+
+// Model that all filed is empty
+var AccountModel = new(Account)

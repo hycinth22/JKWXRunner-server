@@ -20,7 +20,7 @@ func AccountRouter(router gin.IRouter) {
 	//router.PUT("/account", handler.NotImplemented)
 	//router.DELETE("/account/:id", handler.NotImplemented)
 	router.GET("/account/:id/logs", handler.ListLogsByID)
-	router.PUT("/account/:id/status", handler.UpdateAccountStatus)
+	//router.PUT("/account/:id/status", handler.UpdateAccountStatus)
 }
 
 func UserInfoRouter(router gin.IRouter) {

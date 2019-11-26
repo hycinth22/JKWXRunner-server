@@ -14,11 +14,6 @@ import (
 type Account = datamodels.Account // DEPRECATED
 
 // DEPRECATED
-var (
-	ErrNoAccount = service.ErrNoAccount
-)
-
-// DEPRECATED
 type Status = service.AccountStatus
 
 // DEPRECATED
@@ -40,18 +35,6 @@ type RunResult = service.TaskRunResult
 // DEPRECATED
 func ListAccounts(db *database.DB, offset, num uint) ([]Account, error) {
 	return service.NewAccountServiceOn(db).ListAccountsRange(offset, num)
-}
-
-// DEPRECATED
-// Save update value in database, if the value doesn't have primary key(id), will insert it
-func SaveAccount(db *database.DB, acc *Account) error {
-	return service.NewAccountServiceOn(db).SaveAccount(acc)
-}
-
-// DEPRECATED
-// return ErrNoAccount if record not exist.
-func GetAccount(db *database.DB, id uint) (*Account, error) {
-	return service.NewAccountServiceOn(db).GetAccount(id)
 }
 
 func ListAllAccountsWaitRun(db *database.DB) (accounts []datamodels.Account, err error) {

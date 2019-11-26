@@ -10,3 +10,6 @@ type AccountLog struct {
 	Type    string    `gorm:"NOT NULL"`
 	Content string    `gorm:"NOT NULL"`
 }
+
+// Model that all filed is empty
+var AccountLogModel = new(AccountLog)

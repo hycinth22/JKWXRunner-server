@@ -1,10 +1,6 @@
 package userCacheSrv
 
 import (
-	"time"
-
-	"github.com/inkedawn/go-sunshinemotion/v3"
-
 	"github.com/inkedawn/JKWXRunner-server/database"
 	"github.com/inkedawn/JKWXRunner-server/datamodels"
 	"github.com/inkedawn/JKWXRunner-server/service"
@@ -30,21 +26,6 @@ func GetCacheSportResult(db *database.DB, userID int64) (CacheSportResult, error
 		return info, service.WrapAsInternalError(err)
 	}
 	return info, nil
-}
-
-// DEPRECATED: use service.IUserSportResultService
-// 保存SportResult到缓存（通常是上次执行运动任务时更新的）
-func SaveCacheSportResult(db *database.DB, info CacheSportResult) error {
-	err := db.Save(&info).Error
-	if err != nil {
-		return service.WrapAsInternalError(err)
-	}
-	return nil
-}
-
-// DEPRECATED: use datamodels.CacheUserSportResultFromSSMTSportResult
-func FromSSMTSportResult(info ssmt.SportResult, userID int64, fetchTime time.Time) CacheSportResult {
-	return datamodels.CacheUserSportResultFromSSMTSportResult(info, userID, fetchTime)
 }
 
 // DEPRECATED: use service.IUserSportResultService

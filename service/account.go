@@ -58,6 +58,7 @@ type IAccountService interface {
 	GetActiveAccountByStuNum(schoolID int64, stuNum string) (acc *datamodels.Account, err error) // return ErrNoAccount if record not exist.
 	SetCheckCheaterFlag(id uint, check bool) error
 	CreateAccount(SchoolID int64, StuNum string, Password string) (*datamodels.Account, error)
+	UpdateAccountStatus(id uint, newStatus AccountStatus) error
 	ResumeAllSuspend() error
 }
 
@@ -66,8 +67,15 @@ type accountService struct {
 	db database.TX
 }
 
+func (a accountService) UpdateAccountStatus(id uint, newStatus AccountStatus) error {
+	return a.db.Model(datamodels.AccountModel).Select("status").
+		Where("id = ?", id).Updates(map[string]interface{}{
+		"status": newStatus,
+	}).Error
+}
+
 func (a accountService) ResumeAllSuspend() error {
-	return a.db.Model(&datamodels.Account{}).
+	return a.db.Model(datamodels.AccountModel).
 		Where("status=? AND last_result=?", AccountStatusSuspend, TaskRunErrorOccurred).
 		Updates(map[string]interface{}{
 			"status":    AccountStatusNormal,

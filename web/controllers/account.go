@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -62,4 +63,29 @@ func (AccountRouter) RegisterToRouter(router gin.IRouter) {
 	})
 	router.PUT("/account", notImplementedHandler)
 	router.DELETE("/account/:id", notImplementedHandler)
+	router.PUT("/account/:id/status", func(ctx *gin.Context) {
+		var (
+			payload struct {
+				Status string
+			}
+			err error
+		)
+		tid, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+		if err != nil {
+			ctx.String(http.StatusBadRequest, err.Error())
+			return
+		}
+		id := uint(tid)
+		err = ctx.Bind(&payload)
+		if err != nil {
+			ctx.String(http.StatusBadRequest, err.Error())
+			return
+		}
+		accSrv := service.NewAccountService()
+		err = accSrv.UpdateAccountStatus(id, payload.Status)
+		if err != nil {
+			ctx.String(http.StatusInternalServerError, err.Error())
+			return
+		}
+	})
 }
