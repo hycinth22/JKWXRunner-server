@@ -10,6 +10,10 @@ func (err InternalError) Error() string {
 	return "内部错误"
 }
 
+func (err InternalError) Unwrap() error {
+	return err.Detail
+}
+
 func IsInternalError(err error) bool {
 	_, yes := err.(InternalError)
 	return yes
