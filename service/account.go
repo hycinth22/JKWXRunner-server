@@ -71,6 +71,7 @@ type accountService struct {
 func (a accountService) FinishAheadOfSchedule(id uint) error {
 	acc, err := a.GetAccount(id)
 	if err != nil {
+		a.Rollback()
 		return err
 	}
 	sportSrv := NewUserSportResultServiceUpon(a.ICommonService)
@@ -80,7 +81,15 @@ func (a accountService) FinishAheadOfSchedule(id uint) error {
 	}
 	acc.FinishDistance = r.ComputedDistance
 	acc.Status = AccountStatusFinished
-	return a.SaveAccount(acc)
+	tx := a.Begin()
+	err = a.SaveAccount(acc)
+	if err != nil {
+		a.Rollback()
+		return err
+	}
+	accLogSrv.AddLogInfoF(tx, acc.ID, "提前结束。原定完成距离%v，现已跑%v，立即完成。", acc.FinishDistance, r.ComputedDistance)
+	a.Commit()
+	return nil
 }
 
 func (a accountService) UpdateAccountStatus(id uint, newStatus AccountStatus) error {
