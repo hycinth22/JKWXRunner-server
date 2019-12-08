@@ -71,7 +71,6 @@ type accountService struct {
 func (a accountService) FinishAheadOfSchedule(id uint) error {
 	acc, err := a.GetAccount(id)
 	if err != nil {
-		a.Rollback()
 		return err
 	}
 	sportSrv := NewUserSportResultServiceUpon(a.ICommonService)

@@ -29,6 +29,7 @@ func (AccountRouter) RegisterToRouter(router gin.IRouter) {
 			accList, err = leaperSrv.ListAccounts()
 		}
 		if err != nil {
+			context.Error(err)
 			context.String(http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -72,18 +73,21 @@ func (AccountRouter) RegisterToRouter(router gin.IRouter) {
 		)
 		tid, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 		if err != nil {
+			ctx.Error(err)
 			ctx.String(http.StatusBadRequest, err.Error())
 			return
 		}
 		id := uint(tid)
 		err = ctx.Bind(&payload)
 		if err != nil {
+			ctx.Error(err)
 			ctx.String(http.StatusBadRequest, err.Error())
 			return
 		}
 		accSrv := service.NewAccountService()
 		err = accSrv.UpdateAccountStatus(id, payload.Status)
 		if err != nil {
+			ctx.Error(err)
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
@@ -92,6 +96,7 @@ func (AccountRouter) RegisterToRouter(router gin.IRouter) {
 	router.POST("/account/:id/finishNow", func(ctx *gin.Context) {
 		tid, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 		if err != nil {
+			ctx.Error(err)
 			ctx.String(http.StatusBadRequest, err.Error())
 			return
 		}
@@ -99,6 +104,7 @@ func (AccountRouter) RegisterToRouter(router gin.IRouter) {
 		accSrv := service.NewAccountService()
 		err = accSrv.FinishAheadOfSchedule(id)
 		if err != nil {
+			ctx.Error(err)
 			ctx.String(http.StatusInternalServerError, err.Error())
 			return
 		}
