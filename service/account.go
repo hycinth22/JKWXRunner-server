@@ -3,6 +3,7 @@ package service
 import (
 	"database/sql"
 	"errors"
+	"runtime/debug"
 	"time"
 
 	ssmt "github.com/inkedawn/go-sunshinemotion/v3"
@@ -71,11 +72,13 @@ type accountService struct {
 func (a accountService) FinishAheadOfSchedule(id uint) error {
 	acc, err := a.GetAccount(id)
 	if err != nil {
+		debug.PrintStack()
 		return err
 	}
 	sportSrv := NewUserSportResultServiceUpon(a.ICommonService)
 	r, err := sportSrv.GetLocalUserCacheSportResult(id)
 	if err != nil {
+		debug.PrintStack()
 		return err
 	}
 	tx := a.Begin()
@@ -84,6 +87,7 @@ func (a accountService) FinishAheadOfSchedule(id uint) error {
 	acc.Status = AccountStatusFinished
 	err = a.SaveAccount(acc)
 	if err != nil {
+		debug.PrintStack()
 		a.Rollback()
 		return err
 	}
