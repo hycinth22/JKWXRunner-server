@@ -81,16 +81,17 @@ func (a accountService) FinishAheadOfSchedule(id uint) error {
 		debug.PrintStack()
 		return err
 	}
-	tx := a.Begin()
-	accLogSrv.AddLogInfoF(tx, acc.ID, "提前结束。原定完成距离%v，现已跑%v，立即完成。", acc.FinishDistance, r.ComputedDistance)
+	oldFinish := acc.FinishDistance
 	acc.FinishDistance = r.ComputedDistance
 	acc.Status = AccountStatusFinished
+	tx := a.Begin()
 	err = a.SaveAccount(acc)
 	if err != nil {
 		debug.PrintStack()
 		a.Rollback()
 		return err
 	}
+	accLogSrv.AddLogInfoF(tx, acc.ID, "提前结束。原定完成距离%v，现已跑%v，立即完成。", oldFinish, r.ComputedDistance)
 	a.Commit()
 	return nil
 }
