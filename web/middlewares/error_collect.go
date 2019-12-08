@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"errors"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -11,10 +12,11 @@ import (
 func ErrorCollect(context *gin.Context) {
 	context.Next()
 	for _, err := range context.Errors {
-		if service.IsInternalError(err) {
-			log.Println("ErrorCollect: ", *context.Request, err, service.UnwrapInternalError(err))
+		var interErr *service.InternalError
+		if errors.As(err, &interErr) {
+			log.Println("ErrorCollect: ", *context.Request, "\n", interErr.Unwrap().Error())
 		} else {
-			log.Println("ErrorCollect: ", *context.Request, err)
+			log.Println("ErrorCollect: ", *context.Request, "\n", err.Error())
 		}
 	}
 }
