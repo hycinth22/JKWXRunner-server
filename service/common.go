@@ -8,9 +8,15 @@ import (
 
 // comprised of every service interface
 type ICommonService interface {
+	// Begin a transaction and return it.
+	// The return value is only for r/w operation in raw transaction. (for example, external library or old style service)
+	// Don't use database.TX.Commit/Rollback. Use ICommonService.Begin/Rollback instead.
 	Begin() (tx database.TX)
+	// Commit the transaction on this
 	Commit()
+	// Rollback the transaction on this
 	Rollback()
+	// underlying database, without any transaction.
 	GetDB() (txOrDb *database.DB)
 }
 
